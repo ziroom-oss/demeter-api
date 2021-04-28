@@ -37,13 +37,21 @@ public class DemeterAssignTask {
 
     private Date taskEndTime;
 
-    private String taskReceiver;
-
     private Integer taskReward;
 
     private String taskAttachmentUrl;
 
+    private Integer taskStatus;
+
     private String taskDescription;
+
+    private String publisher;
+
+    private Byte needEmailRemind;
+
+    private Byte needPunishment;
+
+    private Byte needAcceptance;
 
     private Date createTime;
 
@@ -93,14 +101,6 @@ public class DemeterAssignTask {
         this.taskEndTime = taskEndTime;
     }
 
-    public String getTaskReceiver() {
-        return taskReceiver;
-    }
-
-    public void setTaskReceiver(String taskReceiver) {
-        this.taskReceiver = taskReceiver;
-    }
-
     public Integer getTaskReward() {
         return taskReward;
     }
@@ -117,12 +117,52 @@ public class DemeterAssignTask {
         this.taskAttachmentUrl = taskAttachmentUrl;
     }
 
+    public Integer getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(Integer taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
     public String getTaskDescription() {
         return taskDescription;
     }
 
     public void setTaskDescription(String taskDescription) {
         this.taskDescription = taskDescription;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public Byte getNeedEmailRemind() {
+        return needEmailRemind;
+    }
+
+    public void setNeedEmailRemind(Byte needEmailRemind) {
+        this.needEmailRemind = needEmailRemind;
+    }
+
+    public Byte getNeedPunishment() {
+        return needPunishment;
+    }
+
+    public void setNeedPunishment(Byte needPunishment) {
+        this.needPunishment = needPunishment;
+    }
+
+    public Byte getNeedAcceptance() {
+        return needAcceptance;
+    }
+
+    public void setNeedAcceptance(Byte needAcceptance) {
+        this.needAcceptance = needAcceptance;
     }
 
     public Date getCreateTime() {

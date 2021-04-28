@@ -27,7 +27,7 @@ import java.util.List;
  * ━━━━━━感觉萌萌哒━━━━━━
  * </pre>
  */
-public class DemeterAssignTaskExample {
+public class DemeterSkillTaskExample {
 
     protected String orderByClause;
 
@@ -35,7 +35,7 @@ public class DemeterAssignTaskExample {
 
     protected List<Criteria> oredCriteria;
 
-    public DemeterAssignTaskExample() {
+    public DemeterSkillTaskExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -283,316 +283,6 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andTaskEffectiveImmediateIsNull() {
-            addCriterion("task_effective_immediate is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateIsNotNull() {
-            addCriterion("task_effective_immediate is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateEqualTo(Byte value) {
-            addCriterion("task_effective_immediate =", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotEqualTo(Byte value) {
-            addCriterion("task_effective_immediate <>", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateGreaterThan(Byte value) {
-            addCriterion("task_effective_immediate >", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateGreaterThanOrEqualTo(Byte value) {
-            addCriterion("task_effective_immediate >=", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateLessThan(Byte value) {
-            addCriterion("task_effective_immediate <", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateLessThanOrEqualTo(Byte value) {
-            addCriterion("task_effective_immediate <=", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateIn(List<Byte> values) {
-            addCriterion("task_effective_immediate in", values, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotIn(List<Byte> values) {
-            addCriterion("task_effective_immediate not in", values, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateBetween(Byte value1, Byte value2) {
-            addCriterion("task_effective_immediate between", value1, value2, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotBetween(Byte value1, Byte value2) {
-            addCriterion("task_effective_immediate not between", value1, value2, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeIsNull() {
-            addCriterion("task_start_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeIsNotNull() {
-            addCriterion("task_start_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeEqualTo(Date value) {
-            addCriterion("task_start_time =", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeNotEqualTo(Date value) {
-            addCriterion("task_start_time <>", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeGreaterThan(Date value) {
-            addCriterion("task_start_time >", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("task_start_time >=", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeLessThan(Date value) {
-            addCriterion("task_start_time <", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeLessThanOrEqualTo(Date value) {
-            addCriterion("task_start_time <=", value, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeIn(List<Date> values) {
-            addCriterion("task_start_time in", values, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeNotIn(List<Date> values) {
-            addCriterion("task_start_time not in", values, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeBetween(Date value1, Date value2) {
-            addCriterion("task_start_time between", value1, value2, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskStartTimeNotBetween(Date value1, Date value2) {
-            addCriterion("task_start_time not between", value1, value2, "taskStartTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeIsNull() {
-            addCriterion("task_end_time is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeIsNotNull() {
-            addCriterion("task_end_time is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeEqualTo(Date value) {
-            addCriterion("task_end_time =", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeNotEqualTo(Date value) {
-            addCriterion("task_end_time <>", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeGreaterThan(Date value) {
-            addCriterion("task_end_time >", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("task_end_time >=", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeLessThan(Date value) {
-            addCriterion("task_end_time <", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeLessThanOrEqualTo(Date value) {
-            addCriterion("task_end_time <=", value, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeIn(List<Date> values) {
-            addCriterion("task_end_time in", values, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeNotIn(List<Date> values) {
-            addCriterion("task_end_time not in", values, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeBetween(Date value1, Date value2) {
-            addCriterion("task_end_time between", value1, value2, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEndTimeNotBetween(Date value1, Date value2) {
-            addCriterion("task_end_time not between", value1, value2, "taskEndTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardIsNull() {
-            addCriterion("task_reward is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardIsNotNull() {
-            addCriterion("task_reward is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardEqualTo(Integer value) {
-            addCriterion("task_reward =", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardNotEqualTo(Integer value) {
-            addCriterion("task_reward <>", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardGreaterThan(Integer value) {
-            addCriterion("task_reward >", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardGreaterThanOrEqualTo(Integer value) {
-            addCriterion("task_reward >=", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardLessThan(Integer value) {
-            addCriterion("task_reward <", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardLessThanOrEqualTo(Integer value) {
-            addCriterion("task_reward <=", value, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardIn(List<Integer> values) {
-            addCriterion("task_reward in", values, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardNotIn(List<Integer> values) {
-            addCriterion("task_reward not in", values, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardBetween(Integer value1, Integer value2) {
-            addCriterion("task_reward between", value1, value2, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskRewardNotBetween(Integer value1, Integer value2) {
-            addCriterion("task_reward not between", value1, value2, "taskReward");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlIsNull() {
-            addCriterion("task_attachment_url is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlIsNotNull() {
-            addCriterion("task_attachment_url is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlEqualTo(String value) {
-            addCriterion("task_attachment_url =", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlNotEqualTo(String value) {
-            addCriterion("task_attachment_url <>", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlGreaterThan(String value) {
-            addCriterion("task_attachment_url >", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlGreaterThanOrEqualTo(String value) {
-            addCriterion("task_attachment_url >=", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlLessThan(String value) {
-            addCriterion("task_attachment_url <", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlLessThanOrEqualTo(String value) {
-            addCriterion("task_attachment_url <=", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlLike(String value) {
-            addCriterion("task_attachment_url like", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlNotLike(String value) {
-            addCriterion("task_attachment_url not like", value, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlIn(List<String> values) {
-            addCriterion("task_attachment_url in", values, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlNotIn(List<String> values) {
-            addCriterion("task_attachment_url not in", values, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlBetween(String value1, String value2) {
-            addCriterion("task_attachment_url between", value1, value2, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskAttachmentUrlNotBetween(String value1, String value2) {
-            addCriterion("task_attachment_url not between", value1, value2, "taskAttachmentUrl");
-            return (Criteria) this;
-        }
-
         public Criteria andTaskStatusIsNull() {
             addCriterion("task_status is null");
             return (Criteria) this;
@@ -653,323 +343,203 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionIsNull() {
-            addCriterion("task_description is null");
+        public Criteria andSkillRewardIsNull() {
+            addCriterion("skill_reward is null");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionIsNotNull() {
-            addCriterion("task_description is not null");
+        public Criteria andSkillRewardIsNotNull() {
+            addCriterion("skill_reward is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionEqualTo(String value) {
-            addCriterion("task_description =", value, "taskDescription");
+        public Criteria andSkillRewardEqualTo(Integer value) {
+            addCriterion("skill_reward =", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionNotEqualTo(String value) {
-            addCriterion("task_description <>", value, "taskDescription");
+        public Criteria andSkillRewardNotEqualTo(Integer value) {
+            addCriterion("skill_reward <>", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionGreaterThan(String value) {
-            addCriterion("task_description >", value, "taskDescription");
+        public Criteria andSkillRewardGreaterThan(Integer value) {
+            addCriterion("skill_reward >", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionGreaterThanOrEqualTo(String value) {
-            addCriterion("task_description >=", value, "taskDescription");
+        public Criteria andSkillRewardGreaterThanOrEqualTo(Integer value) {
+            addCriterion("skill_reward >=", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionLessThan(String value) {
-            addCriterion("task_description <", value, "taskDescription");
+        public Criteria andSkillRewardLessThan(Integer value) {
+            addCriterion("skill_reward <", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionLessThanOrEqualTo(String value) {
-            addCriterion("task_description <=", value, "taskDescription");
+        public Criteria andSkillRewardLessThanOrEqualTo(Integer value) {
+            addCriterion("skill_reward <=", value, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionLike(String value) {
-            addCriterion("task_description like", value, "taskDescription");
+        public Criteria andSkillRewardIn(List<Integer> values) {
+            addCriterion("skill_reward in", values, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionNotLike(String value) {
-            addCriterion("task_description not like", value, "taskDescription");
+        public Criteria andSkillRewardNotIn(List<Integer> values) {
+            addCriterion("skill_reward not in", values, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionIn(List<String> values) {
-            addCriterion("task_description in", values, "taskDescription");
+        public Criteria andSkillRewardBetween(Integer value1, Integer value2) {
+            addCriterion("skill_reward between", value1, value2, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionNotIn(List<String> values) {
-            addCriterion("task_description not in", values, "taskDescription");
+        public Criteria andSkillRewardNotBetween(Integer value1, Integer value2) {
+            addCriterion("skill_reward not between", value1, value2, "skillReward");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionBetween(String value1, String value2) {
-            addCriterion("task_description between", value1, value2, "taskDescription");
+        public Criteria andAttachmentUrlIsNull() {
+            addCriterion("attachment_url is null");
             return (Criteria) this;
         }
 
-        public Criteria andTaskDescriptionNotBetween(String value1, String value2) {
-            addCriterion("task_description not between", value1, value2, "taskDescription");
+        public Criteria andAttachmentUrlIsNotNull() {
+            addCriterion("attachment_url is not null");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherIsNull() {
-            addCriterion("publisher is null");
+        public Criteria andAttachmentUrlEqualTo(String value) {
+            addCriterion("attachment_url =", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherIsNotNull() {
-            addCriterion("publisher is not null");
+        public Criteria andAttachmentUrlNotEqualTo(String value) {
+            addCriterion("attachment_url <>", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherEqualTo(String value) {
-            addCriterion("publisher =", value, "publisher");
+        public Criteria andAttachmentUrlGreaterThan(String value) {
+            addCriterion("attachment_url >", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherNotEqualTo(String value) {
-            addCriterion("publisher <>", value, "publisher");
+        public Criteria andAttachmentUrlGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_url >=", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherGreaterThan(String value) {
-            addCriterion("publisher >", value, "publisher");
+        public Criteria andAttachmentUrlLessThan(String value) {
+            addCriterion("attachment_url <", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherGreaterThanOrEqualTo(String value) {
-            addCriterion("publisher >=", value, "publisher");
+        public Criteria andAttachmentUrlLessThanOrEqualTo(String value) {
+            addCriterion("attachment_url <=", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherLessThan(String value) {
-            addCriterion("publisher <", value, "publisher");
+        public Criteria andAttachmentUrlLike(String value) {
+            addCriterion("attachment_url like", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherLessThanOrEqualTo(String value) {
-            addCriterion("publisher <=", value, "publisher");
+        public Criteria andAttachmentUrlNotLike(String value) {
+            addCriterion("attachment_url not like", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherLike(String value) {
-            addCriterion("publisher like", value, "publisher");
+        public Criteria andAttachmentUrlIn(List<String> values) {
+            addCriterion("attachment_url in", values, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherNotLike(String value) {
-            addCriterion("publisher not like", value, "publisher");
+        public Criteria andAttachmentUrlNotIn(List<String> values) {
+            addCriterion("attachment_url not in", values, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherIn(List<String> values) {
-            addCriterion("publisher in", values, "publisher");
+        public Criteria andAttachmentUrlBetween(String value1, String value2) {
+            addCriterion("attachment_url between", value1, value2, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherNotIn(List<String> values) {
-            addCriterion("publisher not in", values, "publisher");
+        public Criteria andAttachmentUrlNotBetween(String value1, String value2) {
+            addCriterion("attachment_url not between", value1, value2, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherBetween(String value1, String value2) {
-            addCriterion("publisher between", value1, value2, "publisher");
+        public Criteria andTaskRemarkIsNull() {
+            addCriterion("task_remark is null");
             return (Criteria) this;
         }
 
-        public Criteria andPublisherNotBetween(String value1, String value2) {
-            addCriterion("publisher not between", value1, value2, "publisher");
+        public Criteria andTaskRemarkIsNotNull() {
+            addCriterion("task_remark is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindIsNull() {
-            addCriterion("need_email_remind is null");
+        public Criteria andTaskRemarkEqualTo(String value) {
+            addCriterion("task_remark =", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindIsNotNull() {
-            addCriterion("need_email_remind is not null");
+        public Criteria andTaskRemarkNotEqualTo(String value) {
+            addCriterion("task_remark <>", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindEqualTo(Byte value) {
-            addCriterion("need_email_remind =", value, "needEmailRemind");
+        public Criteria andTaskRemarkGreaterThan(String value) {
+            addCriterion("task_remark >", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindNotEqualTo(Byte value) {
-            addCriterion("need_email_remind <>", value, "needEmailRemind");
+        public Criteria andTaskRemarkGreaterThanOrEqualTo(String value) {
+            addCriterion("task_remark >=", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindGreaterThan(Byte value) {
-            addCriterion("need_email_remind >", value, "needEmailRemind");
+        public Criteria andTaskRemarkLessThan(String value) {
+            addCriterion("task_remark <", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindGreaterThanOrEqualTo(Byte value) {
-            addCriterion("need_email_remind >=", value, "needEmailRemind");
+        public Criteria andTaskRemarkLessThanOrEqualTo(String value) {
+            addCriterion("task_remark <=", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindLessThan(Byte value) {
-            addCriterion("need_email_remind <", value, "needEmailRemind");
+        public Criteria andTaskRemarkLike(String value) {
+            addCriterion("task_remark like", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindLessThanOrEqualTo(Byte value) {
-            addCriterion("need_email_remind <=", value, "needEmailRemind");
+        public Criteria andTaskRemarkNotLike(String value) {
+            addCriterion("task_remark not like", value, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindIn(List<Byte> values) {
-            addCriterion("need_email_remind in", values, "needEmailRemind");
+        public Criteria andTaskRemarkIn(List<String> values) {
+            addCriterion("task_remark in", values, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindNotIn(List<Byte> values) {
-            addCriterion("need_email_remind not in", values, "needEmailRemind");
+        public Criteria andTaskRemarkNotIn(List<String> values) {
+            addCriterion("task_remark not in", values, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindBetween(Byte value1, Byte value2) {
-            addCriterion("need_email_remind between", value1, value2, "needEmailRemind");
+        public Criteria andTaskRemarkBetween(String value1, String value2) {
+            addCriterion("task_remark between", value1, value2, "taskRemark");
             return (Criteria) this;
         }
 
-        public Criteria andNeedEmailRemindNotBetween(Byte value1, Byte value2) {
-            addCriterion("need_email_remind not between", value1, value2, "needEmailRemind");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentIsNull() {
-            addCriterion("need_punishment is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentIsNotNull() {
-            addCriterion("need_punishment is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentEqualTo(Byte value) {
-            addCriterion("need_punishment =", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentNotEqualTo(Byte value) {
-            addCriterion("need_punishment <>", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentGreaterThan(Byte value) {
-            addCriterion("need_punishment >", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentGreaterThanOrEqualTo(Byte value) {
-            addCriterion("need_punishment >=", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentLessThan(Byte value) {
-            addCriterion("need_punishment <", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentLessThanOrEqualTo(Byte value) {
-            addCriterion("need_punishment <=", value, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentIn(List<Byte> values) {
-            addCriterion("need_punishment in", values, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentNotIn(List<Byte> values) {
-            addCriterion("need_punishment not in", values, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentBetween(Byte value1, Byte value2) {
-            addCriterion("need_punishment between", value1, value2, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedPunishmentNotBetween(Byte value1, Byte value2) {
-            addCriterion("need_punishment not between", value1, value2, "needPunishment");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceIsNull() {
-            addCriterion("need_acceptance is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceIsNotNull() {
-            addCriterion("need_acceptance is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceEqualTo(Byte value) {
-            addCriterion("need_acceptance =", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceNotEqualTo(Byte value) {
-            addCriterion("need_acceptance <>", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceGreaterThan(Byte value) {
-            addCriterion("need_acceptance >", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceGreaterThanOrEqualTo(Byte value) {
-            addCriterion("need_acceptance >=", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceLessThan(Byte value) {
-            addCriterion("need_acceptance <", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceLessThanOrEqualTo(Byte value) {
-            addCriterion("need_acceptance <=", value, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceIn(List<Byte> values) {
-            addCriterion("need_acceptance in", values, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceNotIn(List<Byte> values) {
-            addCriterion("need_acceptance not in", values, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceBetween(Byte value1, Byte value2) {
-            addCriterion("need_acceptance between", value1, value2, "needAcceptance");
-            return (Criteria) this;
-        }
-
-        public Criteria andNeedAcceptanceNotBetween(Byte value1, Byte value2) {
-            addCriterion("need_acceptance not between", value1, value2, "needAcceptance");
+        public Criteria andTaskRemarkNotBetween(String value1, String value2) {
+            addCriterion("task_remark not between", value1, value2, "taskRemark");
             return (Criteria) this;
         }
 
@@ -1033,63 +603,63 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeIsNull() {
-            addCriterion("update_time is null");
+        public Criteria andModifyTimeIsNull() {
+            addCriterion("modify_time is null");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeIsNotNull() {
-            addCriterion("update_time is not null");
+        public Criteria andModifyTimeIsNotNull() {
+            addCriterion("modify_time is not null");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeEqualTo(Date value) {
-            addCriterion("update_time =", value, "updateTime");
+        public Criteria andModifyTimeEqualTo(Date value) {
+            addCriterion("modify_time =", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeNotEqualTo(Date value) {
-            addCriterion("update_time <>", value, "updateTime");
+        public Criteria andModifyTimeNotEqualTo(Date value) {
+            addCriterion("modify_time <>", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeGreaterThan(Date value) {
-            addCriterion("update_time >", value, "updateTime");
+        public Criteria andModifyTimeGreaterThan(Date value) {
+            addCriterion("modify_time >", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("update_time >=", value, "updateTime");
+        public Criteria andModifyTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("modify_time >=", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeLessThan(Date value) {
-            addCriterion("update_time <", value, "updateTime");
+        public Criteria andModifyTimeLessThan(Date value) {
+            addCriterion("modify_time <", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeLessThanOrEqualTo(Date value) {
-            addCriterion("update_time <=", value, "updateTime");
+        public Criteria andModifyTimeLessThanOrEqualTo(Date value) {
+            addCriterion("modify_time <=", value, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeIn(List<Date> values) {
-            addCriterion("update_time in", values, "updateTime");
+        public Criteria andModifyTimeIn(List<Date> values) {
+            addCriterion("modify_time in", values, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeNotIn(List<Date> values) {
-            addCriterion("update_time not in", values, "updateTime");
+        public Criteria andModifyTimeNotIn(List<Date> values) {
+            addCriterion("modify_time not in", values, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeBetween(Date value1, Date value2) {
-            addCriterion("update_time between", value1, value2, "updateTime");
+        public Criteria andModifyTimeBetween(Date value1, Date value2) {
+            addCriterion("modify_time between", value1, value2, "modifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
-            addCriterion("update_time not between", value1, value2, "updateTime");
+        public Criteria andModifyTimeNotBetween(Date value1, Date value2) {
+            addCriterion("modify_time not between", value1, value2, "modifyTime");
             return (Criteria) this;
         }
 

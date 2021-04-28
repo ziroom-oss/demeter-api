@@ -39,13 +39,13 @@ public class SwaggerConfig {
     public Docket createRestApi() {
         ParameterBuilder uid = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        uid.name("uid").description("用户系统号").modelRef(new ModelRef("string")).parameterType("header").defaultValue(
-                "60028724").required(true).build();
+        uid.name("X-ZCLOUD-TOKEN").description("token").modelRef(new ModelRef("string")).parameterType("header").required(true).build();
         pars.add(uid.build());
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.any())
+//                .apis(RequestHandlerSelectors.basePackage("com.ziroom.zcloud.api.admin"))
+                .apis(RequestHandlerSelectors.basePackage("com.ziroom.tech.demeterapi.controller"))
                 .paths(PathSelectors.any())
                 .build()
                 .globalOperationParameters(pars);
@@ -54,7 +54,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 //标题
-                .title("项目管理系统swagger文档")
+                .title("自如员工成长平台swagger文档")
                 //简介
                 .description("我们的目标是星辰大海")
                 //服务条款

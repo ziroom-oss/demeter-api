@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao">
+    <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="task_name" property="taskName" jdbcType="VARCHAR"/>
+        <result column="task_status" property="taskStatus" jdbcType="INTEGER"/>
+        <result column="skill_reward" property="skillReward" jdbcType="INTEGER"/>
+        <result column="attachment_url" property="attachmentUrl" jdbcType="VARCHAR"/>
+        <result column="task_remark" property="taskRemark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="VARCHAR"/>
+        <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, task_name, task_status, skill_reward, attachment_url, task_remark, create_time, modify_time, create_id, modify_id
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        'true' AS QUERYID,
+        <include refid="Base_Column_List"/>
+        FROM demeter_skill_task
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM demeter_skill_task
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM demeter_skill_task
+        WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO demeter_skill_task (task_name, task_status, skill_reward, attachment_url, task_remark, create_time, 
+            modify_time, create_id, modify_id)
+        VALUES (#{taskName,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{skillReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{taskRemark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+            #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO demeter_skill_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskName != null">
+                task_name,
+            </if>
+            <if test="taskStatus != null">
+                task_status,
+            </if>
+            <if test="skillReward != null">
+                skill_reward,
+            </if>
+            <if test="attachmentUrl != null">
+                attachment_url,
+            </if>
+            <if test="taskRemark != null">
+                task_remark,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="modifyId != null">
+                modify_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskName != null">
+                #{taskName,jdbcType=VARCHAR},
+            </if>
+            <if test="taskStatus != null">
+                #{taskStatus,jdbcType=INTEGER},
+            </if>
+            <if test="skillReward != null">
+                #{skillReward,jdbcType=INTEGER},
+            </if>
+            <if test="attachmentUrl != null">
+                #{attachmentUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="taskRemark != null">
+                #{taskRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM demeter_skill_task
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        UPDATE demeter_skill_task
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.taskName != null">
+                task_name = #{record.taskName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.taskStatus != null">
+                task_status = #{record.taskStatus,jdbcType=INTEGER},
+            </if>
+            <if test="record.skillReward != null">
+                skill_reward = #{record.skillReward,jdbcType=INTEGER},
+            </if>
+            <if test="record.attachmentUrl != null">
+                attachment_url = #{record.attachmentUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.taskRemark != null">
+                task_remark = #{record.taskRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.modifyTime != null">
+                modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.createId != null">
+                create_id = #{record.createId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.modifyId != null">
+                modify_id = #{record.modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        UPDATE demeter_skill_task
+        SET id = #{record.id,jdbcType=BIGINT},
+            task_name = #{record.taskName,jdbcType=VARCHAR},
+            task_status = #{record.taskStatus,jdbcType=INTEGER},
+            skill_reward = #{record.skillReward,jdbcType=INTEGER},
+            attachment_url = #{record.attachmentUrl,jdbcType=VARCHAR},
+            task_remark = #{record.taskRemark,jdbcType=VARCHAR},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{record.createId,jdbcType=VARCHAR},
+            modify_id = #{record.modifyId,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
+        UPDATE demeter_skill_task
+        <set>
+            <if test="taskName != null">
+                task_name = #{taskName,jdbcType=VARCHAR},
+            </if>
+            <if test="taskStatus != null">
+                task_status = #{taskStatus,jdbcType=INTEGER},
+            </if>
+            <if test="skillReward != null">
+                skill_reward = #{skillReward,jdbcType=INTEGER},
+            </if>
+            <if test="attachmentUrl != null">
+                attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="taskRemark != null">
+                task_remark = #{taskRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                modify_id = #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
+        UPDATE demeter_skill_task
+        SET task_name = #{taskName,jdbcType=VARCHAR},
+            task_status = #{taskStatus,jdbcType=INTEGER},
+            skill_reward = #{skillReward,jdbcType=INTEGER},
+            attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+            task_remark = #{taskRemark,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{createId,jdbcType=VARCHAR},
+            modify_id = #{modifyId,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

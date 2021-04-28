@@ -80,11 +80,6 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.60</version>
 		</dependency>
-		<dependency>
-			<artifactId>gear-boot</artifactId>
-			<groupId>com.ziroom.gaea</groupId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
 
 		<!-- swagger2 -->
 		<dependency>
@@ -110,6 +105,24 @@
 			<version>1.0.0-RELEASE</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.ziroom.zcloud</groupId>
+			<artifactId>zcloud-sso-spring-security</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>30.1.1-jre</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+			<version>1.2.4</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>demeter-api</finalName>

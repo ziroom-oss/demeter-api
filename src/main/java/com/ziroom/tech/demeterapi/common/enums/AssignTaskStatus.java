@@ -4,28 +4,57 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 任务类型
+ * 支配类任务状态
  * @author daijiankun
  */
 
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum TaskType {
+public enum AssignTaskStatus {
 
     /**
-     * 技能类任务
+     * 待认领
      */
-    SKILL(1, "技能类任务"),
+    UNCLAIMED(0, "待认领"),
+
     /**
-     * 指派类任务
+     * 已拒绝
      */
-    ASSIGN(2, "指派类任务");
+    FORBIDDEN(1, "已拒绝"),
+
+    /**
+     * 进行中
+     */
+    ONGOING(2, "进行中"),
+
+    /**
+     * 已完成
+     */
+    FINISHED(3, "已完成"),
+
+    /**
+     * 未完成
+     */
+    UNFINISHED(4, "未完成"),
+
+    /**
+     * 验收通过
+     */
+    ACCEPTANCE(5, "验收通过"),
+
+    /**
+     * 验收未通过
+     */
+    FAILED(6, "验收未通过");
 
     /**
      * 类型码
@@ -36,24 +65,24 @@ public enum TaskType {
      */
     private String desc;
 
-    private static Map<Integer, TaskType> map = Arrays.stream(TaskType.values())
-            .collect(Collectors.toMap(TaskType::getCode, Function.identity()));
+    private static Map<Integer, AssignTaskStatus> map = Arrays.stream(AssignTaskStatus.values())
+            .collect(Collectors.toMap(AssignTaskStatus::getCode, Function.identity()));
 
     /**
      * 根据类型码获取指定的类型枚举
      * @param code 类型码
      * @return 类型枚举
      */
-    public static TaskType getByCode(Integer code) {
+    public static AssignTaskStatus getByCode(Integer code) {
         return map.get(code);
     }
 
     /**
      * 获取所有的任务类型
-     * @return List<TaskType>
+     * @return List<SkillTaskStatus>
      */
-    public static List<TaskType> getAllTaskType() {
-        return Arrays.stream(TaskType.values()).collect(Collectors.toList());
+    public static List<AssignTaskStatus> getAllTaskType() {
+        return Arrays.stream(AssignTaskStatus.values()).collect(Collectors.toList());
     }
 
     /**
@@ -65,7 +94,7 @@ public enum TaskType {
         if(Objects.isNull(code)) {
             return false;
         }
-        for(TaskType taskType : TaskType.values()) {
+        for(AssignTaskStatus taskType : AssignTaskStatus.values()) {
             if(Objects.equals(taskType.code, code)) {
                 return true;
             }

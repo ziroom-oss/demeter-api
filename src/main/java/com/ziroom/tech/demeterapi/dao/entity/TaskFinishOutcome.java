@@ -28,17 +28,19 @@ import java.util.Date;
  * </pre>
  */
 @Builder
-public class TaskFinishConditionInfo {
+public class TaskFinishOutcome {
 
     private Long id;
 
-    private String uid;
+    private String fileAddress;
+
+    private String fileName;
 
     private Long taskId;
 
-    private Long taskFinishConditionId;
+    private Integer taskType;
 
-    private Integer taskConditionStatus;
+    private String uid;
 
     private Date createTime;
 
@@ -56,12 +58,20 @@ public class TaskFinishConditionInfo {
         this.id = id;
     }
 
-    public String getUid() {
-        return uid;
+    public String getFileAddress() {
+        return fileAddress;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setFileAddress(String fileAddress) {
+        this.fileAddress = fileAddress;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public Long getTaskId() {
@@ -72,20 +82,20 @@ public class TaskFinishConditionInfo {
         this.taskId = taskId;
     }
 
-    public Long getTaskFinishConditionId() {
-        return taskFinishConditionId;
+    public Integer getTaskType() {
+        return taskType;
     }
 
-    public void setTaskFinishConditionId(Long taskFinishConditionId) {
-        this.taskFinishConditionId = taskFinishConditionId;
+    public void setTaskType(Integer taskType) {
+        this.taskType = taskType;
     }
 
-    public Integer getTaskConditionStatus() {
-        return taskConditionStatus;
+    public String getUid() {
+        return uid;
     }
 
-    public void setTaskConditionStatus(Integer taskConditionStatus) {
-        this.taskConditionStatus = taskConditionStatus;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public Date getCreateTime() {

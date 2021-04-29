@@ -78,7 +78,6 @@
         <if test="distinct">
             distinct
         </if>
-        'true' AS QUERYID,
         <include refid="Base_Column_List"/>
         FROM task_finish_condition
         <if test="_parameter != null">

@@ -15,6 +15,9 @@ import java.util.List;
 @ApiModel("指派类任务请求体")
 public class AssignTaskReq {
 
+    @ApiModelProperty("主键")
+    private Long id;
+
     @ApiModelProperty("任务名称")
     private String taskName;
 

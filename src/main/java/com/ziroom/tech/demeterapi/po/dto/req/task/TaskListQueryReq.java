@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
+ * 任务列表查询请求体
  * @author daijiankun
  */
 @Data
@@ -17,7 +18,7 @@ public class TaskListQueryReq {
     @ApiModelProperty("任务状态")
     private Integer taskStatus;
 
-    @ApiModelProperty("系统号，由前端转换")
+    @ApiModelProperty("接收者系统号，由前端转换")
     private String systemCode;
 
     @ApiModelProperty("任务名称/编号")

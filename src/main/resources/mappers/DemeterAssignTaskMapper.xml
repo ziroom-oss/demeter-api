@@ -88,7 +88,6 @@
         <if test="distinct">
             distinct
         </if>
-        'true' AS QUERYID,
         <include refid="Base_Column_List"/>
         FROM demeter_assign_task
         <if test="_parameter != null">

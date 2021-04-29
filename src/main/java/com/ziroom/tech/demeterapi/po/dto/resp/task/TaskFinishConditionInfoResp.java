@@ -1,24 +1,23 @@
-package com.ziroom.tech.demeterapi.dao.entity;
+package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
-/**
- * @author daijiankun
- */
-@Builder
 @Data
-public class TaskFinishCondition {
+public class TaskFinishConditionInfoResp {
 
     private Long id;
+
+    private String uid;
 
     private Long taskId;
 
     private String taskFinishContent;
 
-    private Integer taskType;
+    private Integer taskConditionStatus;
+
+    private String taskConditionStatusName;
 
     private Date createTime;
 

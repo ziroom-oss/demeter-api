@@ -27,7 +27,7 @@ import java.util.List;
  * ━━━━━━感觉萌萌哒━━━━━━
  * </pre>
  */
-public class TaskFinishConditionInfoExample {
+public class TaskFinishOutcomeExample {
 
     protected String orderByClause;
 
@@ -35,7 +35,7 @@ public class TaskFinishConditionInfoExample {
 
     protected List<Criteria> oredCriteria;
 
-    public TaskFinishConditionInfoExample() {
+    public TaskFinishOutcomeExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -213,6 +213,266 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andFileAddressIsNull() {
+            addCriterion("file_address is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressIsNotNull() {
+            addCriterion("file_address is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressEqualTo(String value) {
+            addCriterion("file_address =", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressNotEqualTo(String value) {
+            addCriterion("file_address <>", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressGreaterThan(String value) {
+            addCriterion("file_address >", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("file_address >=", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressLessThan(String value) {
+            addCriterion("file_address <", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressLessThanOrEqualTo(String value) {
+            addCriterion("file_address <=", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressLike(String value) {
+            addCriterion("file_address like", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressNotLike(String value) {
+            addCriterion("file_address not like", value, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressIn(List<String> values) {
+            addCriterion("file_address in", values, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressNotIn(List<String> values) {
+            addCriterion("file_address not in", values, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressBetween(String value1, String value2) {
+            addCriterion("file_address between", value1, value2, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileAddressNotBetween(String value1, String value2) {
+            addCriterion("file_address not between", value1, value2, "fileAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameIsNull() {
+            addCriterion("file_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameIsNotNull() {
+            addCriterion("file_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameEqualTo(String value) {
+            addCriterion("file_name =", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameNotEqualTo(String value) {
+            addCriterion("file_name <>", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameGreaterThan(String value) {
+            addCriterion("file_name >", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameGreaterThanOrEqualTo(String value) {
+            addCriterion("file_name >=", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameLessThan(String value) {
+            addCriterion("file_name <", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameLessThanOrEqualTo(String value) {
+            addCriterion("file_name <=", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameLike(String value) {
+            addCriterion("file_name like", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameNotLike(String value) {
+            addCriterion("file_name not like", value, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameIn(List<String> values) {
+            addCriterion("file_name in", values, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameNotIn(List<String> values) {
+            addCriterion("file_name not in", values, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameBetween(String value1, String value2) {
+            addCriterion("file_name between", value1, value2, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andFileNameNotBetween(String value1, String value2) {
+            addCriterion("file_name not between", value1, value2, "fileName");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdIsNull() {
+            addCriterion("task_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdIsNotNull() {
+            addCriterion("task_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdEqualTo(Long value) {
+            addCriterion("task_id =", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotEqualTo(Long value) {
+            addCriterion("task_id <>", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdGreaterThan(Long value) {
+            addCriterion("task_id >", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("task_id >=", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdLessThan(Long value) {
+            addCriterion("task_id <", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdLessThanOrEqualTo(Long value) {
+            addCriterion("task_id <=", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdIn(List<Long> values) {
+            addCriterion("task_id in", values, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotIn(List<Long> values) {
+            addCriterion("task_id not in", values, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdBetween(Long value1, Long value2) {
+            addCriterion("task_id between", value1, value2, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotBetween(Long value1, Long value2) {
+            addCriterion("task_id not between", value1, value2, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeIsNull() {
+            addCriterion("task_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeIsNotNull() {
+            addCriterion("task_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeEqualTo(Integer value) {
+            addCriterion("task_type =", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeNotEqualTo(Integer value) {
+            addCriterion("task_type <>", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeGreaterThan(Integer value) {
+            addCriterion("task_type >", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("task_type >=", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeLessThan(Integer value) {
+            addCriterion("task_type <", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("task_type <=", value, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeIn(List<Integer> values) {
+            addCriterion("task_type in", values, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeNotIn(List<Integer> values) {
+            addCriterion("task_type not in", values, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeBetween(Integer value1, Integer value2) {
+            addCriterion("task_type between", value1, value2, "taskType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("task_type not between", value1, value2, "taskType");
+            return (Criteria) this;
+        }
+
         public Criteria andUidIsNull() {
             addCriterion("uid is null");
             return (Criteria) this;
@@ -280,186 +540,6 @@ protected abstract static class GeneratedCriteria {
 
         public Criteria andUidNotBetween(String value1, String value2) {
             addCriterion("uid not between", value1, value2, "uid");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdIsNull() {
-            addCriterion("task_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdIsNotNull() {
-            addCriterion("task_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdEqualTo(Long value) {
-            addCriterion("task_id =", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdNotEqualTo(Long value) {
-            addCriterion("task_id <>", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdGreaterThan(Long value) {
-            addCriterion("task_id >", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("task_id >=", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdLessThan(Long value) {
-            addCriterion("task_id <", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdLessThanOrEqualTo(Long value) {
-            addCriterion("task_id <=", value, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdIn(List<Long> values) {
-            addCriterion("task_id in", values, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdNotIn(List<Long> values) {
-            addCriterion("task_id not in", values, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdBetween(Long value1, Long value2) {
-            addCriterion("task_id between", value1, value2, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskIdNotBetween(Long value1, Long value2) {
-            addCriterion("task_id not between", value1, value2, "taskId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdIsNull() {
-            addCriterion("task_finish_condition_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdIsNotNull() {
-            addCriterion("task_finish_condition_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdEqualTo(Long value) {
-            addCriterion("task_finish_condition_id =", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdNotEqualTo(Long value) {
-            addCriterion("task_finish_condition_id <>", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdGreaterThan(Long value) {
-            addCriterion("task_finish_condition_id >", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("task_finish_condition_id >=", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdLessThan(Long value) {
-            addCriterion("task_finish_condition_id <", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdLessThanOrEqualTo(Long value) {
-            addCriterion("task_finish_condition_id <=", value, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdIn(List<Long> values) {
-            addCriterion("task_finish_condition_id in", values, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdNotIn(List<Long> values) {
-            addCriterion("task_finish_condition_id not in", values, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdBetween(Long value1, Long value2) {
-            addCriterion("task_finish_condition_id between", value1, value2, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskFinishConditionIdNotBetween(Long value1, Long value2) {
-            addCriterion("task_finish_condition_id not between", value1, value2, "taskFinishConditionId");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusIsNull() {
-            addCriterion("task_condition_status is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusIsNotNull() {
-            addCriterion("task_condition_status is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusEqualTo(Integer value) {
-            addCriterion("task_condition_status =", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusNotEqualTo(Integer value) {
-            addCriterion("task_condition_status <>", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusGreaterThan(Integer value) {
-            addCriterion("task_condition_status >", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusGreaterThanOrEqualTo(Integer value) {
-            addCriterion("task_condition_status >=", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusLessThan(Integer value) {
-            addCriterion("task_condition_status <", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusLessThanOrEqualTo(Integer value) {
-            addCriterion("task_condition_status <=", value, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusIn(List<Integer> values) {
-            addCriterion("task_condition_status in", values, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusNotIn(List<Integer> values) {
-            addCriterion("task_condition_status not in", values, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusBetween(Integer value1, Integer value2) {
-            addCriterion("task_condition_status between", value1, value2, "taskConditionStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskConditionStatusNotBetween(Integer value1, Integer value2) {
-            addCriterion("task_condition_status not between", value1, value2, "taskConditionStatus");
             return (Criteria) this;
         }
 

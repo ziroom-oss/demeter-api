@@ -12,23 +12,24 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 技能任务自身状态
+ * 支配类任务状态
  * @author daijiankun
  */
 
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum SkillTaskStatus {
+public enum TaskConditionStatus {
 
     /**
-     * 任务
+     * 已完成
      */
-    FORBIDDEN(0, "已禁用"),
+    FINISHED(3, "已完成"),
+
     /**
-     * 需求
+     * 未完成
      */
-    UNFORBIDDEN(1, "已启用");
+    UNFINISHED(4, "未完成");
 
     /**
      * 类型码
@@ -39,15 +40,15 @@ public enum SkillTaskStatus {
      */
     private String desc;
 
-    private static Map<Integer, SkillTaskStatus> map = Arrays.stream(SkillTaskStatus.values())
-            .collect(Collectors.toMap(SkillTaskStatus::getCode, Function.identity()));
+    private static Map<Integer, TaskConditionStatus> map = Arrays.stream(TaskConditionStatus.values())
+            .collect(Collectors.toMap(TaskConditionStatus::getCode, Function.identity()));
 
     /**
      * 根据类型码获取指定的类型枚举
      * @param code 类型码
      * @return 类型枚举
      */
-    public static SkillTaskStatus getByCode(Integer code) {
+    public static TaskConditionStatus getByCode(Integer code) {
         return map.get(code);
     }
 
@@ -55,8 +56,8 @@ public enum SkillTaskStatus {
      * 获取所有的任务类型
      * @return List<SkillTaskStatus>
      */
-    public static List<SkillTaskStatus> getAllTaskType() {
-        return Arrays.stream(SkillTaskStatus.values()).collect(Collectors.toList());
+    public static List<TaskConditionStatus> getAllTaskType() {
+        return Arrays.stream(TaskConditionStatus.values()).collect(Collectors.toList());
     }
 
     /**
@@ -68,7 +69,7 @@ public enum SkillTaskStatus {
         if(Objects.isNull(code)) {
             return false;
         }
-        for(SkillTaskStatus taskType : SkillTaskStatus.values()) {
+        for(TaskConditionStatus taskType : TaskConditionStatus.values()) {
             if(Objects.equals(taskType.code, code)) {
                 return true;
             }

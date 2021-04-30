@@ -1,0 +1,20 @@
+stages:
+  - build
+
+
+
+
+
+job_build:
+  stage: build
+  script:
+    - set -eo pipefail
+    - omega build --module=${MODULE} -p
+  only:
+    - api
+    - triggers
+  except:
+    variables:
+      - $TRIGGER_DEPLOY == "true"
+
+

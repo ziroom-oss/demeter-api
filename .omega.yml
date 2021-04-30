@@ -1,0 +1,20 @@
+name: demeter-api
+
+
+compile:
+  preset: compile/MAVEN
+  variables:
+    JAVA: 8
+    MAVEN_PROFILES: "{{.MAVEN_PROFILES}}"
+
+assembly:
+  preset: assembly/java/SPRING_BOOT_FATJAR
+  variables:
+    APP_JAR_ARTIFACT: target/demeter-api.jar
+
+
+docker:
+  preset: docker/java/GENERIC_FATJAR
+  variables:
+    BASE_IMAGE: "{{.BASE_IMAGE}}"
+    APP_JAR: lib/demeter-api.jar

@@ -12,15 +12,10 @@ import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 
-import com.ziroom.tech.demeterapi.po.dto.req.task.AssignTaskReq;
-import com.ziroom.tech.demeterapi.po.dto.req.task.RejectTaskReq;
-import com.ziroom.tech.demeterapi.po.dto.req.task.TaskListQueryReq;
-import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.AssignDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskFinishConditionInfoResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,7 +56,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp createAssignTask(AssignTaskReq assignTaskReq) {
+    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setTaskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode());
@@ -113,9 +108,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp createSkillTask(SkillTaskReq skillTaskReq) {
+    public Resp<Object> createSkillTask(SkillTaskReq skillTaskReq) {
         DemeterSkillTask entity = new DemeterSkillTask();
         BeanUtils.copyProperties(skillTaskReq, entity);
+        entity.setPublisher(OperatorContext.getOperator());
         entity.setCreateId(OperatorContext.getOperator());
         entity.setModifyId(OperatorContext.getOperator());
         entity.setCreateTime(new Date());
@@ -142,7 +138,7 @@ public class TaskServiceImpl implements TaskService {
     // todo test
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp updateAssignTask(AssignTaskReq assignTaskReq) {
+    public Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq) {
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
@@ -160,7 +156,7 @@ public class TaskServiceImpl implements TaskService {
     // todo test
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp updateSkillTask(SkillTaskReq skillTaskReq) {
+    public Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq) {
         DemeterSkillTask entity = new DemeterSkillTask();
         BeanUtils.copyProperties(skillTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
@@ -202,9 +198,7 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskIdEqualTo(taskId)
                     .andTaskTypeEqualTo(taskType);
             List<TaskFinishCondition> toBeDeletedTaskCondition = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
-            toBeDeletedTaskCondition.forEach(condition -> {
-                taskFinishConditionDao.deleteByPrimaryKey(condition.getId());
-            });
+            toBeDeletedTaskCondition.forEach(condition -> taskFinishConditionDao.deleteByPrimaryKey(condition.getId()));
             // insert修改后任务完成条件
             newCondition.forEach(condition -> {
                 TaskFinishCondition entity = TaskFinishCondition.builder()
@@ -327,7 +321,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp getExecuteList(TaskListQueryReq taskListQueryReq) {
+    public Resp<Object> getExecuteList(TaskListQueryReq taskListQueryReq) {
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
         DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();
@@ -341,50 +335,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Resp<AssignDetailResp> getAssignDetail(Long id) {
-        DemeterAssignTask entity = demeterAssignTaskDao.selectByPrimaryKey(id);
-        if (Objects.isNull(entity)) {
-            return Resp.error("system error");
-        }
-        AssignDetailResp detailResp = new AssignDetailResp();
-        BeanUtils.copyProperties(entity, detailResp);
-        List<String> receiverNameList = getReceiverListFromTaskUserEntity(entity);
-        String publisherName = this.getNameFromUid(entity.getPublisher());
-        detailResp.setPublisherName(publisherName);
-        detailResp.setReceiverName(String.join(",", receiverNameList));
-        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(entity.getTaskStatus()).getDesc());
-        detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
-
-        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
-        taskFinishConditionExample.createCriteria().andTaskIdEqualTo(entity.getId());
-        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
-
-        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
-        taskFinishConditionInfoExample.createCriteria().andTaskIdEqualTo(entity.getId())
-                .andUidEqualTo(OperatorContext.getOperator());
-        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
-
-        Map<Long, TaskFinishConditionInfo> taskFinishConditionInfoMap = taskFinishConditionInfos.stream().collect(Collectors.toMap(TaskFinishConditionInfo::getTaskFinishConditionId, Function.identity()));
-        List<TaskFinishConditionInfoResp> taskFinishConditionInfoRespList = taskFinishConditions.stream().map(condition -> {
-            TaskFinishConditionInfo taskFinishConditionInfo = taskFinishConditionInfoMap.get(condition.getId());
-            if (Objects.nonNull(taskFinishConditionInfo)) {
-                TaskFinishConditionInfoResp resp = new TaskFinishConditionInfoResp();
-                BeanUtils.copyProperties(taskFinishConditionInfo, resp);
-                resp.setTaskConditionStatusName(TaskConditionStatus.getByCode(taskFinishConditionInfo.getTaskConditionStatus()).getDesc());
-                resp.setTaskFinishContent(condition.getTaskFinishContent());
-                return resp;
-            } else {
-                return null;
-            }
-        }).collect(Collectors.toList());
-
-        detailResp.setTaskFinishConditionList(taskFinishConditions);
-        detailResp.setTaskFinishConditionInfoRespList(taskFinishConditionInfoRespList);
-        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
-        taskFinishOutcomeExample.createCriteria()
-                .andTaskIdEqualTo(entity.getId());
-        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
-        detailResp.setTaskFinishOutcomeList(taskFinishOutcomes);
-        return Resp.success(detailResp);
+        return null;
     }
 
     private List<String> getReceiverListFromTaskUserEntity(DemeterAssignTask entity) {
@@ -412,13 +363,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp getSkillDetail(Long id) {
+    public Resp<Object> getSkillDetail(Long id) {
+        DemeterSkillTask entity = demeterSkillTaskDao.selectByPrimaryKey(id);
         return null;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp delete(Long id, Integer taskType) {
+    public Resp<Object> delete(Long id, Integer taskType) {
         if (taskType.equals(TaskType.SKILL.getCode())) {
             demeterSkillTaskDao.deleteByPrimaryKey(id);
         } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
@@ -429,7 +381,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp acceptTask(Long id, Integer type) {
+    public Resp<Object> acceptTask(Long id, Integer type) {
         if (TaskType.ASSIGN.getCode().equals(type)) {
             DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(id);
             if (Objects.isNull(demeterAssignTask)) {
@@ -538,7 +490,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp rejectTask(RejectTaskReq rejectTaskReq) {
+    public Resp<Object> rejectTask(RejectTaskReq rejectTaskReq) {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
                 .andTaskIdEqualTo(rejectTaskReq.getTaskId());
@@ -558,12 +510,172 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp getAssignTaskCheckList(Long id) {
+    public Resp<List<ReceiverListResp>> getTaskCheckList(Long taskId, Integer taskType) {
+        List<ReceiverListResp> respList = new ArrayList<>(16);
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        DemeterTaskUserExample.Criteria criteria = demeterTaskUserExample.createCriteria();
+        criteria.andTaskIdEqualTo(taskId);
+        criteria.andTaskTypeEqualTo(TaskType.getByCode(taskType).getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
+            demeterTaskUsers.forEach(x -> {
+                ReceiverListResp receiverListResp = new ReceiverListResp();
+                BeanUtils.copyProperties(x, receiverListResp);
+                UserDetailResp userDetail = ehrComponent.getUserDetail(x.getReceiverUid());
+                if (Objects.nonNull(userDetail)) {
+                    receiverListResp.setReceiverName(userDetail.getUserName());
+                    receiverListResp.setReceiverDept(userDetail.getDept());
+                }
+                receiverListResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(x.getTaskStatus()).getDesc());
+                respList.add(receiverListResp);
+            });
+        }
+        return Resp.success(respList);
+    }
+
+    @Override
+    public Resp<Object> getSkillTaskProgress(Long id) {
         return null;
     }
 
     @Override
-    public Resp getSkillTaskAuthList(Long id) {
+    public Resp<Object> getAssignTaskProgress(Long id) {
         return null;
+    }
+
+    @Override
+    public Resp<Object> checkTask(CheckTaskReq checkTaskReq) {
+
+        return null;
+    }
+
+    @Override
+    public Resp<Object> getRejectReason(RejectTaskReasonReq rejectTaskReasonReq) {
+        return null;
+    }
+
+    @Override
+    public Resp<Object> getTaskDetails(Long taskId, Integer taskType) {
+        // 先确定当前登录人与当前任务的关系
+
+        // 当前登录人为接收者，指派类任务
+        // 当前登录人为发布者，技能类任务
+        // 当前登录人为接收者，指派类任务
+
+        if (TaskType.ASSIGN.getCode().equals(taskType)) {
+            DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
+            if (demeterAssignTask != null && demeterAssignTask.getPublisher().equals(OperatorContext.getOperator())) {
+                // 当前登录人为发布者，指派类任务
+                return Resp.success(getAssignTaskBasic(taskId));
+            } else {
+                // 当前登录人非发布者
+                return getAssignTaskDetailAcceptor(taskId);
+            }
+        } else if (TaskType.SKILL.getCode().equals(taskType)) {
+            DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(taskId);
+            if (demeterSkillTask.getPublisher().equals(OperatorContext.getOperator())) {
+                return Resp.success(getSkillDetailResp(taskId));
+            } else {
+                return getSkillTaskDetailAcceptor(taskId);
+            }
+        }
+        return null;
+    }
+
+    private Resp<Object> getAssignTaskDetailAcceptor(Long id) {
+        DemeterAssignTask entity = demeterAssignTaskDao.selectByPrimaryKey(id);
+        if (Objects.isNull(entity)) {
+            return Resp.error("system error");
+        }
+        AssignDetailResp detailResp = new AssignDetailResp();
+        BeanUtils.copyProperties(entity, detailResp);
+        List<String> receiverNameList = getReceiverListFromTaskUserEntity(entity);
+        String publisherName = this.getNameFromUid(entity.getPublisher());
+        detailResp.setPublisherName(publisherName);
+        detailResp.setReceiverName(String.join(",", receiverNameList));
+        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(entity.getTaskStatus()).getDesc());
+        detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
+
+        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
+        taskFinishConditionExample.createCriteria().andTaskIdEqualTo(entity.getId());
+        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
+
+        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
+        taskFinishConditionInfoExample.createCriteria().andTaskIdEqualTo(entity.getId())
+                .andUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+
+        Map<Long, TaskFinishConditionInfo> taskFinishConditionInfoMap = taskFinishConditionInfos.stream().collect(Collectors.toMap(TaskFinishConditionInfo::getTaskFinishConditionId, Function.identity()));
+        List<TaskFinishConditionInfoResp> taskFinishConditionInfoRespList = taskFinishConditions.stream().map(condition -> {
+            TaskFinishConditionInfo taskFinishConditionInfo = taskFinishConditionInfoMap.get(condition.getId());
+            if (Objects.nonNull(taskFinishConditionInfo)) {
+                TaskFinishConditionInfoResp resp = new TaskFinishConditionInfoResp();
+                BeanUtils.copyProperties(taskFinishConditionInfo, resp);
+                resp.setTaskConditionStatusName(TaskConditionStatus.getByCode(taskFinishConditionInfo.getTaskConditionStatus()).getDesc());
+                resp.setTaskFinishContent(condition.getTaskFinishContent());
+                return resp;
+            } else {
+                return null;
+            }
+        }).collect(Collectors.toList());
+
+        detailResp.setTaskFinishConditionList(taskFinishConditions);
+        detailResp.setTaskFinishConditionInfoRespList(taskFinishConditionInfoRespList);
+        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.createCriteria()
+                .andTaskIdEqualTo(entity.getId());
+        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
+        detailResp.setTaskFinishOutcomeList(taskFinishOutcomes);
+        return Resp.success(detailResp);
+    }
+
+    private Resp<Object> getSkillTaskDetailAcceptor(Long id) {
+        return null;
+    }
+
+    private AssignDetailResp getAssignTaskBasic(Long id) {
+        DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(id);
+        AssignDetailResp detailResp = new AssignDetailResp();
+        BeanUtils.copyProperties(demeterAssignTask, detailResp);
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        Set<String> uidSet = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
+        if (CollectionUtils.isNotEmpty(userDetail)) {
+            detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
+        }
+        detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
+        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(demeterAssignTask.getTaskStatus()).getDesc());
+        UserDetailResp publisher = ehrComponent.getUserDetail(demeterAssignTask.getPublisher());
+        if (Objects.nonNull(publisher)) {
+            detailResp.setPublisherName(publisher.getUserName());
+        }
+        return detailResp;
+    }
+
+    private SkillDetailResp getSkillDetailResp(Long id) {
+        DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
+        SkillDetailResp detailResp = new SkillDetailResp();
+        BeanUtils.copyProperties(demeterSkillTask, detailResp);
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        Set<String> uidSet = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
+        if (CollectionUtils.isNotEmpty(userDetail)) {
+            detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
+        }
+        detailResp.setTaskTypeName(TaskType.SKILL.getDesc());
+        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(demeterSkillTask.getTaskStatus()).getDesc());
+        UserDetailResp publisher = ehrComponent.getUserDetail(demeterSkillTask.getPublisher());
+        if (Objects.nonNull(publisher)) {
+            detailResp.setPublisherName(publisher.getUserName());
+        }
+        return detailResp;
     }
 }

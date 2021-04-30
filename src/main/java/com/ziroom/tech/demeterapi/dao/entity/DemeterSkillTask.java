@@ -1,5 +1,7 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import lombok.Builder;
+
 import java.util.Date;
 
 /**
@@ -36,6 +38,8 @@ public class DemeterSkillTask {
     private Integer skillReward;
 
     private String attachmentUrl;
+
+    private String publisher;
 
     private String taskRemark;
 
@@ -85,6 +89,14 @@ public class DemeterSkillTask {
 
     public void setAttachmentUrl(String attachmentUrl) {
         this.attachmentUrl = attachmentUrl;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
     }
 
     public String getTaskRemark() {

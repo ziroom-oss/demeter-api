@@ -40,6 +40,10 @@ public class DemeterTaskUser {
 
     private Integer taskStatus;
 
+    private Integer checkResult;
+
+    private String checkOpinion;
+
     private Date createTime;
 
     private Date modifyTime;
@@ -86,6 +90,22 @@ public class DemeterTaskUser {
 
     public void setTaskStatus(Integer taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public Integer getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(Integer checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public String getCheckOpinion() {
+        return checkOpinion;
+    }
+
+    public void setCheckOpinion(String checkOpinion) {
+        this.checkOpinion = checkOpinion;
     }
 
     public Date getCreateTime() {

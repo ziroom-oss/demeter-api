@@ -473,6 +473,76 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andPublisherIsNull() {
+            addCriterion("publisher is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherIsNotNull() {
+            addCriterion("publisher is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherEqualTo(String value) {
+            addCriterion("publisher =", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherNotEqualTo(String value) {
+            addCriterion("publisher <>", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherGreaterThan(String value) {
+            addCriterion("publisher >", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherGreaterThanOrEqualTo(String value) {
+            addCriterion("publisher >=", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherLessThan(String value) {
+            addCriterion("publisher <", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherLessThanOrEqualTo(String value) {
+            addCriterion("publisher <=", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherLike(String value) {
+            addCriterion("publisher like", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherNotLike(String value) {
+            addCriterion("publisher not like", value, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherIn(List<String> values) {
+            addCriterion("publisher in", values, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherNotIn(List<String> values) {
+            addCriterion("publisher not in", values, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherBetween(String value1, String value2) {
+            addCriterion("publisher between", value1, value2, "publisher");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublisherNotBetween(String value1, String value2) {
+            addCriterion("publisher not between", value1, value2, "publisher");
+            return (Criteria) this;
+        }
+
         public Criteria andTaskRemarkIsNull() {
             addCriterion("task_remark is null");
             return (Criteria) this;

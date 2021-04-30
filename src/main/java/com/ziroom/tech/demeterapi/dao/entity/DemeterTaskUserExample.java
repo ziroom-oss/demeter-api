@@ -463,6 +463,136 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andCheckResultIsNull() {
+            addCriterion("check_result is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultIsNotNull() {
+            addCriterion("check_result is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultEqualTo(Integer value) {
+            addCriterion("check_result =", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultNotEqualTo(Integer value) {
+            addCriterion("check_result <>", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultGreaterThan(Integer value) {
+            addCriterion("check_result >", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultGreaterThanOrEqualTo(Integer value) {
+            addCriterion("check_result >=", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultLessThan(Integer value) {
+            addCriterion("check_result <", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultLessThanOrEqualTo(Integer value) {
+            addCriterion("check_result <=", value, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultIn(List<Integer> values) {
+            addCriterion("check_result in", values, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultNotIn(List<Integer> values) {
+            addCriterion("check_result not in", values, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultBetween(Integer value1, Integer value2) {
+            addCriterion("check_result between", value1, value2, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckResultNotBetween(Integer value1, Integer value2) {
+            addCriterion("check_result not between", value1, value2, "checkResult");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionIsNull() {
+            addCriterion("check_opinion is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionIsNotNull() {
+            addCriterion("check_opinion is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionEqualTo(String value) {
+            addCriterion("check_opinion =", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionNotEqualTo(String value) {
+            addCriterion("check_opinion <>", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionGreaterThan(String value) {
+            addCriterion("check_opinion >", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionGreaterThanOrEqualTo(String value) {
+            addCriterion("check_opinion >=", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionLessThan(String value) {
+            addCriterion("check_opinion <", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionLessThanOrEqualTo(String value) {
+            addCriterion("check_opinion <=", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionLike(String value) {
+            addCriterion("check_opinion like", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionNotLike(String value) {
+            addCriterion("check_opinion not like", value, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionIn(List<String> values) {
+            addCriterion("check_opinion in", values, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionNotIn(List<String> values) {
+            addCriterion("check_opinion not in", values, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionBetween(String value1, String value2) {
+            addCriterion("check_opinion between", value1, value2, "checkOpinion");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckOpinionNotBetween(String value1, String value2) {
+            addCriterion("check_opinion not between", value1, value2, "checkOpinion");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

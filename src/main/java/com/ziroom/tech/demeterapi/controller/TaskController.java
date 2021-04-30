@@ -4,11 +4,11 @@ import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiverListResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskProgressResp;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -100,49 +100,55 @@ public class TaskController {
         return taskService.delete(id, type);
     }
 
-    @PostMapping("/task/accept")
+    @PostMapping("/accept")
     @ApiOperation(value = "任务认领", httpMethod = "POST")
     public Resp<Object> acceptTask(@RequestParam Long id, @RequestParam Integer type) {
         return taskService.acceptTask(id, type);
     }
 
+    @PostMapping("/condition/finish")
+    @ApiOperation(value = "任务条件完成", httpMethod = "POST")
+    public Resp<Object> finishTaskCondition(@RequestParam("id") Long conditionInfoId) {
+        return taskService.finishTaskCondition(conditionInfoId);
+    }
+
     // todo test
-    @PostMapping("/task/reject")
+    @PostMapping("/reject")
     @ApiOperation(value = "任务拒绝", httpMethod = "POST")
     public Resp<Object> acceptTask(@RequestBody RejectTaskReq rejectTaskReq) {
         return taskService.rejectTask(rejectTaskReq);
     }
 
-    @PostMapping("/task/reject/reason")
+    @PostMapping("/reject/reason")
     @ApiOperation(value = "查看拒绝原因", httpMethod = "POST")
     public Resp<Object> acceptTask(@RequestBody RejectTaskReasonReq rejectTaskReasonReq) {
         return taskService.getRejectReason(rejectTaskReasonReq);
     }
 
-    @PostMapping("/task/auth")
+    @PostMapping("/submit/auth")
+    @ApiOperation(value = "任务提交验收", httpMethod = "POST")
+    public Resp<Object> submitCheckTask(@RequestParam Long taskId, @RequestParam Integer taskType) {
+        return taskService.submitCheckTask(taskId, taskType);
+    }
+
+    @PostMapping("/auth")
     @ApiOperation(value = "任务验收", httpMethod = "POST")
     public Resp<Object> checkTask(@RequestBody CheckTaskReq checkTaskReq) {
         return taskService.checkTask(checkTaskReq);
     }
 
-    @PostMapping("/assign/detail/check")
+    @PostMapping("/receiver/list")
     @ApiOperation(value = "两类任务-查看接收人清单", httpMethod = "POST")
     public Resp<List<ReceiverListResp>> getAssignTaskCheckList(@RequestParam Long taskId, @RequestParam Integer taskType) {
         return taskService.getTaskCheckList(taskId, taskType);
     }
 
-    @PostMapping("/skill/detail/progress")
-    @ApiOperation(value = "技能类任务查看进度", httpMethod = "POST")
-    public Resp<Object> getSkillTaskProgress(@RequestParam Long id, @RequestParam String uid) {
-        return taskService.getSkillTaskProgress(id);
+    // todo test
+    @PostMapping("/detail/progress")
+    @ApiOperation(value = "任务查看进度", httpMethod = "POST")
+    public Resp<TaskProgressResp> getAssignTaskProgress(@RequestParam(value = "id") Long id) {
+        return taskService.getTaskProgress(id);
     }
-
-    @PostMapping("/assign/detail/progress")
-    @ApiOperation(value = "指派类任务查看进度", httpMethod = "POST")
-    public Resp<Object> getAssignTaskProgress(@RequestParam Long id, @RequestParam String uid) {
-        return taskService.getAssignTaskProgress(id);
-    }
-
 
     @PostMapping("/graph")
     @ApiOperation(value = "查看任务关联的知识图谱", httpMethod = "POST")

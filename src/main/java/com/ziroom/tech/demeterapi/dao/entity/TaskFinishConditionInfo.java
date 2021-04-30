@@ -36,6 +36,8 @@ public class TaskFinishConditionInfo {
 
     private Long taskId;
 
+    private Integer taskType;
+
     private Long taskFinishConditionId;
 
     private Integer taskConditionStatus;
@@ -70,6 +72,14 @@ public class TaskFinishConditionInfo {
 
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
+    }
+
+    public Integer getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(Integer taskType) {
+        this.taskType = taskType;
     }
 
     public Long getTaskFinishConditionId() {

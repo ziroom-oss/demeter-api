@@ -3,10 +3,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
-import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
-import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
-import com.ziroom.tech.demeterapi.common.enums.TaskConditionStatus;
-import com.ziroom.tech.demeterapi.common.enums.TaskType;
+import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
@@ -59,7 +56,7 @@ public class TaskServiceImpl implements TaskService {
     public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
-        entity.setTaskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode());
+        entity.setTaskStatus(AssignTaskStatus.UNCLAIMED.getCode());
         entity.setPublisher(OperatorContext.getOperator());
         entity.setCreateId(OperatorContext.getOperator());
         entity.setModifyId(OperatorContext.getOperator());
@@ -309,14 +306,6 @@ public class TaskServiceImpl implements TaskService {
                 respList.add(releaseQueryResp);
             });
         }
-
-//        if (CollectionUtils.isNotEmpty(demeterTaskUsers) && CollectionUtils.isNotEmpty(respList)) {
-//            List<DemeterTaskUser> finalDemeterTaskUsers = demeterTaskUsers;
-//            return Resp.success(respList.stream().filter(a -> finalDemeterTaskUsers.stream()
-//                    .map(DemeterTaskUser::getTaskId)
-//                    .anyMatch(id -> a.getId().equals(id))).collect(Collectors.toList()));
-//        }
-
         return Resp.success(respList);
     }
 
@@ -364,7 +353,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Resp<Object> getSkillDetail(Long id) {
-        DemeterSkillTask entity = demeterSkillTaskDao.selectByPrimaryKey(id);
         return null;
     }
 
@@ -534,19 +522,113 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp<Object> getSkillTaskProgress(Long id) {
-        return null;
-    }
-
-    @Override
-    public Resp<Object> getAssignTaskProgress(Long id) {
-        return null;
+    public Resp<TaskProgressResp> getTaskProgress(Long id) {
+        TaskProgressResp taskProgressResp = new TaskProgressResp();
+        DemeterTaskUser taskUser = demeterTaskUserDao.selectByPrimaryKey(id);
+        if (Objects.nonNull(taskUser)) {
+            taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime());
+            taskProgressResp.setCheckoutOpinion(taskUser.getCheckOpinion());
+            taskProgressResp.setCheckoutResult(CheckoutResult.getByCode(taskUser.getCheckResult()).getDesc());
+            UserDetailResp userDetail = ehrComponent.getUserDetail(taskUser.getReceiverUid());
+            if (Objects.nonNull(userDetail)) {
+                taskProgressResp.setReceiverName(userDetail.getUserName());
+            }
+        } else {
+            return Resp.error();
+        }
+        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
+        taskFinishConditionInfoExample.createCriteria()
+                .andTaskIdEqualTo(taskUser.getTaskId())
+                .andTaskTypeEqualTo(taskUser.getTaskType())
+                .andUidEqualTo(taskUser.getReceiverUid());
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
+            List<TaskFinishConditionInfoResp> respList = new ArrayList<>(16);
+            taskFinishConditionInfos.forEach(info -> {
+                TaskFinishConditionInfoResp resp = new TaskFinishConditionInfoResp();
+                BeanUtils.copyProperties(info, resp);
+                resp.setTaskConditionStatusName(TaskConditionStatus.getByCode(info.getTaskConditionStatus()).getDesc());
+                respList.add(resp);
+            });
+            taskProgressResp.setTaskFinishConditionInfoRespList(respList);
+        }
+        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.createCriteria()
+                .andTaskIdEqualTo(taskUser.getTaskId())
+                .andTaskTypeEqualTo(taskUser.getTaskType())
+                .andUidEqualTo(taskUser.getReceiverUid());
+        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
+        taskProgressResp.setTaskFinishOutcomeList(taskFinishOutcomes);
+        return Resp.success(taskProgressResp);
     }
 
     @Override
     public Resp<Object> checkTask(CheckTaskReq checkTaskReq) {
 
         return null;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Resp<Object> submitCheckTask(Long taskId, Integer taskType) {
+        if (!checkTaskAccept(taskId, taskType)) {
+            return Resp.error("任务未认领");
+        }
+
+        // check 任务条件是否完成
+        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
+        taskFinishConditionInfoExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
+            try {
+                taskFinishConditionInfos.forEach(condition -> {
+                    if (condition.getTaskConditionStatus().equals(TaskConditionStatus.UNFINISHED.getCode())) {
+                        throw new BusinessException("无法提交验收，有任务条件未完成.");
+                    }
+                });
+            } catch (BusinessException exception) {
+                return Resp.error(exception.getMessage());
+            }
+        }
+        /// 任务无完成条件
+        // 是否上传学习成果
+        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
+        if (CollectionUtils.isNotEmpty(taskFinishOutcomes)) {
+            try {
+                taskFinishOutcomes.forEach(outcome -> {
+                    if (StringUtils.isEmpty(outcome.getFileAddress())) {
+                        throw new BusinessException("无法提交验收，请先提交学习成果.");
+                    }
+                });
+            } catch (BusinessException exception) {
+                return Resp.error(exception.getMessage());
+            }
+        }
+
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
+            DemeterTaskUser updateEntity = demeterTaskUsers.get(0);
+            if (TaskType.getByCode(taskType).equals(TaskType.SKILL)) {
+                updateEntity.setTaskStatus(AssignTaskFlowStatus.FINISHED.getCode());
+            } else if (TaskType.getByCode(taskType).equals(TaskType.ASSIGN)) {
+                updateEntity.setTaskStatus(SkillTaskFlowStatus.TO_AUTHENTICATE.getCode());
+            }
+            demeterTaskUserDao.updateByPrimaryKey(updateEntity);
+        }
+        return Resp.success();
     }
 
     @Override
@@ -593,8 +675,23 @@ public class TaskServiceImpl implements TaskService {
         String publisherName = this.getNameFromUid(entity.getPublisher());
         detailResp.setPublisherName(publisherName);
         detailResp.setReceiverName(String.join(",", receiverNameList));
-        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(entity.getTaskStatus()).getDesc());
         detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
+
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
+            DemeterTaskUser demeterTaskUser = demeterTaskUsers.get(0);
+            detailResp.setTaskStatus(AssignTaskFlowStatus.getByCode(demeterTaskUser.getTaskStatus()).getCode());
+            detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(demeterTaskUser.getTaskStatus()).getDesc());
+        } else {
+            detailResp.setTaskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode());
+            detailResp.setTaskStatusName(AssignTaskFlowStatus.UNCLAIMED.getDesc());
+
+        }
 
         TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
         taskFinishConditionExample.createCriteria().andTaskIdEqualTo(entity.getId());
@@ -648,7 +745,7 @@ public class TaskServiceImpl implements TaskService {
             detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
         }
         detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
-        detailResp.setTaskStatusName(AssignTaskFlowStatus.getByCode(demeterAssignTask.getTaskStatus()).getDesc());
+        detailResp.setTaskStatusName(AssignTaskStatus.getByCode(demeterAssignTask.getTaskStatus()).getDesc());
         UserDetailResp publisher = ehrComponent.getUserDetail(demeterAssignTask.getPublisher());
         if (Objects.nonNull(publisher)) {
             detailResp.setPublisherName(publisher.getUserName());
@@ -677,5 +774,48 @@ public class TaskServiceImpl implements TaskService {
             detailResp.setPublisherName(publisher.getUserName());
         }
         return detailResp;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Resp<Object> finishTaskCondition(Long conditionInfoId) {
+        TaskFinishConditionInfoExample conditionInfoExample  = new TaskFinishConditionInfoExample();
+        conditionInfoExample.createCriteria()
+                .andIdEqualTo(conditionInfoId);
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(conditionInfoExample);
+        List<String> uidList = taskFinishConditionInfos.stream().map(TaskFinishConditionInfo::getUid).collect(Collectors.toList());
+        if (!uidList.contains(OperatorContext.getOperator())) {
+            return Resp.error("任务未认领");
+        }
+        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
+            TaskFinishConditionInfo conditionInfo = taskFinishConditionInfos.get(0);
+            if (!checkTaskAccept(conditionInfo.getTaskId(), conditionInfo.getTaskType())) {
+                return Resp.error("任务未认领");
+            }
+            if (conditionInfo.getTaskConditionStatus().equals(TaskConditionStatus.FINISHED.getCode())) {
+                return Resp.error("任务条件已完成，请通知前端同学做好校验");
+            }
+        } else {
+            return Resp.error("system error");
+        }
+        // check 任务条件是否已经完成
+        TaskFinishConditionInfo conditionInfo = TaskFinishConditionInfo.builder()
+                .id(conditionInfoId)
+                .taskConditionStatus(TaskConditionStatus.FINISHED.getCode())
+                .build();
+        taskFinishConditionInfoDao.updateByPrimaryKeySelective(conditionInfo);
+        return Resp.success();
+    }
+
+    /**
+     * check 根据id和type查询任务是否被当前登录人认领
+     */
+    private boolean checkTaskAccept(Long id, Integer type) {
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(type)
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        return CollectionUtils.isNotEmpty(demeterTaskUserDao.selectByExample(demeterTaskUserExample));
     }
 }

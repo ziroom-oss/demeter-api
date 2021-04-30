@@ -6,6 +6,7 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="uid" property="uid" jdbcType="VARCHAR"/>
         <result column="task_id" property="taskId" jdbcType="BIGINT"/>
+        <result column="task_type" property="taskType" jdbcType="INTEGER"/>
         <result column="task_finish_condition_id" property="taskFinishConditionId" jdbcType="BIGINT"/>
         <result column="task_condition_status" property="taskConditionStatus" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
@@ -72,7 +73,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, uid, task_id, task_finish_condition_id, task_condition_status, create_time, modify_time, create_id, modify_id
+        id, uid, task_id, task_type, task_finish_condition_id, task_condition_status, create_time, modify_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.TaskFinishConditionInfoExample">
         select
@@ -102,10 +103,10 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO task_finish_condition_info (uid, task_id, task_finish_condition_id, task_condition_status, create_time, modify_time, 
-            create_id, modify_id)
-        VALUES (#{uid,jdbcType=VARCHAR}, #{taskId,jdbcType=BIGINT}, #{taskFinishConditionId,jdbcType=BIGINT}, #{taskConditionStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, 
-            #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+        INSERT INTO task_finish_condition_info (uid, task_id, task_type, task_finish_condition_id, task_condition_status, create_time, 
+            modify_time, create_id, modify_id)
+        VALUES (#{uid,jdbcType=VARCHAR}, #{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{taskFinishConditionId,jdbcType=BIGINT}, #{taskConditionStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+            #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.TaskFinishConditionInfo">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -118,6 +119,9 @@
             </if>
             <if test="taskId != null">
                 task_id,
+            </if>
+            <if test="taskType != null">
+                task_type,
             </if>
             <if test="taskFinishConditionId != null">
                 task_finish_condition_id,
@@ -144,6 +148,9 @@
             </if>
             <if test="taskId != null">
                 #{taskId,jdbcType=BIGINT},
+            </if>
+            <if test="taskType != null">
+                #{taskType,jdbcType=INTEGER},
             </if>
             <if test="taskFinishConditionId != null">
                 #{taskFinishConditionId,jdbcType=BIGINT},
@@ -183,6 +190,9 @@
             <if test="record.taskId != null">
                 task_id = #{record.taskId,jdbcType=BIGINT},
             </if>
+            <if test="record.taskType != null">
+                task_type = #{record.taskType,jdbcType=INTEGER},
+            </if>
             <if test="record.taskFinishConditionId != null">
                 task_finish_condition_id = #{record.taskFinishConditionId,jdbcType=BIGINT},
             </if>
@@ -211,6 +221,7 @@
         SET id = #{record.id,jdbcType=BIGINT},
             uid = #{record.uid,jdbcType=VARCHAR},
             task_id = #{record.taskId,jdbcType=BIGINT},
+            task_type = #{record.taskType,jdbcType=INTEGER},
             task_finish_condition_id = #{record.taskFinishConditionId,jdbcType=BIGINT},
             task_condition_status = #{record.taskConditionStatus,jdbcType=INTEGER},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -229,6 +240,9 @@
             </if>
             <if test="taskId != null">
                 task_id = #{taskId,jdbcType=BIGINT},
+            </if>
+            <if test="taskType != null">
+                task_type = #{taskType,jdbcType=INTEGER},
             </if>
             <if test="taskFinishConditionId != null">
                 task_finish_condition_id = #{taskFinishConditionId,jdbcType=BIGINT},
@@ -255,6 +269,7 @@
         UPDATE task_finish_condition_info
         SET uid = #{uid,jdbcType=VARCHAR},
             task_id = #{taskId,jdbcType=BIGINT},
+            task_type = #{taskType,jdbcType=INTEGER},
             task_finish_condition_id = #{taskFinishConditionId,jdbcType=BIGINT},
             task_condition_status = #{taskConditionStatus,jdbcType=INTEGER},
             create_time = #{createTime,jdbcType=TIMESTAMP},

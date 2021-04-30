@@ -33,15 +33,15 @@
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"
-               enableSelectByExample="true">
-            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
-        </table>
-
-<!--        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
+
+        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"
+               enableSelectByExample="true">
+            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
+        </table>
 
 <!--        <table tableName="task_finish_condition" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->

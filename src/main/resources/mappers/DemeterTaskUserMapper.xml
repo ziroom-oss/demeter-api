@@ -10,6 +10,7 @@
         <result column="task_status" property="taskStatus" jdbcType="INTEGER"/>
         <result column="check_result" property="checkResult" jdbcType="INTEGER"/>
         <result column="check_opinion" property="checkOpinion" jdbcType="VARCHAR"/>
+        <result column="checkout_time" property="checkoutTime" jdbcType="TIMESTAMP"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
@@ -74,7 +75,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_id, task_type, receiver_uid, task_status, check_result, check_opinion, create_time, modify_time, create_id, modify_id
+        id, task_id, task_type, receiver_uid, task_status, check_result, check_opinion, checkout_time, create_time, modify_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample">
         select
@@ -104,10 +105,10 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, check_result, check_opinion, create_time, 
-            modify_time, create_id, modify_id)
-        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, check_result, check_opinion, checkout_time, 
+            create_time, modify_time, create_id, modify_id)
+        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR}, #{checkoutTime,jdbcType=TIMESTAMP}, 
+            #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -132,6 +133,9 @@
             </if>
             <if test="checkOpinion != null">
                 check_opinion,
+            </if>
+            <if test="checkoutTime != null">
+                checkout_time,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -164,6 +168,9 @@
             </if>
             <if test="checkOpinion != null">
                 #{checkOpinion,jdbcType=VARCHAR},
+            </if>
+            <if test="checkoutTime != null">
+                #{checkoutTime,jdbcType=TIMESTAMP},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -209,6 +216,9 @@
             <if test="record.checkOpinion != null">
                 check_opinion = #{record.checkOpinion,jdbcType=VARCHAR},
             </if>
+            <if test="record.checkoutTime != null">
+                checkout_time = #{record.checkoutTime,jdbcType=TIMESTAMP},
+            </if>
             <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
             </if>
@@ -235,6 +245,7 @@
             task_status = #{record.taskStatus,jdbcType=INTEGER},
             check_result = #{record.checkResult,jdbcType=INTEGER},
             check_opinion = #{record.checkOpinion,jdbcType=VARCHAR},
+            checkout_time = #{record.checkoutTime,jdbcType=TIMESTAMP},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
             modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
             create_id = #{record.createId,jdbcType=VARCHAR},
@@ -264,6 +275,9 @@
             <if test="checkOpinion != null">
                 check_opinion = #{checkOpinion,jdbcType=VARCHAR},
             </if>
+            <if test="checkoutTime != null">
+                checkout_time = #{checkoutTime,jdbcType=TIMESTAMP},
+            </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -287,6 +301,7 @@
             task_status = #{taskStatus,jdbcType=INTEGER},
             check_result = #{checkResult,jdbcType=INTEGER},
             check_opinion = #{checkOpinion,jdbcType=VARCHAR},
+            checkout_time = #{checkoutTime,jdbcType=TIMESTAMP},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             modify_time = #{modifyTime,jdbcType=TIMESTAMP},
             create_id = #{createId,jdbcType=VARCHAR},

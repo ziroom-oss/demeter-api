@@ -18,45 +18,47 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum AssignTaskStatus {
+public enum CheckoutResult {
+
+    UNKNOWN(-1, "-"),
 
     /**
-     * 进行中
+     * 验收不通过
      */
-    UNCLAIMED(0, "进行中"),
+    FAILED(0, "验收不通过"),
 
     /**
-     * 已拒绝
+     * 验收通过
      */
-    CLOSED(1, "已关闭");
+    SUCCESS(1, "验收通过");
 
     /**
      * 类型码
      */
-    private Integer code;
+    private final Integer code;
     /**
      * 类型描述
      */
-    private String desc;
+    private final String desc;
 
-    private static Map<Integer, AssignTaskStatus> map = Arrays.stream(AssignTaskStatus.values())
-            .collect(Collectors.toMap(AssignTaskStatus::getCode, Function.identity()));
+    private static final Map<Integer, CheckoutResult> MAP = Arrays.stream(CheckoutResult.values())
+            .collect(Collectors.toMap(CheckoutResult::getCode, Function.identity()));
 
     /**
      * 根据类型码获取指定的类型枚举
      * @param code 类型码
      * @return 类型枚举
      */
-    public static AssignTaskStatus getByCode(Integer code) {
-        return map.get(code);
+    public static CheckoutResult getByCode(Integer code) {
+        return MAP.get(code);
     }
 
     /**
      * 获取所有的任务类型
      * @return List<SkillTaskStatus>
      */
-    public static List<AssignTaskStatus> getAllTaskType() {
-        return Arrays.stream(AssignTaskStatus.values()).collect(Collectors.toList());
+    public static List<CheckoutResult> getAllTaskType() {
+        return Arrays.stream(CheckoutResult.values()).collect(Collectors.toList());
     }
 
     /**
@@ -68,7 +70,7 @@ public enum AssignTaskStatus {
         if(Objects.isNull(code)) {
             return false;
         }
-        for(AssignTaskStatus taskType : AssignTaskStatus.values()) {
+        for(CheckoutResult taskType : CheckoutResult.values()) {
             if(Objects.equals(taskType.code, code)) {
                 return true;
             }

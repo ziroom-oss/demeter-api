@@ -16,6 +16,8 @@ public class AssignDetailResp {
 
     private Long id;
 
+    private String taskNo;
+
     private String taskName;
 
     private Byte taskEffectiveImmediate;

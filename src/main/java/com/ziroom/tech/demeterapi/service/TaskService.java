@@ -5,6 +5,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.AssignDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiverListResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskProgressResp;
 
 import java.util.List;
 
@@ -68,6 +69,7 @@ public interface TaskService {
      * @param id 任务id
      * @return Resp
      */
+    @Deprecated
     Resp<Object> getSkillDetail(Long id);
 
     /**
@@ -93,6 +95,15 @@ public interface TaskService {
      */
     Resp<Object> checkTask(CheckTaskReq checkTaskReq);
 
+
+    /**
+     * 提交验收任务
+     * @param taskId id
+     * @param taskType type
+     * @return Resp
+     */
+    Resp<Object> submitCheckTask(Long taskId, Integer taskType);
+
     /**
      * 拒绝指派类任务
      * @param rejectTaskReq 指派类任务-拒绝请求体
@@ -116,17 +127,11 @@ public interface TaskService {
     Resp<List<ReceiverListResp>> getTaskCheckList(Long id, Integer taskType);
 
     /**
+     * 任务查看进度
      * @param id
      * @return
      */
-    Resp<Object> getSkillTaskProgress(Long id);
-
-
-    /**
-     * @param id
-     * @return
-     */
-    Resp<Object> getAssignTaskProgress(Long id);
+    Resp<TaskProgressResp> getTaskProgress(Long id);
 
 //    /**
 //     * @param id
@@ -153,4 +158,13 @@ public interface TaskService {
 //    Resp<Object> getSkillTaskDetailAcceptor(Long id);
 
     Resp<Object> getTaskDetails(Long taskId, Integer taskType);
+
+    /**
+     * 任务条件完成
+     * @param conditionInfoId conditionInfo Id
+     * @return Resp
+     */
+    Resp<Object> finishTaskCondition(Long conditionInfoId);
+
+
 }

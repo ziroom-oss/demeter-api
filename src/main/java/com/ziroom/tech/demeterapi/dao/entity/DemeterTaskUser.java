@@ -44,6 +44,8 @@ public class DemeterTaskUser {
 
     private String checkOpinion;
 
+    private Date checkoutTime;
+
     private Date createTime;
 
     private Date modifyTime;
@@ -106,6 +108,14 @@ public class DemeterTaskUser {
 
     public void setCheckOpinion(String checkOpinion) {
         this.checkOpinion = checkOpinion;
+    }
+
+    public Date getCheckoutTime() {
+        return checkoutTime;
+    }
+
+    public void setCheckoutTime(Date checkoutTime) {
+        this.checkoutTime = checkoutTime;
     }
 
     public Date getCreateTime() {

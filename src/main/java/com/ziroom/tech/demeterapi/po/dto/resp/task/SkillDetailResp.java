@@ -12,6 +12,8 @@ public class SkillDetailResp {
 
     private Long id;
 
+    private String taskNo;
+
     private String taskName;
 
     private Integer taskStatus;

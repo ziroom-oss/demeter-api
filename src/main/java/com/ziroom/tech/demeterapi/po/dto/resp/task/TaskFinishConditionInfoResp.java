@@ -17,6 +17,9 @@ public class TaskFinishConditionInfoResp {
 
     private Integer taskConditionStatus;
 
+    /**
+     * 任务条件状态名
+     */
     private String taskConditionStatusName;
 
     private Date createTime;

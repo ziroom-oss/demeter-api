@@ -39,7 +39,7 @@ public enum AssignTaskFlowStatus {
     /**
      * 已完成
      */
-    FINISHED(3, "已完成"),
+    FINISHED(3, "已完成/待验收"),
 
     /**
      * 未完成

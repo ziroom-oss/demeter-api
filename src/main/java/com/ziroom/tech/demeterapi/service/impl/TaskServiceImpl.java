@@ -3,15 +3,20 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.StorageComponent;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 
+import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.storage.UploadResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,6 +56,8 @@ public class TaskServiceImpl implements TaskService {
     private TaskFinishOutcomeDao taskFinishOutcomeDao;
     @Resource
     private EhrComponent ehrComponent;
+    @Resource
+    private StorageComponent storageComponent;
 
     private final static String ASSIGN_PREFIX = "ASSIGN-";
     private final static String SKILL_PREFIX = "SKILL-";
@@ -390,7 +401,7 @@ public class TaskServiceImpl implements TaskService {
                 log.error(exception.getMessage());
                 return Resp.error(exception.getMessage());
             }
-            // 技能类任务必须验收or认证
+            // 技能类任务必须认证
             this.createTaskOutcome(id, type);
         }
 
@@ -491,6 +502,8 @@ public class TaskServiceImpl implements TaskService {
         DemeterTaskUser entity = DemeterTaskUser.builder()
                 .id(demeterTaskUser.getId())
                 .taskStatus(AssignTaskFlowStatus.FORBIDDEN.getCode())
+                .modifyTime(new Date())
+                .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(entity);
         // 拒绝原因处理
@@ -563,9 +576,32 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Resp<Object> checkTask(CheckTaskReq checkTaskReq) {
+        if (checkTaskReq.getResult().equals(CheckoutResult.FAILED.getCode())) {
+            if (StringUtils.isEmpty(checkTaskReq.getAcceptanceOpinion())) {
+                return Resp.error("验收结果不通过必须填写验收意见！");
+            }
+        }
 
-        return null;
+        Integer taskStatus = null;
+        if (checkTaskReq.getResult().equals(CheckoutResult.FAILED.getCode())) {
+            taskStatus = TaskType.SKILL.getCode().equals(checkTaskReq.getTaskType()) ? SkillTaskFlowStatus.FAILED.getCode() : AssignTaskFlowStatus.FAILED.getCode();
+        } else if (checkTaskReq.getResult().equals(CheckoutResult.SUCCESS.getCode())) {
+            taskStatus = TaskType.SKILL.getCode().equals(checkTaskReq.getTaskType()) ? SkillTaskFlowStatus.PASS.getCode() : AssignTaskFlowStatus.ACCEPTANCE.getCode();
+        }
+
+        DemeterTaskUser updateTaskUser = DemeterTaskUser.builder()
+                .id(checkTaskReq.getId())
+                .taskStatus(taskStatus)
+                .checkoutTime(new Date())
+                .checkOpinion(checkTaskReq.getAcceptanceOpinion())
+                .checkResult(CheckoutResult.getByCode(checkTaskReq.getResult()).getCode())
+                .modifyTime(new Date())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+        demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
+        return Resp.success();
     }
 
     @Override
@@ -661,7 +697,7 @@ public class TaskServiceImpl implements TaskService {
                 return getSkillTaskDetailAcceptor(taskId);
             }
         }
-        return null;
+        return Resp.error();
     }
 
     private Resp<Object> getAssignTaskDetailAcceptor(Long id) {
@@ -727,6 +763,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private Resp<Object> getSkillTaskDetailAcceptor(Long id) {
+
         return null;
     }
 
@@ -802,6 +839,8 @@ public class TaskServiceImpl implements TaskService {
         TaskFinishConditionInfo conditionInfo = TaskFinishConditionInfo.builder()
                 .id(conditionInfoId)
                 .taskConditionStatus(TaskConditionStatus.FINISHED.getCode())
+                .modifyTime(new Date())
+                .modifyId(OperatorContext.getOperator())
                 .build();
         taskFinishConditionInfoDao.updateByPrimaryKeySelective(conditionInfo);
         return Resp.success();
@@ -817,5 +856,93 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskTypeEqualTo(type)
                 .andReceiverUidEqualTo(OperatorContext.getOperator());
         return CollectionUtils.isNotEmpty(demeterTaskUserDao.selectByExample(demeterTaskUserExample));
+    }
+
+    @Override
+    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
+        UploadResp uploadResp = this.uploadFile(multipartFile);
+        ZiroomFile file = uploadResp.getFile();
+        String uuid = file.getUuid();
+        if (TaskType.SKILL.getCode().equals(taskType)) {
+            DemeterSkillTask demeterSkillTask = new DemeterSkillTask();
+            demeterSkillTask.setId(taskId);
+            demeterSkillTask.setAttachmentUrl(uuid);
+            demeterSkillTask.setModifyTime(new Date());
+            demeterSkillTask.setModifyId(OperatorContext.getOperator());
+            demeterSkillTaskDao.updateByPrimaryKeySelective(demeterSkillTask);
+        } else if (TaskType.ASSIGN.getCode().equals(taskType)) {
+            DemeterAssignTask demeterAssignTask = new DemeterAssignTask();
+            demeterAssignTask.setId(taskId);
+            demeterAssignTask.setTaskAttachmentUrl(uuid);
+            demeterAssignTask.setModifyId(OperatorContext.getOperator());
+            demeterAssignTask.setUpdateTime(new Date());
+            demeterAssignTaskDao.updateByPrimaryKeySelective(demeterAssignTask);
+        }
+        return Resp.success();
+    }
+
+    @Override
+    public Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType) {
+        UploadResp uploadResp = this.uploadFile(multipartFile);
+        ZiroomFile file = uploadResp.getFile();
+        String uuid = file.getUuid();
+        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.createCriteria()
+                .andUidEqualTo(OperatorContext.getOperator())
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType);
+        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
+        if (CollectionUtils.isEmpty(taskFinishOutcomes)) {
+            return Resp.success("请先领取任务");
+        }
+        TaskFinishOutcome taskFinishOutcome = taskFinishOutcomes.get(0);
+        TaskFinishOutcome update = TaskFinishOutcome.builder()
+                .id(taskFinishOutcome.getId())
+                .fileAddress(uuid)
+                .modifyTime(new Date())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+        taskFinishOutcomeDao.updateByPrimaryKeySelective(update);
+        return Resp.success();
+    }
+
+    private UploadResp uploadFile(MultipartFile multipartFile) {
+        File file;
+        String originalFilename = multipartFile.getOriginalFilename();
+        String[] filename = Objects.requireNonNull(originalFilename).split("\\.");
+        try {
+            file= File.createTempFile(filename[0], filename[1]);
+            multipartFile.transferTo(file);
+            file.deleteOnExit();
+        } catch (IOException e) {
+            throw new BusinessException(e.getMessage());
+        }
+        String fileBase64String;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[fileInputStream.available()];
+            fileInputStream.read(buffer);
+            fileBase64String = Base64.getEncoder().encodeToString(buffer);
+        } catch (IOException e) {
+            throw new BusinessException(e.getMessage());
+        }
+
+        UploadParam uploadParam = UploadParam.builder()
+                .source("")
+                .filename(file.getName())
+                .base64(fileBase64String)
+                .type("if")
+                .build();
+        return storageComponent.uploadFile(uploadParam);
+    }
+
+    // TODO: 2021/5/7
+    @Override
+    public Resp<Object> readFile(String uuidString) {
+        DownloadResp downloadResp = storageComponent.downloadFile(uuidString);
+        // 1、浏览器预览pdf形式
+
+        // 2、传统下载文件
+        return null;
     }
 }

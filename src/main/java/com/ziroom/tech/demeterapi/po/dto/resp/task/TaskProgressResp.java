@@ -1,7 +1,5 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
-import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
-import com.ziroom.tech.demeterapi.dao.entity.TaskFinishConditionInfo;
 import com.ziroom.tech.demeterapi.dao.entity.TaskFinishOutcome;
 import lombok.Data;
 

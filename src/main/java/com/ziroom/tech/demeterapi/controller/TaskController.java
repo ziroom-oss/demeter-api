@@ -10,9 +10,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author daijiankun
@@ -62,42 +64,22 @@ public class TaskController {
         return taskService.getExecuteList(taskListQueryReq);
     }
 
-//    @PostMapping("/detail/assign/publisher")
-//    @ApiOperation(value = "任务详情-指派类任务-发布者", httpMethod = "POST")
-//    public Resp<Object> getAssignTaskDetailReleaser(@RequestParam Long id) {
-//        return taskService.getAssignTaskDetailReleaser(id);
-//    }
-//
-//    @PostMapping("/detail/skill/publisher")
-//    @ApiOperation(value = "任务详情-技能类任务-发布者", httpMethod = "POST")
-//    public Resp<Object> getSkillTaskDetailReleaser(@RequestParam Long id) {
-//        return taskService.getSkillTaskDetailReleaser(id);
-//    }
-//
-//    @PostMapping("/detail/assign/receiver")
-//    @ApiOperation(value = "任务详情-指派类任务-接收人", httpMethod = "POST")
-//    public Resp<Object> getAssignTaskDetailAcceptor(@RequestParam Long id) {
-//        return taskService.getAssignTaskDetailAcceptor(id);
-//    }
-//
-//    @PostMapping("/detail/skill/receiver")
-//    @ApiOperation(value = "任务详情-技能类任务-接收人", httpMethod = "POST")
-//    public Resp<Object> getSkillTaskDetailAcceptor(@RequestParam Long id) {
-//        return taskService.getSkillTaskDetailAcceptor(id);
-//    }
-
-
     @PostMapping("/detail")
     @ApiOperation(value = "任务详情", httpMethod = "POST")
     public Resp<Object> getTaskDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
         return taskService.getTaskDetails(taskId, taskType);
     }
 
-
     @PostMapping("/task/delete")
     @ApiOperation(value = "任务删除", httpMethod = "POST")
     public Resp<Object> deleteTask(@RequestParam Long id, @RequestParam Integer type) {
         return taskService.delete(id, type);
+    }
+
+    @PostMapping("/assign/re-designate")
+    @ApiOperation(value = "任务再次指派", httpMethod = "POST")
+    public Resp<Object> reDesignateTask(@RequestParam Long id, @RequestParam Integer type) {
+        return null;
     }
 
     @PostMapping("/accept")
@@ -145,7 +127,7 @@ public class TaskController {
 
     // todo test
     @PostMapping("/detail/progress")
-    @ApiOperation(value = "任务查看进度", httpMethod = "POST")
+    @ApiOperation(value = "任务查看进度/验收任务预览", httpMethod = "POST")
     public Resp<TaskProgressResp> getAssignTaskProgress(@RequestParam(value = "id") Long id) {
         return taskService.getTaskProgress(id);
     }
@@ -154,5 +136,32 @@ public class TaskController {
     @ApiOperation(value = "查看任务关联的知识图谱", httpMethod = "POST")
     public Resp<Object> getSkillGraphOfTask(@RequestParam Long id, @RequestParam Integer taskType) {
         return null;
+    }
+
+    // todo test
+    @PostMapping("/upload/attachment")
+    @ApiOperation(value = "上传附件", httpMethod = "POST")
+    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
+        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
+            return Resp.error("文件为空，请重新上传");
+        }
+        return taskService.uploadAttachment(multipartFile, taskId, taskType);
+    }
+
+    // TODO: 2021/5/6 test
+    @PostMapping("/upload/outcome")
+    @ApiOperation(value = "上传学习成果", httpMethod = "POST")
+    public Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType) {
+        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
+            return Resp.error("文件为空，请重新上传");
+        }
+        return taskService.uploadLearningOutcome(multipartFile, taskId, taskType);
+    }
+
+    // TODO: 2021/5/6 test
+    @PostMapping("/download/file")
+    @ApiOperation(value = "查看文件", httpMethod = "POST")
+    public Resp<Object> downloadFile(String fileUuid) {
+        return taskService.readFile(fileUuid);
     }
 }

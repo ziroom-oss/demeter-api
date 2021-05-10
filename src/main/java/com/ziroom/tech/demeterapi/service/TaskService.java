@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.task.AssignDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiverListResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskProgressResp;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -133,30 +134,12 @@ public interface TaskService {
      */
     Resp<TaskProgressResp> getTaskProgress(Long id);
 
-//    /**
-//     * @param id
-//     * @return
-//     */
-//    Resp<Object> getAssignTaskDetailReleaser(Long id);
-//
-//    /**
-//     * @param id
-//     * @return
-//     */
-//    Resp<Object> getSkillTaskDetailReleaser(Long id);
-//
-//    /**
-//     * @param id
-//     * @return
-//     */
-//    Resp<Object> getAssignTaskDetailAcceptor(Long id);
-//
-//    /**
-//     * @param id
-//     * @return
-//     */
-//    Resp<Object> getSkillTaskDetailAcceptor(Long id);
-
+    /**
+     * 查看任务详情，所有用户及所有类型任务均可使用
+     * @param taskId id
+     * @param taskType type
+     * @return
+     */
     Resp<Object> getTaskDetails(Long taskId, Integer taskType);
 
     /**
@@ -165,6 +148,29 @@ public interface TaskService {
      * @return Resp
      */
     Resp<Object> finishTaskCondition(Long conditionInfoId);
+
+    // TODO: 2021/5/6  test
+    /**
+     * 上传附件
+     * @param file 文件
+     * @return Resp
+     */
+    Resp<Object> uploadAttachment(MultipartFile file, Long taskId, Integer taskType);
+
+    /**
+     * 上传学习成果
+     * @param multipartFile
+     * @return
+     */
+    Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType);
+
+    // TODO: 2021/5/7 test
+    /**
+     * 查看文件
+     * @param uuidString 文件的uuid
+     * @return Resp
+     */
+    Resp<Object> readFile(String uuidString);
 
 
 }

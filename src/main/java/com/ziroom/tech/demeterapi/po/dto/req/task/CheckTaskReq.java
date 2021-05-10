@@ -30,7 +30,7 @@ public class CheckTaskReq {
     /**
      * 验收结果：0 不通过，1 通过
      */
-    private String result;
+    private Integer result;
 
     /**
      * 验收意见

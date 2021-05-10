@@ -1,5 +1,7 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import lombok.Builder;
+
 import java.util.Date;
 
 /**

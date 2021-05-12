@@ -38,10 +38,10 @@
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"
-               enableSelectByExample="true">
-            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
-        </table>
+<!--        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
 
 <!--        <table tableName="task_finish_condition" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
@@ -54,6 +54,20 @@
 <!--        </table>-->
 
 <!--        <table tableName="task_finish_outcome" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--   技能领域     -->
+<!--        <table tableName="graph_skill" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+<!--        <table tableName="graph_area_skill" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+<!--        <table tableName="graph_sub_skill_task" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->

@@ -353,62 +353,52 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andPositionEqualTo(String value) {
+        public Criteria andPositionEqualTo(Integer value) {
             addCriterion("position =", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionNotEqualTo(String value) {
+        public Criteria andPositionNotEqualTo(Integer value) {
             addCriterion("position <>", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionGreaterThan(String value) {
+        public Criteria andPositionGreaterThan(Integer value) {
             addCriterion("position >", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionGreaterThanOrEqualTo(String value) {
+        public Criteria andPositionGreaterThanOrEqualTo(Integer value) {
             addCriterion("position >=", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionLessThan(String value) {
+        public Criteria andPositionLessThan(Integer value) {
             addCriterion("position <", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionLessThanOrEqualTo(String value) {
+        public Criteria andPositionLessThanOrEqualTo(Integer value) {
             addCriterion("position <=", value, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionLike(String value) {
-            addCriterion("position like", value, "position");
-            return (Criteria) this;
-        }
-
-        public Criteria andPositionNotLike(String value) {
-            addCriterion("position not like", value, "position");
-            return (Criteria) this;
-        }
-
-        public Criteria andPositionIn(List<String> values) {
+        public Criteria andPositionIn(List<Integer> values) {
             addCriterion("position in", values, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionNotIn(List<String> values) {
+        public Criteria andPositionNotIn(List<Integer> values) {
             addCriterion("position not in", values, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionBetween(String value1, String value2) {
+        public Criteria andPositionBetween(Integer value1, Integer value2) {
             addCriterion("position between", value1, value2, "position");
             return (Criteria) this;
         }
 
-        public Criteria andPositionNotBetween(String value1, String value2) {
+        public Criteria andPositionNotBetween(Integer value1, Integer value2) {
             addCriterion("position not between", value1, value2, "position");
             return (Criteria) this;
         }

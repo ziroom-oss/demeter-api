@@ -6,7 +6,7 @@
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="graph_name" property="graphName" jdbcType="VARCHAR"/>
         <result column="enable" property="enable" jdbcType="INTEGER"/>
-        <result column="position" property="position" jdbcType="VARCHAR"/>
+        <result column="position" property="position" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
@@ -103,7 +103,7 @@
         </selectKey>
         INSERT INTO graph_skill (graph_name, enable, position, create_time, modify_time, create_id, modify_id
             )
-        VALUES (#{graphName,jdbcType=VARCHAR}, #{enable,jdbcType=INTEGER}, #{position,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
+        VALUES (#{graphName,jdbcType=VARCHAR}, #{enable,jdbcType=INTEGER}, #{position,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkill">
@@ -142,7 +142,7 @@
                 #{enable,jdbcType=INTEGER},
             </if>
             <if test="position != null">
-                #{position,jdbcType=VARCHAR},
+                #{position,jdbcType=INTEGER},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -177,7 +177,7 @@
                 enable = #{record.enable,jdbcType=INTEGER},
             </if>
             <if test="record.position != null">
-                position = #{record.position,jdbcType=VARCHAR},
+                position = #{record.position,jdbcType=INTEGER},
             </if>
             <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -201,7 +201,7 @@
         SET id = #{record.id,jdbcType=BIGINT},
             graph_name = #{record.graphName,jdbcType=VARCHAR},
             enable = #{record.enable,jdbcType=INTEGER},
-            position = #{record.position,jdbcType=VARCHAR},
+            position = #{record.position,jdbcType=INTEGER},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
             modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
             create_id = #{record.createId,jdbcType=VARCHAR},
@@ -220,7 +220,7 @@
                 enable = #{enable,jdbcType=INTEGER},
             </if>
             <if test="position != null">
-                position = #{position,jdbcType=VARCHAR},
+                position = #{position,jdbcType=INTEGER},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -241,7 +241,7 @@
         UPDATE graph_skill
         SET graph_name = #{graphName,jdbcType=VARCHAR},
             enable = #{enable,jdbcType=INTEGER},
-            position = #{position,jdbcType=VARCHAR},
+            position = #{position,jdbcType=INTEGER},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             modify_time = #{modifyTime,jdbcType=TIMESTAMP},
             create_id = #{createId,jdbcType=VARCHAR},

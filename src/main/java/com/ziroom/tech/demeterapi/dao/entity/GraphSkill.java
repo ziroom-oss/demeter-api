@@ -8,12 +8,12 @@ import java.util.Date;
 public class GraphSkill {
 
     private Long id;
-    // 图谱名称
+    // 技能图谱名称
     private String graphName;
     // 启用状态
     private Integer enable;
-    // 职务名称
-    private String position;
+    // 职务
+    private Integer position;
     private Date createTime;
     private Date modifyTime;
     private String createId;

@@ -4,8 +4,7 @@ import com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
-import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillReq;
-import org.springframework.stereotype.Service;
+import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillListReq;
 
 import java.util.List;
 public interface GraphService {
@@ -44,7 +43,7 @@ public interface GraphService {
     /**
      * 查询技能图谱列表
      */
-    Resp<List<GraphSkill>> listGraphSkill(GraphSkillReq graphSkillReq);
+    Resp<List<GraphSkill>> listGraphSkill(GraphSkillListReq graphSkillListReq);
 
     /**
      * 查询技能领域列表

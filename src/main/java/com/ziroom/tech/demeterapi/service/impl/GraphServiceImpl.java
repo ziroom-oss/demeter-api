@@ -7,7 +7,7 @@ import com.ziroom.tech.demeterapi.dao.mapper.GraphAreaSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSubSkillTaskDao;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
-import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillReq;
+import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillListReq;
 import com.ziroom.tech.demeterapi.service.GraphService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class GraphServiceImpl implements GraphService {
         return null;
     }
     @Override
-    public Resp<List<GraphSkill>> listGraphSkill(GraphSkillReq graphSkillReq) {
+    public Resp<List<GraphSkill>> listGraphSkill(GraphSkillListReq graphSkillListReq) {
         return null;
     }
     @Override

@@ -4,23 +4,18 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
-@ApiModel("查询技能图谱")
+@ApiModel("新增和编辑技能图谱")
 public class GraphSkillReq {
-    @ApiModelProperty("创建时间")
-    private Date createTime;
-
-    @ApiModelProperty("图谱状态")
-    private Byte enable;
-
-    @ApiModelProperty("职务")
-    private Integer position;
+    @ApiModelProperty("主键id，也是图谱编号")
+    private Integer id;
 
     @ApiModelProperty("图谱名称")
     private String graphName;
 
-    @ApiModelProperty("图谱编号")
-    private Long id;
+    @ApiModelProperty("启用状态")
+    private Byte enable;
+
+    @ApiModelProperty("职务")
+    private Integer position;
 }

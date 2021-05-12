@@ -10,21 +10,36 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 public interface GraphService {
     /**
-     * 创建和编辑技能图谱
+     * 创建技能图谱
      */
     Resp<Object> insertGraph(GraphSkill graphSkill);
 
     /**
-     * 创建和编辑技能领域
+     * 更新技能图谱
+     */
+    Resp<Object> updateGraph(GraphSkill graphSkill);
+
+    /**
+     * 创建技能领域
      * 每一个技能领域至少包含一个技能
      */
     Resp<Object> insertSkill(GraphAreaSkill graphAreaSkill);
 
     /**
-     * 创建和编辑子技能
+     * 更新技能领域
+     */
+    Resp<Object> updateSkill(GraphAreaSkill graphAreaSkill);
+
+    /**
+     * 创建子技能
      * 每一个子技能必须与一个任务关联
      */
     Resp<Object> insertSubSkill(GraphSubSkillTask graphSubSkillTask);
+
+    /**
+     * 更新子技能
+     */
+    Resp<Object> updateSubSkill(GraphSubSkillTask graphSubSkillTask);
 
     /**
      * 查询技能图谱列表

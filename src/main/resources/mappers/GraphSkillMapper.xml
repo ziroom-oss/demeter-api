@@ -158,12 +158,12 @@
             </if>
         </trim>
     </insert>
-    <SELECT id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkillExample" resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkillExample" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM graph_skill
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
-    </SELECT>
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         UPDATE graph_skill
         <set>

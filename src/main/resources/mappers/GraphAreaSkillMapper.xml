@@ -93,6 +93,13 @@
         FROM graph_area_skill
         WHERE id = #{id,jdbcType=BIGINT}
     </select>
+    <select id="selectByGraphId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM graph_area_skill
+        WHERE graph_id = #{graphId}
+        order by modify_time desc
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM graph_area_skill
         WHERE id = #{id,jdbcType=BIGINT}

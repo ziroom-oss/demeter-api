@@ -46,6 +46,11 @@ public interface GraphAreaSkillDao {
 
     public GraphAreaSkill selectByPrimaryKey(Long id);
 
+    /**
+     * 按 graphId 返回技能领域列表
+     */
+    public List<GraphAreaSkill> selectByGraphId(Long graphId);
+
     public int updateByExampleSelective(@Param("record") GraphAreaSkill record, @Param("example") GraphAreaSkillExample example);
 
     public int updateByExample(@Param("record") GraphAreaSkill record, @Param("example") GraphAreaSkillExample example);

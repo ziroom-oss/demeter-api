@@ -6,8 +6,8 @@ import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphAreaSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSubSkillTaskDao;
-import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillListReq;
+import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillReq;
 import com.ziroom.tech.demeterapi.service.GraphService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,39 +26,49 @@ public class GraphServiceImpl implements GraphService {
     private GraphSubSkillTaskDao graphSubSkillTaskDao;
 
     @Override
-    public Resp<Object> insertGraph(GraphSkill graphSkill) {
-        return null;
+    public int insertGraph(GraphSkill graphSkill) {
+        return graphSkillDao.insert(graphSkill);
     }
     @Override
-    public Resp<Object> updateGraph(GraphSkill graphSkill) {
-        return null;
+    public int updateGraph(GraphSkill graphSkill) {
+        return graphSkillDao.updateByPrimaryKeySelective(graphSkill);
     }
     @Override
-    public Resp<Object> insertSkill(GraphAreaSkill graphAreaSkill) {
-        return null;
+    public int insertSkill(GraphAreaSkill graphAreaSkill) {
+        return graphAreaSkillDao.insert(graphAreaSkill);
     }
     @Override
-    public Resp<Object> updateSkill(GraphAreaSkill graphAreaSkill) {
-        return null;
+    public int updateSkill(GraphAreaSkill graphAreaSkill) {
+        return graphAreaSkillDao.updateByPrimaryKeySelective(graphAreaSkill);
     }
     @Override
-    public Resp<Object> insertSubSkill(GraphSubSkillTask graphSubSkillTask) {
-        return null;
+    public int insertSubSkill(GraphSubSkillTask graphSubSkillTask) {
+        return graphSubSkillTaskDao.insert(graphSubSkillTask);
     }
     @Override
-    public Resp<Object> updateSubSkill(GraphSubSkillTask graphSubSkillTask) {
-        return null;
+    public int updateSubSkill(GraphSubSkillTask graphSubSkillTask) {
+        return graphSubSkillTaskDao.updateByPrimaryKeySelective(graphSubSkillTask);
+    }
+
+    @Override
+    public List<GraphSkill> listAllGraphSkill() {
+        return graphSkillDao.selectAll();
     }
     @Override
-    public Resp<List<GraphSkill>> listGraphSkill(GraphSkillListReq graphSkillListReq) {
-        return null;
+    public List<GraphSkill> listGraphSkillByCondition(GraphSkillListReq graphSkillListReq) {
+        return graphSkillDao.selectByCondition(graphSkillListReq);
     }
     @Override
-    public Resp<List<GraphAreaSkill>> listGraphAreaSkill(Long graphId) {
-        return null;
+    public GraphSkill getGraphSkill(Long id) {
+        return graphSkillDao.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public List<GraphAreaSkill> listGraphAreaSkill(Long graphId) {
+        return graphAreaSkillDao.selectByGraphId(graphId);
     }
     @Override
-    public Resp<List<GraphSubSkillTask>> listGraphSubSkillTask(Long skillId) {
+    public List<GraphSubSkillTask> listGraphSubSkillTask(Long skillId) {
         return null;
     };
 }

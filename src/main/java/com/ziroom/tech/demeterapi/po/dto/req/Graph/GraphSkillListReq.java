@@ -9,8 +9,11 @@ import java.util.Date;
 @Data
 @ApiModel("查询技能图谱列表")
 public class GraphSkillListReq {
-    @ApiModelProperty("创建时间")
-    private Date createTime;
+    @ApiModelProperty("创建时间-开始时间段")
+    private Date createStartTime;
+
+    @ApiModelProperty("创建时间-结束时间段")
+    private Date createEndTime;
 
     @ApiModelProperty("图谱状态")
     private Byte enable;

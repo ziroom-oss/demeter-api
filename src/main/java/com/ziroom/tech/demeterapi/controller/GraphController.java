@@ -5,6 +5,7 @@ import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillReq;
+import com.ziroom.tech.demeterapi.service.GraphService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Api(tags = "任务相关")
@@ -19,6 +21,8 @@ import java.util.List;
 @RestController
 @RequestMapping("api/graph")
 public class GraphController {
+    @Resource
+    private GraphService graphService;
 
     /**
      * 获取图谱列表接口
@@ -50,7 +54,8 @@ public class GraphController {
      */
     @PostMapping("/")
     public Resp<Object> createGraph(GraphSkillReq graphSkillReq) {
-        return Resp.success();
+        GraphSkill graphSkill = graphSkillReq.getEntity();
+        return Resp.success(graphService.insertGraph(graphSkill));
     }
 
     /**

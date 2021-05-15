@@ -69,6 +69,6 @@ public class GraphServiceImpl implements GraphService {
     }
     @Override
     public List<GraphSubSkillTask> listGraphSubSkillTask(Long skillId) {
-        return null;
+        return graphSubSkillTaskDao.selectBySkillId(skillId);
     };
 }

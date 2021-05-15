@@ -9,9 +9,9 @@ public class GraphSubSkillTask {
 
     private Long id;
     // 关联的技能ID
-    private Integer skillId;
+    private Long skillId;
     // 关联的任务ID
-    private String taskId;
+    private Long taskId;
     // 技能等级 1 初级 2 中级 3 高级
     private Integer level;
     // 子技能名称

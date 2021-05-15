@@ -101,6 +101,7 @@
     <select id="selectByCondition" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
+        FROM graph_skill
         WHERE 1 = 1
         <if test="graphSkillListReq.id != null">
             and id = #{graphSkillListReq.id}
@@ -118,7 +119,7 @@
             and create_time >= #{graphSkillListReq.createStartTime}
             and create_time &lt;= #{graphSkillListReq.createEndTime}
         </if>
-        order by modify_time desc
+        order by modify_time desc;
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM graph_skill

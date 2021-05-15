@@ -5,7 +5,7 @@
     <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="skill_id" property="skillId" jdbcType="INTEGER"/>
-        <result column="task_id" property="taskId" jdbcType="VARCHAR"/>
+        <result column="task_id" property="taskId" jdbcType="INTEGER"/>
         <result column="level" property="level" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="job_level" property="jobLevel" jdbcType="INTEGER"/>
@@ -95,6 +95,13 @@
         FROM graph_sub_skill_task
         WHERE id = #{id,jdbcType=BIGINT}
     </select>
+    <select id="selectBySkillId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM graph_sub_skill_task
+        WHERE skill_id = #{skillId}
+        order by modify_time desc
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM graph_sub_skill_task
         WHERE id = #{id,jdbcType=BIGINT}
@@ -105,7 +112,7 @@
         </selectKey>
         INSERT INTO graph_sub_skill_task (skill_id, task_id, level, name, job_level, create_time, modify_time, 
             create_id, modify_id)
-        VALUES (#{skillId,jdbcType=INTEGER}, #{taskId,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{jobLevel,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, 
+        VALUES (#{skillId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{jobLevel,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP},
             #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
@@ -147,7 +154,7 @@
                 #{skillId,jdbcType=INTEGER},
             </if>
             <if test="taskId != null">
-                #{taskId,jdbcType=VARCHAR},
+                #{taskId,jdbcType=INTEGER},
             </if>
             <if test="level != null">
                 #{level,jdbcType=INTEGER},
@@ -188,7 +195,7 @@
                 skill_id = #{record.skillId,jdbcType=INTEGER},
             </if>
             <if test="record.taskId != null">
-                task_id = #{record.taskId,jdbcType=VARCHAR},
+                task_id = #{record.taskId,jdbcType=INTEGER},
             </if>
             <if test="record.level != null">
                 level = #{record.level,jdbcType=INTEGER},
@@ -220,7 +227,7 @@
         UPDATE graph_sub_skill_task
         SET id = #{record.id,jdbcType=BIGINT},
             skill_id = #{record.skillId,jdbcType=INTEGER},
-            task_id = #{record.taskId,jdbcType=VARCHAR},
+            task_id = #{record.taskId,jdbcType=INTEGER},
             level = #{record.level,jdbcType=INTEGER},
             name = #{record.name,jdbcType=VARCHAR},
             job_level = #{record.jobLevel,jdbcType=INTEGER},
@@ -239,7 +246,7 @@
                 skill_id = #{skillId,jdbcType=INTEGER},
             </if>
             <if test="taskId != null">
-                task_id = #{taskId,jdbcType=VARCHAR},
+                task_id = #{taskId,jdbcType=INTEGER},
             </if>
             <if test="level != null">
                 level = #{level,jdbcType=INTEGER},
@@ -268,7 +275,7 @@
     <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
         UPDATE graph_sub_skill_task
         SET skill_id = #{skillId,jdbcType=INTEGER},
-            task_id = #{taskId,jdbcType=VARCHAR},
+            task_id = #{taskId,jdbcType=INTEGER},
             level = #{level,jdbcType=INTEGER},
             name = #{name,jdbcType=VARCHAR},
             job_level = #{jobLevel,jdbcType=INTEGER},

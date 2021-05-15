@@ -7,29 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
 
-/**
- * <pre>
- * ━━━━━━神兽出没━━━━━━
- * 　　　┏┓　　　┏┓
- * 　　┏┛┻━━━┛┻┓
- * 　　┃　　　　　　　┃
- * 　　┃　　　━　　　┃
- * 　　┃　┳┛　┗┳　┃
- * 　　┃　　　　　　　┃
- * 　　┃　　　┻　　　┃
- * 　　┃　　　　　　　┃
- * 　　┗━┓　　　┏━┛
- * 　　　　┃　　　┃神兽保佑, 永无BUG!
- * 　　　　┃　　　┃Code is far away from bug with the animal protecting
- * 　　　　┃　　　┗━━━┓
- * 　　　　┃　　　　　　　┣┓
- * 　　　　┃　　　　　　　┏┛
- * 　　　　┗┓┓┏━┳┓┏┛
- * 　　　　　┃┫┫　┃┫┫
- * 　　　　　┗┻┛　┗┻┛
- * ━━━━━━感觉萌萌哒━━━━━━
- * </pre>
- */
 @SuppressWarnings("UnnecessaryInterfaceModifier")
 @Repository
 public interface GraphSubSkillTaskDao {
@@ -45,6 +22,11 @@ public interface GraphSubSkillTaskDao {
     public List<GraphSubSkillTask> selectByExample(GraphSubSkillTaskExample example);
 
     public GraphSubSkillTask selectByPrimaryKey(Long id);
+
+    /**
+     * 按父级技能 id 查询子技能列表
+     */
+    public List<GraphSubSkillTask> selectBySkillId(Long skillId);
 
     public int updateByExampleSelective(@Param("record") GraphSubSkillTask record, @Param("example") GraphSubSkillTaskExample example);
 

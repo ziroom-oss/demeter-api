@@ -11,10 +11,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSubSkillTaskReq;
 import com.ziroom.tech.demeterapi.service.GraphService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -61,7 +58,7 @@ public class GraphController {
      * 创建和修改技能图谱
      */
     @PostMapping("/")
-    public Resp<Object> createGraph(GraphSkillReq graphSkillReq) {
+    public Resp<Object> createGraph(@RequestBody GraphSkillReq graphSkillReq) {
         GraphSkill graphSkill = graphSkillReq.getEntity();
         return Resp.success(graphService.insertGraph(graphSkill));
     }
@@ -70,7 +67,7 @@ public class GraphController {
      * 创建和修改技能领域
      */
     @PostMapping("/area")
-    public Resp<Object> createArea(GraphAreaSkillReq graphAreaSkillReq) {
+    public Resp<Object> createArea(@RequestBody GraphAreaSkillReq graphAreaSkillReq) {
         GraphAreaSkill graphAreaSkill = graphAreaSkillReq.getEntity();
         return Resp.success(graphService.insertSkill(graphAreaSkill));
     }
@@ -79,7 +76,7 @@ public class GraphController {
      * 创建和修改子技能
      */
     @PostMapping("/subSkill")
-    public Resp<Object> createSubSkill(GraphSubSkillTaskReq graphSubSkillTaskReq) {
+    public Resp<Object> createSubSkill(@RequestBody GraphSubSkillTaskReq graphSubSkillTaskReq) {
         GraphSubSkillTask graphSubSkillTask = graphSubSkillTaskReq.getEntity();
         return Resp.success(graphService.insertSubSkill(graphSubSkillTask));
     }

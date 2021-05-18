@@ -43,7 +43,7 @@ public class GraphController {
      * 技能领域同时包含它的技能
      */
     @GetMapping("/area/list")
-    public Resp<List<GraphAreaSkill>> listGraphArea(Long graphId) {
+    public Resp<List<GraphAreaSkill>> listGraphArea(@RequestParam Long graphId) {
         return Resp.success(graphService.listGraphAreaSkill(graphId));
     }
 
@@ -74,7 +74,11 @@ public class GraphController {
     @PostMapping("/area")
     public Resp<Object> createArea(@RequestBody GraphAreaSkillReq graphAreaSkillReq) {
         GraphAreaSkill graphAreaSkill = graphAreaSkillReq.getEntity();
-        return Resp.success(graphService.insertSkill(graphAreaSkill));
+        if (Objects.nonNull(graphAreaSkill.getId())) {
+           return Resp.success(graphService.updateSkill(graphAreaSkill));
+        } else {
+            return Resp.success(graphService.insertSkill(graphAreaSkill));
+        }
     }
 
     /**

@@ -9,8 +9,6 @@
         <result column="skill_name" property="skillName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
-        <result column="create_id" property="createId" jdbcType="VARCHAR"/>
-        <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -71,7 +69,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, graph_id, skill_area_name, skill_name, create_time, modify_time, create_id, modify_id
+        id, graph_id, skill_area_name, skill_name, create_time, modify_time
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkillExample">
         select
@@ -108,10 +106,8 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO graph_area_skill (graph_id, skill_area_name, skill_name, create_time, modify_time, create_id, 
-            modify_id)
-        VALUES (#{graphId,jdbcType=INTEGER}, #{skillAreaName,jdbcType=VARCHAR}, #{skillName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, 
-            #{modifyId,jdbcType=VARCHAR})
+        INSERT INTO graph_area_skill (graph_id, skill_area_name, skill_name, create_time, modify_time)
+        VALUES (#{graphId,jdbcType=INTEGER}, #{skillAreaName,jdbcType=VARCHAR}, #{skillName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -134,12 +130,6 @@
             <if test="modifyTime != null">
                 modify_time,
             </if>
-            <if test="createId != null">
-                create_id,
-            </if>
-            <if test="modifyId != null">
-                modify_id,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="graphId != null">
@@ -156,12 +146,6 @@
             </if>
             <if test="modifyTime != null">
                 #{modifyTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="createId != null">
-                #{createId,jdbcType=VARCHAR},
-            </if>
-            <if test="modifyId != null">
-                #{modifyId,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -192,12 +176,6 @@
             <if test="record.modifyTime != null">
                 modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.createId != null">
-                create_id = #{record.createId,jdbcType=VARCHAR},
-            </if>
-            <if test="record.modifyId != null">
-                modify_id = #{record.modifyId,jdbcType=VARCHAR},
-            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -210,9 +188,7 @@
             skill_area_name = #{record.skillAreaName,jdbcType=VARCHAR},
             skill_name = #{record.skillName,jdbcType=VARCHAR},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
-            create_id = #{record.createId,jdbcType=VARCHAR},
-            modify_id = #{record.modifyId,jdbcType=VARCHAR}
+            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -235,12 +211,6 @@
             <if test="modifyTime != null">
                 modify_time = #{modifyTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="createId != null">
-                create_id = #{createId,jdbcType=VARCHAR},
-            </if>
-            <if test="modifyId != null">
-                modify_id = #{modifyId,jdbcType=VARCHAR},
-            </if>
         </set>
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
@@ -250,9 +220,7 @@
             skill_area_name = #{skillAreaName,jdbcType=VARCHAR},
             skill_name = #{skillName,jdbcType=VARCHAR},
             create_time = #{createTime,jdbcType=TIMESTAMP},
-            modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-            create_id = #{createId,jdbcType=VARCHAR},
-            modify_id = #{modifyId,jdbcType=VARCHAR}
+            modify_time = #{modifyTime,jdbcType=TIMESTAMP}
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

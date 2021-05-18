@@ -16,6 +16,4 @@ public class GraphAreaSkill {
     private String skillName;
     private Date createTime;
     private Date modifyTime;
-    private String createId;
-    private String modifyId;
 }

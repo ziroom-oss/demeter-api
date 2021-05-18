@@ -16,6 +16,4 @@ public class GraphSkill {
     private Integer position;
     private Date createTime;
     private Date modifyTime;
-    private String createId;
-    private String modifyId;
 }

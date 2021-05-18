@@ -100,23 +100,24 @@
         SELECT
         <include refid="Base_Column_List" />
         FROM graph_skill
-        WHERE 1 = 1
-        <if test="graphSkillListReq.id != null">
-            and id = #{graphSkillListReq.id}
-        </if>
-        <if test="graphSkillListReq.graphName">
-            and graph_name = #{graphSkillListReq.graphName}
-        </if>
-        <if test="graphSkillListReq.enable">
-            and enable = #{graphSkillListReq.enable}
-        </if>
-        <if test="graphSkillListReq.position">
-            and position = #{graphSkillListReq.position}
-        </if>
-        <if test="graphSkillListReq.createStartTime != null and graphSkillListReq.createEndTime != null">
-            and create_time >= #{graphSkillListReq.createStartTime}
-            and create_time &lt;= #{graphSkillListReq.createEndTime}
-        </if>
+        <where>
+            <if test="graphSkillListReq.id != null">
+                and id = #{graphSkillListReq.id}
+            </if>
+            <if test="graphSkillListReq.graphName != null">
+                and graph_name = #{graphSkillListReq.graphName}
+            </if>
+            <if test="graphSkillListReq.enable != null">
+                and enable = #{graphSkillListReq.enable}
+            </if>
+            <if test="graphSkillListReq.position != null">
+                and position = #{graphSkillListReq.position}
+            </if>
+            <if test="graphSkillListReq.createStartTime != null and graphSkillListReq.createEndTime != null">
+                and create_time >= #{graphSkillListReq.createStartTime}
+                and create_time &lt;= #{graphSkillListReq.createEndTime}
+            </if>
+        </where>
         order by modify_time desc;
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

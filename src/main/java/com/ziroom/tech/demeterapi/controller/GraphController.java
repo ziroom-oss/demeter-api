@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 @Api(tags = "任务相关")
 @Slf4j
@@ -28,7 +29,7 @@ public class GraphController {
      * 获取图谱列表接口
      */
     @PostMapping("/list")
-    public Resp<List<GraphSkill>> listGraphSkill(GraphSkillListReq graphSkillListReq) {
+    public Resp<List<GraphSkill>> listGraphSkill(@RequestBody GraphSkillListReq graphSkillListReq) {
         return Resp.success(graphService.listGraphSkillByCondition(graphSkillListReq));
     }
 
@@ -60,7 +61,11 @@ public class GraphController {
     @PostMapping("/")
     public Resp<Object> createGraph(@RequestBody GraphSkillReq graphSkillReq) {
         GraphSkill graphSkill = graphSkillReq.getEntity();
-        return Resp.success(graphService.insertGraph(graphSkill));
+        if (Objects.nonNull(graphSkill.getId())) {
+            return Resp.success(graphService.updateGraph(graphSkill));
+        } else {
+            return Resp.success(graphService.insertGraph(graphSkill));
+        }
     }
 
     /**

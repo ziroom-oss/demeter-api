@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.StorageComponent;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
@@ -397,7 +398,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp<List<ReleaseQueryResp>> getReleaseList(TaskListQueryReq taskListQueryReq) {
+    public PageListResp<ReleaseQueryResp> getReleaseList(TaskListQueryReq taskListQueryReq) {
+        PageListResp<ReleaseQueryResp> pageListResp = new PageListResp<>();
+
         List<ReleaseQueryResp> respList = new ArrayList<>(16);
 
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
@@ -424,7 +427,7 @@ public class TaskServiceImpl implements TaskService {
                         assignTaskExampleCriteria.andPublisherEqualTo(publisher);
                         skillTaskExampleCriteria.andPublisherEqualTo(publisher);
                     } else {
-                        return Resp.success(respList);
+                        return PageListResp.emptyList();
                     }
                 } else {
                     assignTaskExampleCriteria.andPublisherIn(currentDeptUsers);
@@ -433,7 +436,7 @@ public class TaskServiceImpl implements TaskService {
                 break;
             case PLAIN:
                 if (StringUtils.isNotEmpty(publisher) && !publisher.equals(OperatorContext.getOperator())) {
-                    return Resp.success(respList);
+                    return PageListResp.emptyList();
                 }
                 assignTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
                 skillTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
@@ -452,7 +455,7 @@ public class TaskServiceImpl implements TaskService {
                 assignTaskExampleCriteria.andIdIn(taskIdList);
                 skillTaskExampleCriteria.andIdIn(taskIdList);
             } else {
-                return Resp.success(Lists.newArrayList());
+                return PageListResp.emptyList();
             }
         }
 
@@ -536,11 +539,15 @@ public class TaskServiceImpl implements TaskService {
         }
 
         respList.sort(Comparator.comparing(ReleaseQueryResp::getTaskCreateTime).reversed());
-        return Resp.success(respList);
+        pageListResp.setTotal(respList.size());
+        List<ReleaseQueryResp> rtv = respList.stream().skip(taskListQueryReq.getStart()).limit(taskListQueryReq.getPageSize()).collect(Collectors.toList());
+        pageListResp.setData(rtv);
+        return pageListResp;
     }
 
     @Override
-    public Resp<List<ReceiveQueryResp>> getExecuteList(TaskListQueryReq taskListQueryReq) {
+    public PageListResp<ReceiveQueryResp> getExecuteList(TaskListQueryReq taskListQueryReq) {
+        PageListResp<ReceiveQueryResp> pageListResp = new PageListResp<>();
         // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
         List<ReceiveQueryResp> respList = new ArrayList<>(16);
 
@@ -636,6 +643,7 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.SKILL.getCode());
                     resp.setTaskTypeName(TaskType.SKILL.getDesc());
                     resp.setTaskReward(skill.getSkillReward());
+                    resp.setReceiver(taskUser.getReceiverUid());
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
@@ -658,8 +666,10 @@ public class TaskServiceImpl implements TaskService {
             }
         });
         respList.sort(Comparator.comparing(ReceiveQueryResp::getCreateTime).reversed());
+        pageListResp.setTotal(respList.size());
         List<ReceiveQueryResp> rtv = respList.stream().skip(taskListQueryReq.getStart()).limit(taskListQueryReq.getPageSize()).collect(Collectors.toList());
-        return Resp.success(rtv);
+        pageListResp.setData(rtv);
+        return pageListResp;
     }
 
     private CurrentRole getCurrentRole() {
@@ -1436,6 +1446,7 @@ public class TaskServiceImpl implements TaskService {
 
     /**
      * 检查技能任务是否禁用
+     * @param id id
      * @return true：禁用，false：未禁用
      */
     private void checkSkillForbidden(Long id) {

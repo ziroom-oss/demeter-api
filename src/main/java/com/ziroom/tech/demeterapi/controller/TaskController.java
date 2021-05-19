@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
@@ -92,15 +93,16 @@ public class TaskController {
 
     @PostMapping("/list/release")
     @ApiOperation(value = "发布任务列表", httpMethod = "POST")
-    public Resp<List<ReleaseQueryResp>> getReleaseList(@RequestBody TaskListQueryReq taskListQueryReq) {
-        return taskService.getReleaseList(taskListQueryReq);
+    public Resp<PageListResp<ReleaseQueryResp>> getReleaseList(@RequestBody TaskListQueryReq taskListQueryReq) {
+        taskListQueryReq.validate();
+        return Resp.success(taskService.getReleaseList(taskListQueryReq));
     }
 
     @PostMapping("/list/receive")
     @ApiOperation(value = "接收任务列表", httpMethod = "POST")
-    public Resp<List<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
+    public Resp<PageListResp<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
         taskListQueryReq.validate();
-        return taskService.getExecuteList(taskListQueryReq);
+        return Resp.success(taskService.getExecuteList(taskListQueryReq));
     }
 
     @PostMapping("/detail")

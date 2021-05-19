@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.service;
 
+import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
@@ -57,14 +58,14 @@ public interface TaskService {
      * @param taskListQueryReq 任务列表查询请求体
      * @return Resp<List<ReleaseQueryResp>>
      */
-    Resp<List<ReleaseQueryResp>> getReleaseList(TaskListQueryReq taskListQueryReq);
+    PageListResp<ReleaseQueryResp> getReleaseList(TaskListQueryReq taskListQueryReq);
 
     /**
      * 接收任务列表
      * @param taskListQueryReq 任务列表查询请求体
      * @return Resp
      */
-    Resp<List<ReceiveQueryResp>> getExecuteList(TaskListQueryReq taskListQueryReq);
+    PageListResp<ReceiveQueryResp> getExecuteList(TaskListQueryReq taskListQueryReq);
 
     /**
      * 任务详情-指派类任务

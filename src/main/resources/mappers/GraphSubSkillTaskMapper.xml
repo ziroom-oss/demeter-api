@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.GraphSubSkillTaskDao">
+    <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="skill_id" property="skillId" jdbcType="INTEGER"/>
+        <result column="task_id" property="taskId" jdbcType="INTEGER"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="job_level" property="jobLevel" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="VARCHAR"/>
+        <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, skill_id, task_id, level, name, job_level, create_time, modify_time, create_id, modify_id
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTaskExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        FROM graph_sub_skill_task
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM graph_sub_skill_task
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectBySkillId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM graph_sub_skill_task
+        WHERE skill_id = #{skillId}
+        order by modify_time desc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM graph_sub_skill_task
+        WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO graph_sub_skill_task (skill_id, task_id, level, name, job_level, create_time, modify_time, 
+            create_id, modify_id)
+        VALUES (#{skillId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{jobLevel,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP},
+            #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO graph_sub_skill_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="skillId != null">
+                skill_id,
+            </if>
+            <if test="taskId != null">
+                task_id,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="jobLevel != null">
+                job_level,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="modifyId != null">
+                modify_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="skillId != null">
+                #{skillId,jdbcType=INTEGER},
+            </if>
+            <if test="taskId != null">
+                #{taskId,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="jobLevel != null">
+                #{jobLevel,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTaskExample" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM graph_sub_skill_task
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        UPDATE graph_sub_skill_task
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.skillId != null">
+                skill_id = #{record.skillId,jdbcType=INTEGER},
+            </if>
+            <if test="record.taskId != null">
+                task_id = #{record.taskId,jdbcType=INTEGER},
+            </if>
+            <if test="record.level != null">
+                level = #{record.level,jdbcType=INTEGER},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.jobLevel != null">
+                job_level = #{record.jobLevel,jdbcType=INTEGER},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.modifyTime != null">
+                modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.createId != null">
+                create_id = #{record.createId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.modifyId != null">
+                modify_id = #{record.modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        UPDATE graph_sub_skill_task
+        SET id = #{record.id,jdbcType=BIGINT},
+            skill_id = #{record.skillId,jdbcType=INTEGER},
+            task_id = #{record.taskId,jdbcType=INTEGER},
+            level = #{record.level,jdbcType=INTEGER},
+            name = #{record.name,jdbcType=VARCHAR},
+            job_level = #{record.jobLevel,jdbcType=INTEGER},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{record.createId,jdbcType=VARCHAR},
+            modify_id = #{record.modifyId,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
+        UPDATE graph_sub_skill_task
+        <set>
+            <if test="skillId != null">
+                skill_id = #{skillId,jdbcType=INTEGER},
+            </if>
+            <if test="taskId != null">
+                task_id = #{taskId,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="jobLevel != null">
+                job_level = #{jobLevel,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                modify_id = #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
+        UPDATE graph_sub_skill_task
+        SET skill_id = #{skillId,jdbcType=INTEGER},
+            task_id = #{taskId,jdbcType=INTEGER},
+            level = #{level,jdbcType=INTEGER},
+            name = #{name,jdbcType=VARCHAR},
+            job_level = #{jobLevel,jdbcType=INTEGER},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{createId,jdbcType=VARCHAR},
+            modify_id = #{modifyId,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

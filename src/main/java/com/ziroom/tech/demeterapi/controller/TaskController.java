@@ -53,9 +53,8 @@ public class TaskController {
 
     @PostMapping("get/skill")
     @ApiOperation(value = "查看技能类任务", httpMethod = "POST")
-    public Resp<Object> getSkillTask(@RequestBody SkillTaskReq skillTaskReq) {
-        skillTaskReq.validateAdd();
-        return taskService.createSkillTask(skillTaskReq);
+    public Resp<SkillDetailResp> getSkillTask(@RequestParam Long id) {
+        return taskService.getSkillTask(id);
     }
 
     @GetMapping("type/all")
@@ -148,7 +147,7 @@ public class TaskController {
 
     @PostMapping("/reject/reason")
     @ApiOperation(value = "查看拒绝原因", httpMethod = "POST")
-    public Resp<Object> acceptTask(@RequestBody RejectTaskReasonReq rejectTaskReasonReq) {
+    public Resp<Object> getRejectReason(@RequestBody RejectTaskReasonReq rejectTaskReasonReq) {
         return taskService.getRejectReason(rejectTaskReasonReq);
     }
 

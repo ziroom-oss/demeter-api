@@ -22,6 +22,8 @@ public interface TaskService {
 
     Resp<AssignDetailResp> getAssignTask(Long id);
 
+    Resp<SkillDetailResp> getSkillTask(Long id);
+
     /**
      * 创建技能类任务
      * @param skillTaskReq 技能类任务请求体

@@ -29,11 +29,11 @@ public enum SkillTaskStatus {
     /**
      * 已禁用
      */
-    FORBIDDEN(1, "已启用"),
+    UNFORBIDDEN(1, "已启用"),
     /**
      * 已启用
      */
-    UNFORBIDDEN(2, "已禁用");
+    FORBIDDEN(2, "已禁用");
 
     /**
      * 类型码

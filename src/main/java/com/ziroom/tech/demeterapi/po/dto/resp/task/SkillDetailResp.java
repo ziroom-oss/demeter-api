@@ -1,8 +1,11 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
+import com.ziroom.tech.demeterapi.dao.entity.TaskFinishCondition;
+import com.ziroom.tech.demeterapi.dao.entity.TaskFinishOutcome;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author daijiankun
@@ -28,9 +31,13 @@ public class SkillDetailResp {
 
     private String publisherName;
 
+    private List<String> taskReceiver;
+
     private String receiverName;
 
     private String taskRemark;
+
+    private Integer taskType;
 
     private String taskTypeName;
 
@@ -41,4 +48,10 @@ public class SkillDetailResp {
     private String createId;
 
     private String modifyId;
+
+    private List<TaskFinishCondition> taskFinishConditionList;
+
+    private List<TaskFinishConditionInfoResp> taskFinishConditionInfoRespList;
+
+    private List<TaskFinishOutcome> taskFinishOutcomeList;
 }

@@ -44,4 +44,8 @@ public class ReleaseQueryResp {
 
     @ApiModelProperty("任务接收者姓名")
     private String taskReceiverName;
+
+    private String publisher;
+
+    private String publisherName;
 }

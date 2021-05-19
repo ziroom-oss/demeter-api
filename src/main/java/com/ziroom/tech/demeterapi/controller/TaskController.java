@@ -1,14 +1,17 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.TaskType;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiverListResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskProgressResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,19 +34,55 @@ public class TaskController {
     @PostMapping("save/assign")
     @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
     public Resp<Object> createAssignTask(@RequestBody AssignTaskReq assignTaskReq) {
+        assignTaskReq.validateAdd();
         return taskService.createAssignTask(assignTaskReq);
     }
 
     @PostMapping("save/skill")
     @ApiOperation(value = "新建技能类任务", httpMethod = "POST")
     public Resp<Object> createSkillTask(@RequestBody SkillTaskReq skillTaskReq) {
+        skillTaskReq.validateAdd();
         return taskService.createSkillTask(skillTaskReq);
+    }
+
+    @PostMapping("get/assign")
+    @ApiOperation(value = "查看指派类任务", httpMethod = "POST")
+    public Resp<AssignDetailResp> getAssignTask(@RequestParam Long id) {
+        return taskService.getAssignTask(id);
+    }
+
+    @PostMapping("get/skill")
+    @ApiOperation(value = "查看技能类任务", httpMethod = "POST")
+    public Resp<Object> getSkillTask(@RequestBody SkillTaskReq skillTaskReq) {
+        skillTaskReq.validateAdd();
+        return taskService.createSkillTask(skillTaskReq);
+    }
+
+    @GetMapping("type/all")
+    public Resp<Object> getAllTaskTypes() {
+        return Resp.success(TaskType.getAllTaskType());
+    }
+
+    @GetMapping("status/assign")
+    public Resp<Object> getAllAssignStatus() {
+        return Resp.success(AssignTaskFlowStatus.getAllTaskType());
+    }
+
+    @GetMapping("status/skill")
+    public Resp<Object> getAllSkillStatus() {
+        return Resp.success(SkillTaskFlowStatus.getAllTaskType());
     }
 
     @PostMapping("update/assign")
     @ApiOperation(value = "编辑指派类任务", httpMethod = "POST")
     public Resp<Object> updateAssignTask(@RequestBody AssignTaskReq assignTaskReq) {
         return taskService.updateAssignTask(assignTaskReq);
+    }
+
+    @PostMapping("status/assign")
+    @ApiOperation(value = "任务自身状态更改：指派类：开启 关闭，技能类：启用 禁用", httpMethod = "POST")
+    public Resp<Object> updateAssignTaskStatus(@RequestParam Long taskId, Integer taskType, Integer taskStatus) {
+        return taskService.updateAssignTaskStatus(taskId, taskType, taskStatus);
     }
 
     @PostMapping("update/skill")
@@ -53,14 +92,15 @@ public class TaskController {
     }
 
     @PostMapping("/list/release")
-    @ApiOperation(value = "任务列表-我发布的", httpMethod = "POST")
+    @ApiOperation(value = "发布任务列表", httpMethod = "POST")
     public Resp<List<ReleaseQueryResp>> getReleaseList(@RequestBody TaskListQueryReq taskListQueryReq) {
         return taskService.getReleaseList(taskListQueryReq);
     }
 
-    @PostMapping("/list/execute")
-    @ApiOperation(value = "任务列表-我接收的", httpMethod = "POST")
-    public Resp<Object> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
+    @PostMapping("/list/receive")
+    @ApiOperation(value = "接收任务列表", httpMethod = "POST")
+    public Resp<List<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
+        taskListQueryReq.validate();
         return taskService.getExecuteList(taskListQueryReq);
     }
 
@@ -68,6 +108,11 @@ public class TaskController {
     @ApiOperation(value = "任务详情", httpMethod = "POST")
     public Resp<Object> getTaskDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
         return taskService.getTaskDetails(taskId, taskType);
+    }
+
+    @PostMapping("/detail/all")
+    public Resp<TaskDetailResp> getAllDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
+        return taskService.getAllDetails(taskId, taskType);
     }
 
     @PostMapping("/task/delete")
@@ -97,7 +142,7 @@ public class TaskController {
     // todo test
     @PostMapping("/reject")
     @ApiOperation(value = "任务拒绝", httpMethod = "POST")
-    public Resp<Object> acceptTask(@RequestBody RejectTaskReq rejectTaskReq) {
+    public Resp<Object> rejectTask(@RequestBody RejectTaskReq rejectTaskReq) {
         return taskService.rejectTask(rejectTaskReq);
     }
 
@@ -119,11 +164,11 @@ public class TaskController {
         return taskService.checkTask(checkTaskReq);
     }
 
-    @PostMapping("/receiver/list")
-    @ApiOperation(value = "两类任务-查看接收人清单", httpMethod = "POST")
-    public Resp<List<ReceiverListResp>> getAssignTaskCheckList(@RequestParam Long taskId, @RequestParam Integer taskType) {
-        return taskService.getTaskCheckList(taskId, taskType);
-    }
+//    @PostMapping("/receiver/list")
+//    @ApiOperation(value = "两类任务-查看接收人清单", httpMethod = "POST")
+//    public Resp<List<ReceiverListResp>> getAssignTaskCheckList(@RequestParam Long taskId, @RequestParam Integer taskType) {
+//        return taskService.getTaskCheckList(taskId, taskType);
+//    }
 
     // todo test
     @PostMapping("/detail/progress")

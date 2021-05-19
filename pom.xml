@@ -123,6 +123,46 @@
 			<artifactId>druid-spring-boot-starter</artifactId>
 			<version>1.2.4</version>
 		</dependency>
+
+		<!-- 任务调度平台 -->
+		<dependency>
+			<groupId>com.ziroom.tech.sia</groupId>
+			<artifactId>sia-task-hunter</artifactId>
+			<version>1.1.0-SNAPSHOT</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>guava</artifactId>
+						<groupId>com.google.guava</groupId>
+					</exclusion>
+				</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- halo sdk -->
+		<dependency>
+			<groupId>com.ziroom.tech</groupId>
+			<artifactId>halo-perm-spring-boot-starter</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+
 	</dependencies>
 	<build>
 		<finalName>demeter-api</finalName>

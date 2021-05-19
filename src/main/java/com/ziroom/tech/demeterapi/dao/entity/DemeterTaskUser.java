@@ -46,6 +46,8 @@ public class DemeterTaskUser {
 
     private Date checkoutTime;
 
+    private Date taskEndTime;
+
     private Date createTime;
 
     private Date modifyTime;
@@ -116,6 +118,14 @@ public class DemeterTaskUser {
 
     public void setCheckoutTime(Date checkoutTime) {
         this.checkoutTime = checkoutTime;
+    }
+
+    public Date getTaskEndTime() {
+        return taskEndTime;
+    }
+
+    public void setTaskEndTime(Date taskEndTime) {
+        this.taskEndTime = taskEndTime;
     }
 
     public Date getCreateTime() {

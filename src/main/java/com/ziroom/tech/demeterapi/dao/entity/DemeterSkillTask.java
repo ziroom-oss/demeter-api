@@ -1,7 +1,5 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
-import lombok.Builder;
-
 import java.util.Date;
 
 /**
@@ -45,7 +43,7 @@ public class DemeterSkillTask {
 
     private Date createTime;
 
-    private Date modifyTime;
+    private Date updateTime;
 
     private String createId;
 
@@ -115,12 +113,12 @@ public class DemeterSkillTask {
         this.createTime = createTime;
     }
 
-    public Date getModifyTime() {
-        return modifyTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getCreateId() {

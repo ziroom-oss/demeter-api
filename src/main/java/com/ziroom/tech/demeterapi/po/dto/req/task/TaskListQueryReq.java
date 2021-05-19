@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.req.task;
 
+import com.ziroom.tech.demeterapi.common.PageListReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("任务列表-查询请求体")
-public class TaskListQueryReq {
+public class TaskListQueryReq extends PageListReq {
 
     @ApiModelProperty("任务类型")
     private Integer taskType;
@@ -24,4 +25,5 @@ public class TaskListQueryReq {
     @ApiModelProperty("任务名称/编号")
     private String nameOrNo;
 
+    private String publisher;
 }

@@ -21,14 +21,19 @@ import java.util.stream.Collectors;
 public enum AssignTaskStatus {
 
     /**
+     * 全部
+     */
+    ALL(0, "全部"),
+
+    /**
      * 进行中
      */
-    UNCLAIMED(0, "进行中"),
+    UNCLAIMED(1, "进行中"),
 
     /**
      * 已拒绝
      */
-    CLOSED(1, "已关闭");
+    CLOSED(2, "已关闭");
 
     /**
      * 类型码

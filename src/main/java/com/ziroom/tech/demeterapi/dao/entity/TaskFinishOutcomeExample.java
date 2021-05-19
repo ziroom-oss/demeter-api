@@ -473,73 +473,73 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andUidIsNull() {
-            addCriterion("uid is null");
+        public Criteria andReceiverUidIsNull() {
+            addCriterion("receiver_uid is null");
             return (Criteria) this;
         }
 
-        public Criteria andUidIsNotNull() {
-            addCriterion("uid is not null");
+        public Criteria andReceiverUidIsNotNull() {
+            addCriterion("receiver_uid is not null");
             return (Criteria) this;
         }
 
-        public Criteria andUidEqualTo(String value) {
-            addCriterion("uid =", value, "uid");
+        public Criteria andReceiverUidEqualTo(String value) {
+            addCriterion("receiver_uid =", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotEqualTo(String value) {
-            addCriterion("uid <>", value, "uid");
+        public Criteria andReceiverUidNotEqualTo(String value) {
+            addCriterion("receiver_uid <>", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidGreaterThan(String value) {
-            addCriterion("uid >", value, "uid");
+        public Criteria andReceiverUidGreaterThan(String value) {
+            addCriterion("receiver_uid >", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidGreaterThanOrEqualTo(String value) {
-            addCriterion("uid >=", value, "uid");
+        public Criteria andReceiverUidGreaterThanOrEqualTo(String value) {
+            addCriterion("receiver_uid >=", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidLessThan(String value) {
-            addCriterion("uid <", value, "uid");
+        public Criteria andReceiverUidLessThan(String value) {
+            addCriterion("receiver_uid <", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidLessThanOrEqualTo(String value) {
-            addCriterion("uid <=", value, "uid");
+        public Criteria andReceiverUidLessThanOrEqualTo(String value) {
+            addCriterion("receiver_uid <=", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidLike(String value) {
-            addCriterion("uid like", value, "uid");
+        public Criteria andReceiverUidLike(String value) {
+            addCriterion("receiver_uid like", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotLike(String value) {
-            addCriterion("uid not like", value, "uid");
+        public Criteria andReceiverUidNotLike(String value) {
+            addCriterion("receiver_uid not like", value, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidIn(List<String> values) {
-            addCriterion("uid in", values, "uid");
+        public Criteria andReceiverUidIn(List<String> values) {
+            addCriterion("receiver_uid in", values, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotIn(List<String> values) {
-            addCriterion("uid not in", values, "uid");
+        public Criteria andReceiverUidNotIn(List<String> values) {
+            addCriterion("receiver_uid not in", values, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidBetween(String value1, String value2) {
-            addCriterion("uid between", value1, value2, "uid");
+        public Criteria andReceiverUidBetween(String value1, String value2) {
+            addCriterion("receiver_uid between", value1, value2, "receiverUid");
             return (Criteria) this;
         }
 
-        public Criteria andUidNotBetween(String value1, String value2) {
-            addCriterion("uid not between", value1, value2, "uid");
+        public Criteria andReceiverUidNotBetween(String value1, String value2) {
+            addCriterion("receiver_uid not between", value1, value2, "receiverUid");
             return (Criteria) this;
         }
 

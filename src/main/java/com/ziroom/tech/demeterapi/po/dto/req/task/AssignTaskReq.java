@@ -1,11 +1,14 @@
 package com.ziroom.tech.demeterapi.po.dto.req.task;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 指派类任务请求体
@@ -31,7 +34,10 @@ public class AssignTaskReq {
     private Date taskEndTime;
 
     @ApiModelProperty("任务接收者")
-    private String taskReceiver;
+    private List<String> taskReceiver;
+
+    @ApiModelProperty("任务自身状态：关闭 开启")
+    private Integer taskStatus;
 
     @ApiModelProperty("任务完成条件")
     private List<String> taskFinishCondition;
@@ -53,4 +59,13 @@ public class AssignTaskReq {
 
     @ApiModelProperty("备注")
     private String taskDescription;
+
+    public void validateAdd() {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(taskName), "任务名称不能为空");
+        Preconditions.checkArgument(Objects.nonNull(taskEndTime), "任务结束时间不能为空");
+        Preconditions.checkArgument(Objects.nonNull(taskReward), "任务成长值奖励不能为空");
+        Preconditions.checkArgument(Objects.nonNull(needEmailRemind), "任务是否邮件提醒不能为空");
+        Preconditions.checkArgument(Objects.nonNull(needPunishment), "任务是否有惩罚不能为空");
+        Preconditions.checkArgument(Objects.nonNull(needAcceptance), "任务是否需要验收不能为空");
+    }
 }

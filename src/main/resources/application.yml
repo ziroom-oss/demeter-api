@@ -66,3 +66,15 @@ mybatis:
 #logging:
 #  root:
 #    level: debug
+
+message:
+  baseUrl: http://message.t.ziroom.com
+  token:
+    workWechat: 6099ed8a28a4fb4763b10ada
+  model:
+    workWechat: WW-1620700709
+
+halo:
+  user-perm:
+    app-code: demeter-api
+    url: http://tech.halo.t.ziroom.com/api/v2/user-perm

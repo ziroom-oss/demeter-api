@@ -653,6 +653,66 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andTaskEndTimeIsNull() {
+            addCriterion("task_end_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeIsNotNull() {
+            addCriterion("task_end_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeEqualTo(Date value) {
+            addCriterion("task_end_time =", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeNotEqualTo(Date value) {
+            addCriterion("task_end_time <>", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeGreaterThan(Date value) {
+            addCriterion("task_end_time >", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("task_end_time >=", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeLessThan(Date value) {
+            addCriterion("task_end_time <", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeLessThanOrEqualTo(Date value) {
+            addCriterion("task_end_time <=", value, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeIn(List<Date> values) {
+            addCriterion("task_end_time in", values, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeNotIn(List<Date> values) {
+            addCriterion("task_end_time not in", values, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeBetween(Date value1, Date value2) {
+            addCriterion("task_end_time between", value1, value2, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskEndTimeNotBetween(Date value1, Date value2) {
+            addCriterion("task_end_time not between", value1, value2, "taskEndTime");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;

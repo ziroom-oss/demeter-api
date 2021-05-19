@@ -40,7 +40,7 @@ public class TaskFinishOutcome {
 
     private Integer taskType;
 
-    private String uid;
+    private String receiverUid;
 
     private Date createTime;
 
@@ -90,12 +90,12 @@ public class TaskFinishOutcome {
         this.taskType = taskType;
     }
 
-    public String getUid() {
-        return uid;
+    public String getReceiverUid() {
+        return receiverUid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setReceiverUid(String receiverUid) {
+        this.receiverUid = receiverUid;
     }
 
     public Date getCreateTime() {

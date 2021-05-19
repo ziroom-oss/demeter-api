@@ -1,11 +1,9 @@
 package com.ziroom.tech.demeterapi.service;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.AssignDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiverListResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.ReleaseQueryResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.task.TaskProgressResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -22,6 +20,8 @@ public interface TaskService {
      */
     Resp<Object> createAssignTask(AssignTaskReq assignTaskReq);
 
+    Resp<AssignDetailResp> getAssignTask(Long id);
+
     /**
      * 创建技能类任务
      * @param skillTaskReq 技能类任务请求体
@@ -37,6 +37,13 @@ public interface TaskService {
     Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq);
 
     /**
+     * @param taskId id
+     * @param taskType type
+     * @return
+     */
+    Resp<Object> updateAssignTaskStatus(Long taskId, Integer taskType, Integer taskStatus);
+
+    /**
      * 编辑技能类任务
      * @param skillTaskReq  技能类任务请求体
      * @return Resp
@@ -44,18 +51,18 @@ public interface TaskService {
     Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq);
 
     /**
-     * 任务列表-我发布的
+     * 发布任务列表
      * @param taskListQueryReq 任务列表查询请求体
      * @return Resp<List<ReleaseQueryResp>>
      */
     Resp<List<ReleaseQueryResp>> getReleaseList(TaskListQueryReq taskListQueryReq);
 
     /**
-     * 任务列表-我接收的
+     * 接收任务列表
      * @param taskListQueryReq 任务列表查询请求体
      * @return Resp
      */
-    Resp<Object> getExecuteList(TaskListQueryReq taskListQueryReq);
+    Resp<List<ReceiveQueryResp>> getExecuteList(TaskListQueryReq taskListQueryReq);
 
     /**
      * 任务详情-指派类任务
@@ -119,14 +126,6 @@ public interface TaskService {
      */
     Resp<Object> getRejectReason(RejectTaskReasonReq rejectTaskReasonReq);
 
-
-    /**
-     * 任务接收人清单
-     * @param id 任务id
-     * @return Resp
-     */
-    Resp<List<ReceiverListResp>> getTaskCheckList(Long id, Integer taskType);
-
     /**
      * 任务查看进度
      * @param id
@@ -135,12 +134,22 @@ public interface TaskService {
     Resp<TaskProgressResp> getTaskProgress(Long id);
 
     /**
-     * 查看任务详情，所有用户及所有类型任务均可使用
+     * 查看任务详情
      * @param taskId id
      * @param taskType type
      * @return
      */
+    @Deprecated
     Resp<Object> getTaskDetails(Long taskId, Integer taskType);
+
+
+    /**
+     * 查看任务详情，所有用户及所有类型任务均可使用
+     * @param taskId id
+     * @param taskType type
+     * @return TaskDetailsResp
+     */
+    Resp<TaskDetailResp> getAllDetails(Long taskId, Integer taskType);
 
     /**
      * 任务条件完成
@@ -173,4 +182,9 @@ public interface TaskService {
     Resp<Object> readFile(String uuidString);
 
 
+    /**
+     * 检查指派任务是否延期
+     * @return 是 否
+     */
+    Boolean checkTaskDelay();
 }

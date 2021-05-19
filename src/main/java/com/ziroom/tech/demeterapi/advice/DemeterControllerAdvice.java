@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.config;
+package com.ziroom.tech.demeterapi.advice;
 
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.sql.SQLException;
 
 /**
- * @author chenx34
- * @date 2020/8/13 15:51
- */
+ * 统一异常捕获器
+ *
+ * @author huangqiaowei
+ * @date 2019-11-01 10:22
+ **/
 @RestControllerAdvice
 @Slf4j
-public class ManagementControllerAdvice {
-
+public class DemeterControllerAdvice {
     /**
      * 业务异常
      *
@@ -28,6 +29,7 @@ public class ManagementControllerAdvice {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public Resp handleParamValidate(BusinessException exception) {
+        log.error(exception.getMessage(), exception);
         return Resp.error(exception.getMessage());
     }
 
@@ -39,6 +41,7 @@ public class ManagementControllerAdvice {
     @ExceptionHandler(value = {IllegalArgumentException.class, HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.OK)
     public Resp handleParamValidate(Exception exception) {
+        log.error(exception.getMessage(), exception);
         return Resp.error(exception.getMessage());
     }
 
@@ -63,4 +66,5 @@ public class ManagementControllerAdvice {
         log.error(exception.getMessage(), exception);
         return Resp.error(exception.getMessage());
     }
+
 }

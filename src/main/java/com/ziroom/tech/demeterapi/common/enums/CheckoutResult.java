@@ -20,7 +20,15 @@ import java.util.stream.Collectors;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum CheckoutResult {
 
-    UNKNOWN(-1, "-"),
+    /**
+     * 不需要验收
+     */
+    NO_CHECKOUT(-2, "-"),
+
+    /**
+     * 需要验收但未验收
+     */
+    NEED_CHECKOUT(-1, "-"),
 
     /**
      * 验收不通过

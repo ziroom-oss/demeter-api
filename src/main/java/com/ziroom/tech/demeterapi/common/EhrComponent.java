@@ -91,11 +91,14 @@ public class EhrComponent {
      * 根据用户系统号获取用户详情
      * userCodes最多传10个 示例：["20237106", “20118321”]
      *
-     * @param userCodes 用户系统号列表
+     * @param uidString 用户系统号列表
      * @return List<User>
      */
-    public List<EhrUserDetailResp> getEhrUserDetail(String userCodes) {
-        log.info("EhrService.getEhrUserDetail params:{}", userCodes);
+    public List<EhrUserDetailResp> getEhrUserDetail(String uidString) {
+        log.info("EhrService.getEhrUserDetail params:{}", uidString);
+        List<String> strings = Arrays.asList(uidString.split(","));
+        List<String> collect = strings.stream().map(this::addQuotationMark).collect(Collectors.toList());
+        String userCodes = "[" +  String.join(",", collect) + "]";
         Call<JSONObject> call = ehrApiEndPoint.getUserDetail(userCodes);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String failure = "failure";
@@ -127,6 +130,10 @@ public class EhrComponent {
         }
         log.info("EhrService.getEhrUserDetail request success result:{}", userList);
         return userList;
+    }
+
+    private String addQuotationMark(String uid) {
+        return "\"" + uid + "\"";
     }
 
     /**

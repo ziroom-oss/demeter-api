@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
 import com.ziroom.tech.demeterapi.dao.entity.TaskFinishCondition;
 import com.ziroom.tech.demeterapi.dao.entity.TaskFinishOutcome;
 import lombok.Builder;
@@ -34,6 +35,8 @@ public class AssignDetailResp {
 
     private String taskStatusName;
 
+    private Integer taskType;
+
     private String taskTypeName;
 
     private String taskDescription;
@@ -42,7 +45,7 @@ public class AssignDetailResp {
 
     private String publisherName;
 
-    private String receiver;
+    private List<String> taskReceiver;
 
     private String receiverName;
 

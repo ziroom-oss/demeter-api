@@ -8,26 +8,19 @@ import java.util.Date;
  * @author daijiankun
  */
 @Data
-public class TaskFinishConditionInfoResp {
+public class TaskFinishOutcomeResp {
 
     private Long id;
 
-    private String uid;
+    private String fileAddress;
+
+    private String fileName;
 
     private Long taskId;
 
     private Integer taskType;
 
-    private Long taskFinishConditionId;
-
-    private String taskFinishContent;
-
-    private Integer taskConditionStatus;
-
-    /**
-     * 任务条件状态名
-     */
-    private String taskConditionStatusName;
+    private String receiverUid;
 
     private Date createTime;
 

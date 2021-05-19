@@ -11,7 +11,7 @@
         <result column="publisher" property="publisher" jdbcType="VARCHAR"/>
         <result column="task_remark" property="taskRemark" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
         <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
     </resultMap>
@@ -74,7 +74,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_name, task_status, skill_reward, attachment_url, publisher, task_remark, create_time, modify_time, create_id, modify_id
+        id, task_name, task_status, skill_reward, attachment_url, publisher, task_remark, create_time, update_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample">
         select
@@ -105,9 +105,9 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
         INSERT INTO demeter_skill_task (task_name, task_status, skill_reward, attachment_url, publisher, task_remark, 
-            create_time, modify_time, create_id, modify_id)
+            create_time, update_time, create_id, modify_id)
         VALUES (#{taskName,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{skillReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR}, #{taskRemark,jdbcType=VARCHAR}, 
-            #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+            #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -136,8 +136,8 @@
             <if test="createTime != null">
                 create_time,
             </if>
-            <if test="modifyTime != null">
-                modify_time,
+            <if test="updateTime != null">
+                update_time,
             </if>
             <if test="createId != null">
                 create_id,
@@ -168,8 +168,8 @@
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="modifyTime != null">
-                #{modifyTime,jdbcType=TIMESTAMP},
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="createId != null">
                 #{createId,jdbcType=VARCHAR},
@@ -212,8 +212,8 @@
             <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.modifyTime != null">
-                modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="record.createId != null">
                 create_id = #{record.createId,jdbcType=VARCHAR},
@@ -236,7 +236,7 @@
             publisher = #{record.publisher,jdbcType=VARCHAR},
             task_remark = #{record.taskRemark,jdbcType=VARCHAR},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            update_time = #{record.updateTime,jdbcType=TIMESTAMP},
             create_id = #{record.createId,jdbcType=VARCHAR},
             modify_id = #{record.modifyId,jdbcType=VARCHAR}
         <if test="_parameter != null">
@@ -267,8 +267,8 @@
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="modifyTime != null">
-                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="createId != null">
                 create_id = #{createId,jdbcType=VARCHAR},
@@ -288,7 +288,7 @@
             publisher = #{publisher,jdbcType=VARCHAR},
             task_remark = #{taskRemark,jdbcType=VARCHAR},
             create_time = #{createTime,jdbcType=TIMESTAMP},
-            modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
             create_id = #{createId,jdbcType=VARCHAR},
             modify_id = #{modifyId,jdbcType=VARCHAR}
         WHERE id = #{id,jdbcType=BIGINT}

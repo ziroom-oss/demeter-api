@@ -12,47 +12,47 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 技能任务自身状态
+ * 当前登录人角色
  * @author daijiankun
  */
-
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum SkillTaskStatus {
+public enum CurrentRole {
 
     /**
-     * 全部
+     * 普通用户
      */
-    ALL(0, "全部"),
+    PLAIN("plain", "普通用户"),
 
     /**
-     * 已禁用
+     * 部门管理员
      */
-    FORBIDDEN(1, "已启用"),
-    /**
-     * 已启用
-     */
-    UNFORBIDDEN(2, "已禁用");
+    DEPT("demeter-dept-admin", "部门管理员"),
 
     /**
-     * 类型码
+     * 超级管理员
      */
-    private Integer code;
+    SUPER("demeter-super-admin", "超级管理员");
+
     /**
-     * 类型描述
+     * 角色码
+     */
+    private String code;
+    /**
+     * 角色描述
      */
     private String desc;
 
-    private static Map<Integer, SkillTaskStatus> map = Arrays.stream(SkillTaskStatus.values())
-            .collect(Collectors.toMap(SkillTaskStatus::getCode, Function.identity()));
+    private static Map<String, CurrentRole> map = Arrays.stream(CurrentRole.values())
+            .collect(Collectors.toMap(CurrentRole::getCode, Function.identity()));
 
     /**
      * 根据类型码获取指定的类型枚举
      * @param code 类型码
      * @return 类型枚举
      */
-    public static SkillTaskStatus getByCode(Integer code) {
+    public static CurrentRole getByCode(String code) {
         return map.get(code);
     }
 
@@ -60,8 +60,8 @@ public enum SkillTaskStatus {
      * 获取所有的任务类型
      * @return List<SkillTaskStatus>
      */
-    public static List<SkillTaskStatus> getAllTaskType() {
-        return Arrays.stream(SkillTaskStatus.values()).collect(Collectors.toList());
+    public static List<CurrentRole> getAllTaskType() {
+        return Arrays.stream(CurrentRole.values()).collect(Collectors.toList());
     }
 
     /**
@@ -69,11 +69,11 @@ public enum SkillTaskStatus {
      * @param code 状态码
      * @return 是否合法 合法:true 不合法:false
      */
-    public static boolean isValid(Integer code){
+    public static boolean isValid(String code){
         if(Objects.isNull(code)) {
             return false;
         }
-        for(SkillTaskStatus taskType : SkillTaskStatus.values()) {
+        for(CurrentRole taskType : CurrentRole.values()) {
             if(Objects.equals(taskType.code, code)) {
                 return true;
             }

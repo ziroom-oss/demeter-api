@@ -55,4 +55,7 @@ public class EhrUserDetailResp {
 
     @ApiModelProperty("职务描述")
     private String desc;
+
+    @ApiModelProperty("公司编码")
+    private String setId;
 }

@@ -12,17 +12,24 @@ import com.ziroom.tech.demeterapi.po.dto.Resp;
 
 import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.UploadResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
+import com.ziroom.tech.demeterapi.service.HaloService;
+import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.TaskService;
+import com.ziroom.tech.sia.hunter.taskstatus.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,8 +66,14 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private StorageComponent storageComponent;
 
-    private final static String ASSIGN_PREFIX = "ASSIGN-";
-    private final static String SKILL_PREFIX = "SKILL-";
+    @Resource
+    private HaloService haloService;
+
+    @Resource
+    private MessageService messageService;
+
+//    private final static String ASSIGN_PREFIX = "ASSIGN-";
+//    private final static String SKILL_PREFIX = "SKILL-";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -77,15 +90,18 @@ public class TaskServiceImpl implements TaskService {
 
         // DemeterTaskUser
         // batchInsert?
-        String taskReceiverString = assignTaskReq.getTaskReceiver();
-        if (StringUtils.isNotEmpty(taskReceiverString)) {
-            Arrays.stream(taskReceiverString.split(",")).forEach(taskReceiver -> {
+
+        List<String> taskReceiver = assignTaskReq.getTaskReceiver();
+        if (CollectionUtils.isNotEmpty(taskReceiver)) {
+            taskReceiver.forEach(receiver -> {
                 DemeterTaskUser demeterTaskUser = DemeterTaskUser.builder()
                         .taskId(entity.getId())
-                        .receiverUid(taskReceiver)
+                        .receiverUid(receiver)
                         // 增加记录但为未认领状态
                         .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
+                        .checkResult(assignTaskReq.getNeedAcceptance() == 1 ? CheckoutResult.NEED_CHECKOUT.getCode() : CheckoutResult.NO_CHECKOUT.getCode())
                         .taskType(TaskType.ASSIGN.getCode())
+                        .taskEndTime(assignTaskReq.getTaskEndTime())
                         .createId(OperatorContext.getOperator())
                         .modifyId(OperatorContext.getOperator())
                         .createTime(new Date())
@@ -112,7 +128,30 @@ public class TaskServiceImpl implements TaskService {
             });
         }
 
+//        messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
+
         return Resp.success();
+    }
+
+    @Override
+    public Resp<AssignDetailResp> getAssignTask(Long id) {
+        AssignDetailResp resp = new AssignDetailResp();
+        DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(id);
+        BeanUtils.copyProperties(demeterAssignTask, resp);
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        List<String> receiverList = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
+        resp.setTaskReceiver(receiverList);
+        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
+        taskFinishConditionExample.createCriteria()
+                .andTaskIdEqualTo(id)
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
+        resp.setTaskFinishConditionList(taskFinishConditions);
+        return Resp.success(resp);
     }
 
     @Override
@@ -123,7 +162,7 @@ public class TaskServiceImpl implements TaskService {
         entity.setCreateId(OperatorContext.getOperator());
         entity.setModifyId(OperatorContext.getOperator());
         entity.setCreateTime(new Date());
-        entity.setModifyTime(new Date());
+        entity.setUpdateTime(new Date());
         List<String> taskFinishCondition = skillTaskReq.getTaskFinishCondition();
         demeterSkillTaskDao.insertSelective(entity);
         if (CollectionUtils.isNotEmpty(taskFinishCondition)) {
@@ -147,6 +186,26 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq) {
+        // 校验任务是否被认领
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdEqualTo(assignTaskReq.getId())
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        demeterTaskUsers.forEach(x -> {
+            if (TaskType.ASSIGN.getCode().equals(x.getTaskType())) {
+                if (!x.getTaskStatus().equals(AssignTaskFlowStatus.UNCLAIMED.getCode())) {
+                    throw new BusinessException("该指派任务已被认领，不可编辑");
+                }
+            } else if (TaskType.SKILL.getCode().equals(x.getTaskType())) {
+//                if (!x.getTaskStatus().equals(SkillTaskFlowStatus.UNFORBIDDEN.getCode()) ||
+//                        !x.getTaskStatus().equals(SkillTaskFlowStatus.FORBIDDEN.getCode())) {
+//                }
+                // DemeterTaskUser表中出现技能类任务表示任务已被认领
+                throw new BusinessException("该技能任务已被认领，不可编辑");
+            }
+        });
+
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
@@ -158,7 +217,61 @@ public class TaskServiceImpl implements TaskService {
             log.info("update task finish condition occur exception = {}", exception.getMessage());
             return Resp.error(exception.getMessage());
         }
+
+        try {
+            updateTaskUser(assignTaskReq);
+        } catch (BusinessException exception) {
+            log.info("update task user occur exception = {}", exception.getMessage());
+            return Resp.error(exception.getMessage());
+        }
         return Resp.success();
+    }
+
+    @Override
+    public Resp<Object> updateAssignTaskStatus(Long taskId, Integer taskType, Integer taskStatus) {
+        if (taskType.equals(TaskType.SKILL.getCode())) {
+
+        } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
+            DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
+            if (taskStatus.equals(AssignTaskStatus.UNCLAIMED.getCode())) {
+                if (Objects.isNull(demeterAssignTask)) {
+                    return Resp.error("任务不存在！taskId = " + taskId);
+                }
+                if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.UNCLAIMED.getCode())) {
+                    return Resp.error("此任务已经为开启状态，请勿重复开启！");
+                }
+                DemeterAssignTask update = new DemeterAssignTask();
+                update.setId(taskId);
+                update.setTaskStatus(AssignTaskStatus.UNCLAIMED.getCode());
+                demeterAssignTaskDao.updateByPrimaryKeySelective(update);
+                return Resp.success();
+            } else if (taskStatus.equals(AssignTaskStatus.CLOSED.getCode())) {
+                if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.CLOSED.getCode())) {
+                    return Resp.error("此任务已经为关闭状态，请勿重复关闭！");
+                }
+                // 待认领、进行中，待验收 任务不可关闭
+                List<Integer> forbiddenList = new ArrayList<>();
+                forbiddenList.add(AssignTaskFlowStatus.UNCLAIMED.getCode());
+                forbiddenList.add(AssignTaskFlowStatus.ONGOING.getCode());
+                forbiddenList.add(AssignTaskFlowStatus.WAIT_ACCEPTANCE.getCode());
+                DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+                demeterTaskUserExample.createCriteria()
+                        .andTaskIdEqualTo(taskId)
+                        .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+                List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+                List<Integer> existStatusList = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskStatus).collect(Collectors.toList());
+                List<Integer> intersection = forbiddenList.stream().filter(existStatusList::contains).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(intersection)) {
+                    return Resp.error("存在待认领、进行中或待验收状态的接收者，无法关闭当前任务：" + demeterAssignTask.getTaskName());
+                }
+                DemeterAssignTask update = new DemeterAssignTask();
+                update.setId(taskId);
+                update.setTaskStatus(AssignTaskStatus.CLOSED.getCode());
+                demeterAssignTaskDao.updateByPrimaryKeySelective(update);
+                return Resp.success();
+            }
+        }
+        return Resp.error("未知的任务类型");
     }
 
     // todo test
@@ -168,7 +281,7 @@ public class TaskServiceImpl implements TaskService {
         DemeterSkillTask entity = new DemeterSkillTask();
         BeanUtils.copyProperties(skillTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
-        entity.setModifyTime(new Date());
+        entity.setUpdateTime(new Date());
         demeterSkillTaskDao.updateByPrimaryKeySelective(entity);
         try {
             updateTaskFinishCondition(skillTaskReq.getTaskFinishCondition(), skillTaskReq.getId(), TaskType.SKILL.getCode());
@@ -179,26 +292,36 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
+    private void updateTaskUser(AssignTaskReq assignTaskReq) {
+        List<String> newReceiverList = assignTaskReq.getTaskReceiver();
+        Long taskId = assignTaskReq.getId();
+        if (CollectionUtils.isNotEmpty(newReceiverList)) {
+            // 原有待认领关系全部删除
+            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+            demeterTaskUserExample.createCriteria()
+                    .andTaskIdEqualTo(taskId)
+                    .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+            List<DemeterTaskUser> toBeDeleteDemeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+            toBeDeleteDemeterTaskUsers.forEach(demeterTaskUser -> demeterTaskUserDao.deleteByPrimaryKey(demeterTaskUser.getId()));
+            newReceiverList.forEach(receiver -> {
+                DemeterTaskUser demeterTaskUser = DemeterTaskUser.builder()
+                        .taskId(taskId)
+                        .receiverUid(receiver)
+                        // 增加记录但为未认领状态
+                        .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
+                        .taskType(TaskType.ASSIGN.getCode())
+                        .taskEndTime(assignTaskReq.getTaskEndTime())
+                        .createId(OperatorContext.getOperator())
+                        .modifyId(OperatorContext.getOperator())
+                        .createTime(new Date())
+                        .modifyTime(new Date())
+                        .build();
+                demeterTaskUserDao.insertSelective(demeterTaskUser);
+            });
+        }
+    }
+
     private void updateTaskFinishCondition(List<String> newCondition, Long taskId, Integer taskType) {
-        // 校验任务是否被认领
-        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-        demeterTaskUserExample.createCriteria()
-                .andTaskIdEqualTo(taskId)
-                .andTaskTypeEqualTo(taskType);
-        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
-        demeterTaskUsers.forEach(x -> {
-            if (TaskType.ASSIGN.getCode().equals(taskType)) {
-                if (!x.getTaskStatus().equals(AssignTaskFlowStatus.UNCLAIMED.getCode())) {
-                    throw new BusinessException("该指派任务已被认领，不可编辑");
-                }
-            } else if (TaskType.SKILL.getCode().equals(taskType)) {
-//                if (!x.getTaskStatus().equals(SkillTaskFlowStatus.UNFORBIDDEN.getCode()) ||
-//                        !x.getTaskStatus().equals(SkillTaskFlowStatus.FORBIDDEN.getCode())) {
-//                }
-                // 出现技能类任务表示任务已被认领
-                throw new BusinessException("该技能任务已被认领，不可编辑");
-            }
-        });
         if (CollectionUtils.isNotEmpty(newCondition)) {
             // 原有任务完成条件全部删除
             TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
@@ -225,16 +348,51 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Resp<List<ReleaseQueryResp>> getReleaseList(TaskListQueryReq taskListQueryReq) {
+        List<ReleaseQueryResp> respList = new ArrayList<>(16);
+
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
         DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();
         DemeterAssignTaskExample.Criteria assignTaskExampleCriteria = assignTaskExample.createCriteria();
 
-        assignTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
+        // 员工只能看到本人创建或接收的任务，部门管理者可以看到本部门员工创建或接收的所有任务，超级管理员可以看到所有部门员工创建或接收的所有任务。
+
+        CurrentRole currentRole = this.getCurrentRole();
+        String publisher = taskListQueryReq.getPublisher();
+        switch (currentRole) {
+            case SUPER:
+                // 查询所有记录
+                if (StringUtils.isNotEmpty(publisher)) {
+                    assignTaskExampleCriteria.andPublisherEqualTo(publisher);
+                }
+                break;
+            case DEPT:
+
+                List<String> currentDeptUsers = this.getCurrentDeptUsers();
+                if (StringUtils.isNotEmpty(publisher)) {
+                    if (currentDeptUsers.contains(publisher)) {
+                        assignTaskExampleCriteria.andPublisherEqualTo(publisher);
+                        skillTaskExampleCriteria.andPublisherEqualTo(publisher);
+                    } else {
+                        return Resp.success(respList);
+                    }
+                } else {
+                    assignTaskExampleCriteria.andPublisherIn(currentDeptUsers);
+                    skillTaskExampleCriteria.andPublisherIn(currentDeptUsers);
+                }
+                break;
+            case PLAIN:
+                if (StringUtils.isNotEmpty(publisher) && !publisher.equals(OperatorContext.getOperator())) {
+                    return Resp.success(respList);
+                }
+                assignTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
+                skillTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
+            default:
+        }
 
         String receiverUid = taskListQueryReq.getSystemCode();
         List<DemeterTaskUser> demeterTaskUsers;
-        if (receiverUid != null) {
+        if (StringUtils.isNotEmpty(receiverUid)) {
             // 查询任务接收表 List<Long> taskIdList = queryTaskReceive();
             DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
             demeterTaskUserExample.createCriteria().andReceiverUidEqualTo(receiverUid);
@@ -248,13 +406,11 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        List<ReleaseQueryResp> respList = new ArrayList<>(16);
-
         String nameOrNo = taskListQueryReq.getNameOrNo();
-        if (Objects.nonNull(nameOrNo)) {
-            if (nameOrNo.startsWith(ASSIGN_PREFIX)) {
+        if (StringUtils.isNotEmpty(nameOrNo)) {
+            if (nameOrNo.startsWith(TaskIdPrefix.ASSIGN_PREFIX.getDesc())) {
                 assignTaskExampleCriteria.andIdEqualTo(Long.parseLong(nameOrNo.split("-")[1]));
-            } else if (nameOrNo.startsWith(SKILL_PREFIX)) {
+            } else if (nameOrNo.startsWith(TaskIdPrefix.SKILL_PREFIX.getDesc())) {
                 skillTaskExampleCriteria.andIdEqualTo(Long.parseLong(nameOrNo.split("-")[1]));
             } else {
                 assignTaskExampleCriteria.andTaskNameLike(nameOrNo);
@@ -275,62 +431,209 @@ public class TaskServiceImpl implements TaskService {
                     assignTaskExampleCriteria.andTaskStatusEqualTo(taskListQueryReq.getTaskStatus());
                 }
                 assignTasks = demeterAssignTaskDao.selectByExample(assignTaskExample);
+            } else if (taskListQueryReq.getTaskType().equals(TaskType.ALL.getCode())){
+                skillTasks = demeterSkillTaskDao.selectByExample(skillTaskExample);
+                assignTasks = demeterAssignTaskDao.selectByExample(assignTaskExample);
             }
-        } else {
-            skillTasks = demeterSkillTaskDao.selectByExample(skillTaskExample);
-            assignTasks = demeterAssignTaskDao.selectByExample(assignTaskExample);
         }
 
         if (CollectionUtils.isNotEmpty(skillTasks)) {
+            Set<String> publisherSet = skillTasks.stream().map(DemeterSkillTask::getPublisher).collect(Collectors.toSet());
+            Set<UserResp> userDetail = ehrComponent.getUserDetail(publisherSet);
+            Map<String, UserResp> userRespMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
             skillTasks.forEach(task -> {
                 ReleaseQueryResp releaseQueryResp = ReleaseQueryResp.builder()
                         .id(task.getId())
-                        .taskNo(SKILL_PREFIX + task.getId())
+                        .taskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + task.getId())
                         .taskName(task.getTaskName())
-                        .taskReceiverName("技能类任务接收者todo")
+                        // TODO: 2021/5/14
+                        .taskReceiverName("")
                         .taskStatus(task.getTaskStatus())
                         .taskStatusName(SkillTaskFlowStatus.getByCode(task.getTaskStatus()).getDesc())
                         .taskType(TaskType.SKILL.getCode())
                         .taskTypeName(TaskType.SKILL.getDesc())
                         .taskCreateTime(task.getCreateTime())
                         .growthValue(task.getSkillReward())
+                        .publisher(task.getPublisher())
+                        .publisherName(userRespMap.get(task.getPublisher()).getName())
                         .build();
                 respList.add(releaseQueryResp);
             });
         }
 
         if (CollectionUtils.isNotEmpty(assignTasks)) {
+            Set<String> publisherSet = assignTasks.stream().map(DemeterAssignTask::getPublisher).collect(Collectors.toSet());
+            Set<UserResp> userDetail = ehrComponent.getUserDetail(publisherSet);
+            Map<String, UserResp> userRespMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
             assignTasks.forEach(task -> {
                 List<String> receiverNameList = getReceiverListFromTaskUserEntity(task);
                 ReleaseQueryResp releaseQueryResp = ReleaseQueryResp.builder()
                         .id(task.getId())
-                        .taskNo(ASSIGN_PREFIX + task.getId())
+                        .taskNo(TaskIdPrefix.ASSIGN_PREFIX.getDesc() + task.getId())
                         .taskName(task.getTaskName())
                         .taskReceiverName(String.join(",", receiverNameList))
                         .taskStatus(task.getTaskStatus())
-                        .taskStatusName(AssignTaskFlowStatus.getByCode(task.getTaskStatus()).getDesc())
+                        .taskStatusName(AssignTaskStatus.getByCode(task.getTaskStatus()).getDesc())
                         .taskType(TaskType.ASSIGN.getCode())
                         .taskTypeName(TaskType.ASSIGN.getDesc())
                         .taskCreateTime(task.getCreateTime())
                         .growthValue(task.getTaskReward())
+                        .publisher(task.getPublisher())
+                        .publisherName(userRespMap.get(task.getPublisher()).getName())
                         .build();
                 respList.add(releaseQueryResp);
             });
         }
+
+        respList.sort(Comparator.comparing(ReleaseQueryResp::getTaskCreateTime).reversed());
         return Resp.success(respList);
     }
 
     @Override
-    public Resp<Object> getExecuteList(TaskListQueryReq taskListQueryReq) {
+    public Resp<List<ReceiveQueryResp>> getExecuteList(TaskListQueryReq taskListQueryReq) {
+        // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
+        List<ReceiveQueryResp> respList = new ArrayList<>(16);
+
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
         DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();
         DemeterAssignTaskExample.Criteria assignTaskExampleCriteria = assignTaskExample.createCriteria();
 
-        if (Objects.nonNull(taskListQueryReq.getSystemCode())) {
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        DemeterTaskUserExample.Criteria demeterTaskUserCriteria = demeterTaskUserExample.createCriteria();
 
+        CurrentRole currentRole = this.getCurrentRole();
+        String receiverCode = taskListQueryReq.getSystemCode();
+        switch (currentRole) {
+            case SUPER:
+                // 全部
+                if (StringUtils.isNotEmpty(receiverCode)) {
+                    demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
+                }
+                break;
+            case DEPT:
+                if (StringUtils.isNotEmpty(receiverCode)) {
+                    demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
+                } else {
+                    List<String> currentDeptUsers = this.getCurrentDeptUsers();
+                    demeterTaskUserCriteria.andReceiverUidIn(currentDeptUsers);
+                }
+                break;
+            case PLAIN:
+                demeterTaskUserCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
+            default:
         }
-        return Resp.success();
+        Integer taskType = taskListQueryReq.getTaskType();
+        Integer taskStatus = taskListQueryReq.getTaskStatus();
+        if (taskType != null && TaskType.isValid(taskType)) {
+            switch (TaskType.getByCode(taskType)) {
+                case ALL:
+                    break;
+                case SKILL:
+                    demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode());
+                    if (taskStatus != null && SkillTaskFlowStatus.isValid(taskStatus)) {
+                        demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                    }
+                    break;
+                case ASSIGN:
+                    demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
+                    if (taskStatus != null && AssignTaskFlowStatus.isValid(taskStatus)) {
+                        demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                    }
+                default:
+            }
+        }
+
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+
+        List<Long> skillIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.SKILL.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+        List<Long> assignIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.ASSIGN.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+
+        Set<String> receiverId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
+
+        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        List<DemeterAssignTask> demeterAssignTasks = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(skillIds)) {
+            skillTaskExampleCriteria.andIdIn(skillIds);
+            demeterSkillTasks = demeterSkillTaskDao.selectByExample(skillTaskExample);
+        }
+        if (CollectionUtils.isNotEmpty(assignIds)) {
+            assignTaskExampleCriteria.andIdIn(assignIds);
+            demeterAssignTasks = demeterAssignTaskDao.selectByExample(assignTaskExample);
+        }
+        // todo 全部查出，效率低
+        Set<String> skillPublisher = demeterSkillTasks.stream().map(DemeterSkillTask::getPublisher).collect(Collectors.toSet());
+        Set<String> assignPublisher = demeterAssignTasks.stream().map(DemeterAssignTask::getPublisher).collect(Collectors.toSet());
+        receiverId.addAll(skillPublisher);
+        receiverId.addAll(assignPublisher);
+
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(receiverId);
+        Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+
+        Map<Long, DemeterSkillTask> skillTaskMap = demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function.identity()));
+        Map<Long, DemeterAssignTask> assignTaskMap = demeterAssignTasks.stream().collect(Collectors.toMap(DemeterAssignTask::getId, Function.identity()));
+
+        demeterTaskUsers.forEach(taskUser -> {
+            ReceiveQueryResp resp = new ReceiveQueryResp();
+            Long taskId = taskUser.getTaskId();
+
+            switch (TaskType.getByCode(taskUser.getTaskType())) {
+                case SKILL:
+                    DemeterSkillTask skill = skillTaskMap.get(taskId);
+                    BeanUtils.copyProperties(skill, resp);
+                    resp.setTaskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + skill.getId());
+                    resp.setTaskType(TaskType.SKILL.getCode());
+                    resp.setTaskTypeName(TaskType.SKILL.getDesc());
+                    resp.setTaskReward(skill.getSkillReward());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
+                    resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                    resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                    resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                    respList.add(resp);
+                    break;
+                case ASSIGN:
+                    DemeterAssignTask assign = assignTaskMap.get(taskId);
+                    BeanUtils.copyProperties(assign, resp);
+                    resp.setTaskNo(TaskIdPrefix.ASSIGN_PREFIX.getDesc() + assign.getId());
+                    resp.setTaskType(TaskType.ASSIGN.getCode());
+                    resp.setTaskTypeName(TaskType.ASSIGN.getDesc());
+                    resp.setReceiver(taskUser.getReceiverUid());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
+                    resp.setPublisherName(userMap.get(assign.getPublisher()).getName());
+                    resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                    resp.setTaskFlowStatusName(AssignTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                    respList.add(resp);
+                default:
+            }
+        });
+        respList.sort(Comparator.comparing(ReceiveQueryResp::getCreateTime).reversed());
+        List<ReceiveQueryResp> rtv = respList.stream().skip(taskListQueryReq.getStart()).limit(taskListQueryReq.getPageSize()).collect(Collectors.toList());
+        return Resp.success(rtv);
+    }
+
+    private CurrentRole getCurrentRole() {
+        AuthResp permission = haloService.getAuth();
+        List<String> roles = permission.getRoles();
+        if (roles.contains(CurrentRole.SUPER.getCode())) {
+            return CurrentRole.SUPER;
+        } else if (roles.contains(CurrentRole.DEPT.getCode())) {
+            return CurrentRole.DEPT;
+        } else {
+            return CurrentRole.PLAIN;
+        }
+    }
+
+    private List<String> getCurrentDeptUsers() {
+        List<EhrUserDetailResp> ehrUserDetail = ehrComponent.getEhrUserDetail(OperatorContext.getOperator());
+        EhrUserDetailResp ehrUserDetailResp;
+        if (CollectionUtils.isNotEmpty(ehrUserDetail)) {
+            ehrUserDetailResp = ehrUserDetail.get(0);
+        } else {
+            throw new BusinessException("ehr查询用户失败，uid=" + OperatorContext.getOperator());
+        }
+        Set<EhrUserResp> users = ehrComponent.getUsers(ehrUserDetailResp.getDeptCode(), null);
+        return users.stream().map(EhrUserResp::getUserCode).collect(Collectors.toList());
     }
 
     @Override
@@ -340,7 +643,10 @@ public class TaskServiceImpl implements TaskService {
 
     private List<String> getReceiverListFromTaskUserEntity(DemeterAssignTask entity) {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-        demeterTaskUserExample.createCriteria().andTaskIdEqualTo(entity.getId());
+        demeterTaskUserExample.createCriteria()
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
+                .andTaskIdEqualTo(entity.getId())
+                .andTaskStatusNotEqualTo(AssignTaskFlowStatus.UNCLAIMED.getCode());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         Set<String> uidSet = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
         List<String> receiverNameList = Lists.newLinkedList();
@@ -414,6 +720,7 @@ public class TaskServiceImpl implements TaskService {
             taskFinishConditions.forEach(condition -> {
                 TaskFinishConditionInfo info = TaskFinishConditionInfo.builder()
                         .taskId(id)
+                        .taskType(type)
                         .taskConditionStatus(TaskConditionStatus.UNFINISHED.getCode())
                         .taskFinishConditionId(condition.getId())
                         .createId(OperatorContext.getOperator())
@@ -425,6 +732,8 @@ public class TaskServiceImpl implements TaskService {
                 taskFinishConditionInfoDao.insertSelective(info);
             });
         }
+
+        messageService.acceptTaskNotice(id, type, OperatorContext.getOperator());
         return Resp.success();
     }
 
@@ -433,9 +742,11 @@ public class TaskServiceImpl implements TaskService {
                 .createId(OperatorContext.getOperator())
                 .createTime(new Date())
                 .taskId(id)
+                .fileAddress("https://www.ziroom.com")
+                .fileName("文件上传功能待做.jpg")
                 .taskType(TaskType.getByCode(type).getCode())
                 .modifyId(OperatorContext.getOperator())
-                .uid(OperatorContext.getOperator())
+                .receiverUid(OperatorContext.getOperator())
                 .modifyTime(new Date())
                 .build();
         taskFinishOutcomeDao.insertSelective(taskFinishOutcome);
@@ -479,6 +790,7 @@ public class TaskServiceImpl implements TaskService {
                 .createTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
+                .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                 .createId(OperatorContext.getOperator())
                 .taskType(TaskType.SKILL.getCode())
                 .receiverUid(OperatorContext.getOperator())
@@ -510,8 +822,13 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
-    @Override
-    public Resp<List<ReceiverListResp>> getTaskCheckList(Long taskId, Integer taskType) {
+    /**
+     * 查询任务接收人清单
+     * @param taskId id
+     * @param taskType type
+     * @return List<ReceiverListResp>
+     */
+    private List<ReceiverListResp> getTaskCheckList(Long taskId, Integer taskType) {
         List<ReceiverListResp> respList = new ArrayList<>(16);
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         DemeterTaskUserExample.Criteria criteria = demeterTaskUserExample.createCriteria();
@@ -531,7 +848,7 @@ public class TaskServiceImpl implements TaskService {
                 respList.add(receiverListResp);
             });
         }
-        return Resp.success(respList);
+        return respList;
     }
 
     @Override
@@ -539,9 +856,13 @@ public class TaskServiceImpl implements TaskService {
         TaskProgressResp taskProgressResp = new TaskProgressResp();
         DemeterTaskUser taskUser = demeterTaskUserDao.selectByPrimaryKey(id);
         if (Objects.nonNull(taskUser)) {
+            taskProgressResp.setId(taskUser.getId());
+            taskProgressResp.setTaskId(taskUser.getTaskId());
+            taskProgressResp.setTaskType(taskUser.getTaskType());
             taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime());
             taskProgressResp.setCheckoutOpinion(taskUser.getCheckOpinion());
             taskProgressResp.setCheckoutResult(CheckoutResult.getByCode(taskUser.getCheckResult()).getDesc());
+            taskProgressResp.setReceiverUid(taskUser.getReceiverUid());
             UserDetailResp userDetail = ehrComponent.getUserDetail(taskUser.getReceiverUid());
             if (Objects.nonNull(userDetail)) {
                 taskProgressResp.setReceiverName(userDetail.getUserName());
@@ -555,21 +876,30 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskTypeEqualTo(taskUser.getTaskType())
                 .andUidEqualTo(taskUser.getReceiverUid());
         List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+        List<Long> conditionIdList = taskFinishConditionInfos.stream().map(TaskFinishConditionInfo::getTaskFinishConditionId).collect(Collectors.toList());
+        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
+        taskFinishConditionExample.createCriteria()
+                .andIdIn(conditionIdList);
+        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
+        Map<Long, TaskFinishCondition> conditionMap = taskFinishConditions.stream().collect(Collectors.toMap(TaskFinishCondition::getId, Function.identity()));
         if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
             List<TaskFinishConditionInfoResp> respList = new ArrayList<>(16);
             taskFinishConditionInfos.forEach(info -> {
                 TaskFinishConditionInfoResp resp = new TaskFinishConditionInfoResp();
                 BeanUtils.copyProperties(info, resp);
+                TaskFinishCondition taskFinishCondition = conditionMap.get(info.getTaskFinishConditionId());
                 resp.setTaskConditionStatusName(TaskConditionStatus.getByCode(info.getTaskConditionStatus()).getDesc());
+                resp.setTaskFinishContent(taskFinishCondition.getTaskFinishContent());
                 respList.add(resp);
             });
             taskProgressResp.setTaskFinishConditionInfoRespList(respList);
+            taskProgressResp.setTaskFinishConditionList(taskFinishConditions);
         }
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
         taskFinishOutcomeExample.createCriteria()
                 .andTaskIdEqualTo(taskUser.getTaskId())
                 .andTaskTypeEqualTo(taskUser.getTaskType())
-                .andUidEqualTo(taskUser.getReceiverUid());
+                .andReceiverUidEqualTo(taskUser.getReceiverUid());
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
         taskProgressResp.setTaskFinishOutcomeList(taskFinishOutcomes);
         return Resp.success(taskProgressResp);
@@ -583,7 +913,6 @@ public class TaskServiceImpl implements TaskService {
                 return Resp.error("验收结果不通过必须填写验收意见！");
             }
         }
-
         Integer taskStatus = null;
         if (checkTaskReq.getResult().equals(CheckoutResult.FAILED.getCode())) {
             taskStatus = TaskType.SKILL.getCode().equals(checkTaskReq.getTaskType()) ? SkillTaskFlowStatus.FAILED.getCode() : AssignTaskFlowStatus.FAILED.getCode();
@@ -622,7 +951,7 @@ public class TaskServiceImpl implements TaskService {
             try {
                 taskFinishConditionInfos.forEach(condition -> {
                     if (condition.getTaskConditionStatus().equals(TaskConditionStatus.UNFINISHED.getCode())) {
-                        throw new BusinessException("无法提交验收，有任务条件未完成.");
+                        throw new BusinessException("无法提交验收，有任务条件未完成");
                     }
                 });
             } catch (BusinessException exception) {
@@ -635,13 +964,13 @@ public class TaskServiceImpl implements TaskService {
         taskFinishOutcomeExample.createCriteria()
                 .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(taskType)
-                .andUidEqualTo(OperatorContext.getOperator());
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
         if (CollectionUtils.isNotEmpty(taskFinishOutcomes)) {
             try {
                 taskFinishOutcomes.forEach(outcome -> {
                     if (StringUtils.isEmpty(outcome.getFileAddress())) {
-                        throw new BusinessException("无法提交验收，请先提交学习成果.");
+                        throw new BusinessException("无法提交验收，请先上传学习成果.");
                     }
                 });
             } catch (BusinessException exception) {
@@ -658,9 +987,9 @@ public class TaskServiceImpl implements TaskService {
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
             DemeterTaskUser updateEntity = demeterTaskUsers.get(0);
             if (TaskType.getByCode(taskType).equals(TaskType.SKILL)) {
-                updateEntity.setTaskStatus(AssignTaskFlowStatus.FINISHED.getCode());
-            } else if (TaskType.getByCode(taskType).equals(TaskType.ASSIGN)) {
                 updateEntity.setTaskStatus(SkillTaskFlowStatus.TO_AUTHENTICATE.getCode());
+            } else if (TaskType.getByCode(taskType).equals(TaskType.ASSIGN)) {
+                updateEntity.setTaskStatus(AssignTaskFlowStatus.WAIT_ACCEPTANCE.getCode());
             }
             demeterTaskUserDao.updateByPrimaryKey(updateEntity);
         }
@@ -687,7 +1016,7 @@ public class TaskServiceImpl implements TaskService {
                 return Resp.success(getAssignTaskBasic(taskId));
             } else {
                 // 当前登录人非发布者
-                return getAssignTaskDetailAcceptor(taskId);
+                return Resp.success(getAssignTaskDetailAcceptor(taskId));
             }
         } else if (TaskType.SKILL.getCode().equals(taskType)) {
             DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(taskId);
@@ -700,10 +1029,74 @@ public class TaskServiceImpl implements TaskService {
         return Resp.error();
     }
 
-    private Resp<Object> getAssignTaskDetailAcceptor(Long id) {
+    @Override
+    public Resp<TaskDetailResp> getAllDetails(Long taskId, Integer taskType) {
+        TaskDetailResp resp = new TaskDetailResp();
+
+        List<ReceiverListResp> taskCheckList = this.getTaskCheckList(taskId, taskType);
+
+//        任务基本信息
+        switch (TaskType.getByCode(taskType)) {
+            case SKILL:
+                DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(taskId);
+                break;
+            case ASSIGN:
+                DemeterAssignTask assignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
+                AssignDetailResp assignTaskBasic = this.getAssignTaskBasic(taskId);
+                resp.setAssignDetailResp(assignTaskBasic);
+                break;
+            default:
+        }
+
+        resp.setReceiverList(taskCheckList);
+
+        // 所有人 + 任务完成信息
+        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
+        taskFinishConditionExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType);
+        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
+        resp.setTaskFinishConditionList(taskFinishConditions);
+
+        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
+        taskFinishConditionInfoExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+        List<TaskFinishConditionInfoResp> taskFinishConditionInfoRespList = new ArrayList<>();
+        taskFinishConditionInfos.forEach(taskFinishConditionInfo -> {
+            TaskFinishConditionInfoResp infoResp = new TaskFinishConditionInfoResp();
+            Long taskFinishConditionId = taskFinishConditionInfo.getTaskFinishConditionId();
+            TaskFinishCondition taskFinishCondition = taskFinishConditionDao.selectByPrimaryKey(taskFinishConditionId);
+            BeanUtils.copyProperties(taskFinishConditionInfo, infoResp);
+            infoResp.setTaskConditionStatusName(TaskConditionStatus.getByCode(taskFinishConditionInfo.getTaskConditionStatus()).getDesc());
+            infoResp.setTaskFinishContent(taskFinishCondition.getTaskFinishContent());
+            taskFinishConditionInfoRespList.add(infoResp);
+        });
+        resp.setTaskFinishConditionInfoRespList(taskFinishConditionInfoRespList);
+
+        TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
+        List<TaskFinishOutcomeResp> taskFinishOutcomeRespList = new ArrayList<>(16);
+        taskFinishOutcomes.forEach(outcome -> {
+            TaskFinishOutcomeResp outcomeResp = new TaskFinishOutcomeResp();
+            BeanUtils.copyProperties(outcome, outcomeResp);
+            taskFinishOutcomeRespList.add(outcomeResp);
+        });
+        resp.setTaskFinishOutcomeRespList(taskFinishOutcomeRespList);
+        // 技能类任务所有人可查看关联的技能图谱信息
+        return Resp.success(resp);
+    }
+
+    private AssignDetailResp getAssignTaskDetailAcceptor(Long id) {
         DemeterAssignTask entity = demeterAssignTaskDao.selectByPrimaryKey(id);
         if (Objects.isNull(entity)) {
-            return Resp.error("system error");
+            throw new BusinessException("system error");
         }
         AssignDetailResp detailResp = new AssignDetailResp();
         BeanUtils.copyProperties(entity, detailResp);
@@ -712,6 +1105,7 @@ public class TaskServiceImpl implements TaskService {
         detailResp.setPublisherName(publisherName);
         detailResp.setReceiverName(String.join(",", receiverNameList));
         detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
+        detailResp.setTaskNo(TaskIdPrefix.ASSIGN_PREFIX.getDesc() + entity.getId());
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -759,7 +1153,7 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskIdEqualTo(entity.getId());
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
         detailResp.setTaskFinishOutcomeList(taskFinishOutcomes);
-        return Resp.success(detailResp);
+        return detailResp;
     }
 
     private Resp<Object> getSkillTaskDetailAcceptor(Long id) {
@@ -781,6 +1175,8 @@ public class TaskServiceImpl implements TaskService {
         if (CollectionUtils.isNotEmpty(userDetail)) {
             detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
         }
+        detailResp.setTaskNo(TaskIdPrefix.ASSIGN_PREFIX.getDesc() + demeterAssignTask.getId());
+        detailResp.setTaskType(TaskType.ASSIGN.getCode());
         detailResp.setTaskTypeName(TaskType.ASSIGN.getDesc());
         detailResp.setTaskStatusName(AssignTaskStatus.getByCode(demeterAssignTask.getTaskStatus()).getDesc());
         UserDetailResp publisher = ehrComponent.getUserDetail(demeterAssignTask.getPublisher());
@@ -816,24 +1212,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> finishTaskCondition(Long conditionInfoId) {
-        TaskFinishConditionInfoExample conditionInfoExample  = new TaskFinishConditionInfoExample();
-        conditionInfoExample.createCriteria()
-                .andIdEqualTo(conditionInfoId);
-        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(conditionInfoExample);
-        List<String> uidList = taskFinishConditionInfos.stream().map(TaskFinishConditionInfo::getUid).collect(Collectors.toList());
-        if (!uidList.contains(OperatorContext.getOperator())) {
+        TaskFinishConditionInfo taskFinishConditionInfo = taskFinishConditionInfoDao.selectByPrimaryKey(conditionInfoId);
+        if (!taskFinishConditionInfo.getUid().equals(OperatorContext.getOperator())) {
             return Resp.error("任务未认领");
         }
-        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
-            TaskFinishConditionInfo conditionInfo = taskFinishConditionInfos.get(0);
-            if (!checkTaskAccept(conditionInfo.getTaskId(), conditionInfo.getTaskType())) {
-                return Resp.error("任务未认领");
-            }
-            if (conditionInfo.getTaskConditionStatus().equals(TaskConditionStatus.FINISHED.getCode())) {
-                return Resp.error("任务条件已完成，请通知前端同学做好校验");
-            }
-        } else {
-            return Resp.error("system error");
+        if (!checkTaskAccept(taskFinishConditionInfo.getTaskId(), taskFinishConditionInfo.getTaskType())) {
+            return Resp.error("任务未认领");
+        }
+        if (taskFinishConditionInfo.getTaskConditionStatus().equals(TaskConditionStatus.FINISHED.getCode())) {
+            return Resp.error("任务条件已完成，请勿重复完成");
         }
         // check 任务条件是否已经完成
         TaskFinishConditionInfo conditionInfo = TaskFinishConditionInfo.builder()
@@ -867,7 +1254,7 @@ public class TaskServiceImpl implements TaskService {
             DemeterSkillTask demeterSkillTask = new DemeterSkillTask();
             demeterSkillTask.setId(taskId);
             demeterSkillTask.setAttachmentUrl(uuid);
-            demeterSkillTask.setModifyTime(new Date());
+            demeterSkillTask.setUpdateTime(new Date());
             demeterSkillTask.setModifyId(OperatorContext.getOperator());
             demeterSkillTaskDao.updateByPrimaryKeySelective(demeterSkillTask);
         } else if (TaskType.ASSIGN.getCode().equals(taskType)) {
@@ -888,7 +1275,7 @@ public class TaskServiceImpl implements TaskService {
         String uuid = file.getUuid();
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
         taskFinishOutcomeExample.createCriteria()
-                .andUidEqualTo(OperatorContext.getOperator())
+                .andReceiverUidEqualTo(OperatorContext.getOperator())
                 .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(taskType);
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
@@ -944,5 +1331,28 @@ public class TaskServiceImpl implements TaskService {
 
         // 2、传统下载文件
         return null;
+    }
+
+    @Override
+    public Boolean checkTaskDelay() {
+        // 查询出所有非 已延期，待验收 验收通过 验收未通过 状态，且任务的结束时间小于当前时间的的 task_user记录，更新状态为已延期
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        List<Integer> taskEndStatus = new ArrayList<>();
+        taskEndStatus.add(AssignTaskFlowStatus.WAIT_ACCEPTANCE.getCode());
+        taskEndStatus.add(AssignTaskFlowStatus.ACCEPTANCE.getCode());
+        taskEndStatus.add(AssignTaskFlowStatus.FAILED.getCode());
+        taskEndStatus.add(AssignTaskFlowStatus.UNFINISHED.getCode());
+        demeterTaskUserExample.createCriteria()
+                .andTaskStatusNotIn(taskEndStatus)
+                .andTaskEndTimeLessThan(new Date());
+        DemeterTaskUser updated = DemeterTaskUser.builder()
+                .taskStatus(AssignTaskFlowStatus.UNFINISHED.getCode())
+                .build();
+        demeterTaskUserDao.updateByExampleSelective(updated, demeterTaskUserExample);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        List<Long> taskIds = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+
+        // 如果有惩罚，则更新相应数据
+        return true;
     }
 }

@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 public enum TaskType {
 
     /**
+     * 全部
+     */
+    ALL(0, "全部"),
+
+    /**
      * 技能类任务
      */
     SKILL(1, "技能类任务"),

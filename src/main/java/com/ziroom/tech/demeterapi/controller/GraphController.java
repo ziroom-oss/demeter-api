@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.tech.demeterapi.common.enums.TechRanks;
 import com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
@@ -8,13 +9,16 @@ import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphAreaSkillReq;
 import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSkillReq;
 import com.ziroom.tech.demeterapi.po.dto.req.Graph.GraphSubSkillTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.enums.TechRanksEnum;
 import com.ziroom.tech.demeterapi.service.GraphService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Api(tags = "任务相关")
@@ -88,5 +92,20 @@ public class GraphController {
     public Resp<Object> createSubSkill(@RequestBody GraphSubSkillTaskReq graphSubSkillTaskReq) {
         GraphSubSkillTask graphSubSkillTask = graphSubSkillTaskReq.getEntity();
         return Resp.success(graphService.insertSubSkill(graphSubSkillTask));
+    }
+
+    /**
+     * 获取 T 序列
+     */
+    @GetMapping("/tech/ranks")
+    public Resp<List<TechRanksEnum>> listTechRanks() {
+        List<TechRanksEnum> techRanksEnumList = new ArrayList<>();
+        for (TechRanks techRanks : TechRanks.values()) {
+            TechRanksEnum techRanksEnum = new TechRanksEnum();
+            techRanksEnum.setCode(techRanks.getCode());
+            techRanksEnum.setName(techRanks.getDesc());
+            techRanksEnumList.add(techRanksEnum);
+        }
+        return Resp.success(techRanksEnumList);
     }
 }

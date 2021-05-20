@@ -34,12 +34,14 @@ public class GraphServiceImpl implements GraphService {
         return graphSkillDao.updateByPrimaryKeySelective(graphSkill);
     }
     @Override
-    public int insertSkill(GraphAreaSkill graphAreaSkill) {
-        return graphAreaSkillDao.insert(graphAreaSkill);
+    public Long insertSkill(GraphAreaSkill graphAreaSkill) {
+        graphAreaSkillDao.insertSelective(graphAreaSkill);
+        return graphAreaSkill.getId();
     }
     @Override
-    public int updateSkill(GraphAreaSkill graphAreaSkill) {
-        return graphAreaSkillDao.updateByPrimaryKeySelective(graphAreaSkill);
+    public Long updateSkill(GraphAreaSkill graphAreaSkill) {
+        graphAreaSkillDao.updateByPrimaryKeySelective(graphAreaSkill);
+        return graphAreaSkill.getId();
     }
     @Override
     public int insertSubSkill(GraphSubSkillTask graphSubSkillTask) {

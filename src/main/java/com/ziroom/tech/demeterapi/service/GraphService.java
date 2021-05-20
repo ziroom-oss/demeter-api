@@ -22,12 +22,12 @@ public interface GraphService {
      * 创建技能领域
      * 每一个技能领域至少包含一个技能
      */
-    int insertSkill(GraphAreaSkill graphAreaSkill);
+    Long insertSkill(GraphAreaSkill graphAreaSkill);
 
     /**
      * 更新技能领域
      */
-    int updateSkill(GraphAreaSkill graphAreaSkill);
+    Long updateSkill(GraphAreaSkill graphAreaSkill);
 
     /**
      * 创建子技能

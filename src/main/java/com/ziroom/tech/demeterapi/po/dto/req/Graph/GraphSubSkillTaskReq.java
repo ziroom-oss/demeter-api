@@ -26,6 +26,9 @@ public class GraphSubSkillTaskReq {
     @ApiModelProperty("职务等级 T 序列")
     private Integer jobLevel;
 
+    @ApiModelProperty("子技能名称")
+    private String name;
+
     public GraphSubSkillTask getEntity() {
         GraphSubSkillTask graphSubSkillTask = new GraphSubSkillTask();
         if (Objects.nonNull(id)) {
@@ -36,6 +39,7 @@ public class GraphSubSkillTaskReq {
         graphSubSkillTask.setTaskId(taskId);
         graphSubSkillTask.setLevel(level);;
         graphSubSkillTask.setJobLevel(jobLevel);
+        graphSubSkillTask.setName(name);
         return graphSubSkillTask;
     }
 

@@ -102,7 +102,7 @@
         DELETE FROM graph_area_skill
         WHERE id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill">
+    <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill" useGeneratedKeys="true" keyProperty="id">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
@@ -193,7 +193,7 @@
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill">
+    <update id="updateByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill">
         UPDATE graph_area_skill
         <set>
             <if test="graphId != null">

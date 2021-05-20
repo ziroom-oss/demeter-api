@@ -14,6 +14,7 @@ public class GraphSkill {
     private Integer enable;
     // 职务
     private Integer position;
+    private Integer isDel;
     private Date createTime;
     private Date modifyTime;
 }

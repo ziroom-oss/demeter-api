@@ -85,6 +85,7 @@ public class TaskController {
     @PostMapping("update/assign")
     @ApiOperation(value = "编辑指派类任务", httpMethod = "POST")
     public Resp<Object> updateAssignTask(@RequestBody AssignTaskReq assignTaskReq) {
+        assignTaskReq.validateAdd();
         return taskService.updateAssignTask(assignTaskReq);
     }
 

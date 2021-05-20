@@ -1079,7 +1079,7 @@ public class TaskServiceImpl implements TaskService {
 
     /**
      * 检查当前任务是否需要验收
-     * @param taskId
+     * @param taskId id
      */
     private boolean checkNeedCheck(Long taskId) {
         DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
@@ -1097,7 +1097,7 @@ public class TaskServiceImpl implements TaskService {
         if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
             taskFinishConditionInfos.forEach(condition -> {
                 if (condition.getTaskConditionStatus().equals(TaskConditionStatus.UNFINISHED.getCode())) {
-                    throw new BusinessException("无法提交验收/认证，有任务条件未完成");
+                    throw new BusinessException("操作失败，有部分或全部任务条件未完成");
                 }
             });
         }
@@ -1476,7 +1476,6 @@ public class TaskServiceImpl implements TaskService {
     /**
      * 检查技能任务是否禁用
      * @param id id
-     * @return true：禁用，false：未禁用
      */
     private void checkSkillForbidden(Long id) {
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
@@ -1499,7 +1498,8 @@ public class TaskServiceImpl implements TaskService {
         }
         DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
         demeterSkillTaskExample.createCriteria()
-                .andTaskNameLike("%" + condition + "%");
+                .andTaskNameLike("%" + condition + "%")
+                .andTaskStatusEqualTo(SkillTaskStatus.UNFORBIDDEN.getCode());
         return demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
     }
 }

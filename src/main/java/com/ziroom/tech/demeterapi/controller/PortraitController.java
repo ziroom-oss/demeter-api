@@ -3,9 +3,8 @@ package com.ziroom.tech.demeterapi.controller;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
-import com.ziroom.tech.demeterapi.service.PortrayalService;
+import com.ziroom.tech.demeterapi.service.PortraitService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +19,11 @@ import java.util.List;
  */
 @RestController
 @Slf4j
-@RequestMapping("api/portrayal")
-public class PortrayalController {
+@RequestMapping("api/portrait")
+public class PortraitController {
 
     @Resource
-    private PortrayalService portrayalService;
+    private PortraitService portraitService;
 
     /**
      * 员工列表（管理者）
@@ -34,7 +33,7 @@ public class PortrayalController {
 
     @PostMapping("/list")
     public Resp<List<EmployeeListResp>> getEmployeeList(@RequestBody EmployeeListReq employeeListReq) {
-        List<EmployeeListResp> employeeList = portrayalService.getEmployeeList(employeeListReq);
+        List<EmployeeListResp> employeeList = portraitService.getEmployeeList(employeeListReq);
         return Resp.success(employeeList);
     }
 

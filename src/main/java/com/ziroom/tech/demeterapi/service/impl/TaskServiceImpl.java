@@ -1310,7 +1310,7 @@ public class TaskServiceImpl implements TaskService {
         detailResp.setTaskType(TaskType.SKILL.getCode());
         detailResp.setTaskTypeName(TaskType.SKILL.getDesc());
         detailResp.setTaskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + demeterSkillTask.getId());
-        detailResp.setTaskStatusName(SkillTaskFlowStatus.getByCode(demeterSkillTask.getTaskStatus()).getDesc());
+        detailResp.setTaskStatusName(SkillTaskStatus.getByCode(demeterSkillTask.getTaskStatus()).getDesc());
         UserDetailResp publisher = ehrComponent.getUserDetail(demeterSkillTask.getPublisher());
         if (Objects.nonNull(publisher)) {
             detailResp.setPublisherName(publisher.getUserName());

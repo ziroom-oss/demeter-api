@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author daijiankun
  */
-public interface PortrayalService {
+public interface PortraitService {
 
     /**
      * 员工列表（管理者）

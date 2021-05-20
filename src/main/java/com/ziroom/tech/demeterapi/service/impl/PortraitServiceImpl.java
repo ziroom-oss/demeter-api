@@ -13,15 +13,12 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
-import com.ziroom.tech.demeterapi.service.PortrayalService;
+import com.ziroom.tech.demeterapi.service.PortraitService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,7 +27,7 @@ import java.util.stream.Stream;
  * @author daijiankun
  */
 @Service
-public class PortrayalServiceImpl implements PortrayalService {
+public class PortraitServiceImpl implements PortraitService {
 
     @Resource
     private EhrComponent ehrComponent;
@@ -44,7 +41,6 @@ public class PortrayalServiceImpl implements PortrayalService {
 
     @Override
     public List<EmployeeListResp> getEmployeeList(EmployeeListReq employeeListReq) {
-        // TODO: 2021/5/18 test
         List<EmployeeListResp> respList = new ArrayList<>(16);
         Set<EhrUserResp> users = ehrComponent.getUsers(employeeListReq.getDeptNo(), 101);
         List<String> uidList = users.stream().map(EhrUserResp::getUserCode).collect(Collectors.toList());
@@ -58,11 +54,15 @@ public class PortrayalServiceImpl implements PortrayalService {
 
             // 仅认证通过的技能类任务可计算技能值
             DemeterTaskUserExample skillExample = new DemeterTaskUserExample();
-            skillExample.createCriteria()
-                    .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+            DemeterTaskUserExample.Criteria criteria = skillExample.createCriteria();
+            criteria.andTaskTypeEqualTo(TaskType.SKILL.getCode())
                     .andTaskStatusEqualTo(SkillTaskFlowStatus.PASS.getCode())
-                    .andReceiverUidEqualTo(uid)
-                    .andCheckoutTimeBetween(employeeListReq.getStartTime(), employeeListReq.getEndTime());
+                    .andReceiverUidEqualTo(uid);
+            Date startTime = employeeListReq.getStartTime();
+            Date endTime = employeeListReq.getEndTime();
+            if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
+                criteria.andCheckoutTimeBetween(startTime, endTime);
+            }
             List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(skillExample);
             List<Long> skillIdList = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 

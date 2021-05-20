@@ -21,10 +21,6 @@ import java.util.stream.Collectors;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum SkillTaskFlowStatus {
 
-    FORBIDDEN(0, "已禁用"),
-
-    UNFORBIDDEN(1, "已启用"),
-
     ONGOING(2, "进行中"),
 
     TO_AUTHENTICATE(3, "待认证"),

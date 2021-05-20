@@ -2,9 +2,7 @@ package com.ziroom.tech.demeterapi.controller;
 
 import com.google.common.base.Preconditions;
 import com.ziroom.tech.demeterapi.common.PageListResp;
-import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
-import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
-import com.ziroom.tech.demeterapi.common.enums.TaskType;
+import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
@@ -66,11 +64,21 @@ public class TaskController {
 
     @GetMapping("status/assign")
     public Resp<Object> getAllAssignStatus() {
-        return Resp.success(AssignTaskFlowStatus.getAllTaskType());
+        return Resp.success(AssignTaskStatus.getAllTaskType());
     }
 
     @GetMapping("status/skill")
     public Resp<Object> getAllSkillStatus() {
+        return Resp.success(SkillTaskStatus.getAllTaskType());
+    }
+
+    @GetMapping("status/flow/assign")
+    public Resp<Object> getAllAssignFlowStatus() {
+        return Resp.success(AssignTaskFlowStatus.getAllTaskType());
+    }
+
+    @GetMapping("status/flow/skill")
+    public Resp<Object> getAllSkillFlowStatus() {
         return Resp.success(SkillTaskFlowStatus.getAllTaskType());
     }
 

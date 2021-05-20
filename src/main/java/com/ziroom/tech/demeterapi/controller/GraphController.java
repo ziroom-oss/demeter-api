@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.controller;
 
 import com.ziroom.tech.demeterapi.common.enums.TechRanks;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterPosition;
 import com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Api(tags = "任务相关")
@@ -111,5 +111,13 @@ public class GraphController {
             techRanksEnumList.add(techRanksEnum);
         }
         return Resp.success(techRanksEnumList);
+    }
+
+    /**
+     * 查询所有职务
+     */
+    @GetMapping("/positions")
+    public Resp<List<DemeterPosition>> listDemeterPosition() {
+        return Resp.success(graphService.listAllDemeterPosition());
     }
 }

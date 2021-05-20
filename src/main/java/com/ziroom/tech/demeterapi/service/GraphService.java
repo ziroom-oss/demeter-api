@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.service;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterPosition;
 import com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
@@ -66,4 +67,9 @@ public interface GraphService {
      * @param skillId （父级）技能ID
      */
     List<GraphSubSkillTask> listGraphSubSkillTask(Long skillId);
+
+    /**
+     * 查询所有职务
+     */
+    List<DemeterPosition> listAllDemeterPosition();
 }

@@ -117,6 +117,13 @@ public interface TaskService {
     Resp<Object> submitCheckTask(Long taskId, Integer taskType);
 
     /**
+     * 指派类任务直接完成
+     * @param taskId id
+     * @return Resp
+     */
+    Resp<Object> submitComplete(Long taskId);
+
+    /**
      * 拒绝指派类任务
      * @param rejectTaskReq 指派类任务-拒绝请求体
      * @return Resp

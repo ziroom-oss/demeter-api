@@ -21,30 +21,30 @@ public class EmployeeListResp {
     /**
      * 成长值
      */
-    private Integer growthValue;
+    private Integer growthValue = 0;
 
     /**
      * 指派类任务完成数
      */
-    private Integer assignTaskCount;
+    private Integer assignTaskCount = 0;
 
     /**
      * 技能值
      */
-    private Integer skillValue;
+    private Integer skillValue = 0;
 
     /**
      * 技能类任务完成数
      */
-    private Integer skillTaskCount;
+    private Integer skillTaskCount = 0;
 
     /**
      * 认证技能数量
      */
-    private Integer skillCount;
+    private Integer skillCount = 0;
 
     /**
      * 认证技能图谱数量
      */
-    private Integer graphCount;
+    private Integer graphCount = 0;
 }

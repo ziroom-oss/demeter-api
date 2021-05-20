@@ -55,7 +55,7 @@ public class GraphController {
      * 获取子技能列表
      */
     @GetMapping("/subSkill/list")
-    public Resp<List<GraphSubSkillTask>> listSubSkill(Long skillId) {
+    public Resp<List<GraphSubSkillTask>> listSubSkill(@RequestParam Long skillId) {
         return Resp.success(graphService.listGraphSubSkillTask(skillId));
     }
 
@@ -91,7 +91,11 @@ public class GraphController {
     @PostMapping("/subSkill")
     public Resp<Object> createSubSkill(@RequestBody GraphSubSkillTaskReq graphSubSkillTaskReq) {
         GraphSubSkillTask graphSubSkillTask = graphSubSkillTaskReq.getEntity();
-        return Resp.success(graphService.insertSubSkill(graphSubSkillTask));
+        if (Objects.nonNull(graphSubSkillTask.getId())) {
+            return Resp.success(graphService.updateSubSkill(graphSubSkillTask));
+        } else {
+            return Resp.success(graphService.insertSubSkill(graphSubSkillTask));
+        }
     }
 
     /**

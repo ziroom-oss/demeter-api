@@ -9,6 +9,7 @@
         <result column="level" property="level" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="job_level" property="jobLevel" jdbcType="INTEGER"/>
+        <result column="is_del" property="isDel" jdbcType="INTEGER" />
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -97,12 +98,17 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM graph_sub_skill_task
-        WHERE skill_id = #{skillId}
+        WHERE skill_id = #{skillId} and is_del = 0
         order by modify_time desc
     </select>
+<!--    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
+<!--        DELETE FROM graph_sub_skill_task-->
+<!--        WHERE id = #{id,jdbcType=BIGINT}-->
+<!--    </delete>-->
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        DELETE FROM graph_sub_skill_task
-        WHERE id = #{id,jdbcType=BIGINT}
+        update graph_sub_skill_task
+        set is_del = 1
+        where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">

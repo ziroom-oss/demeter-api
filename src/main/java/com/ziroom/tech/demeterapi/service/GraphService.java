@@ -15,6 +15,11 @@ public interface GraphService {
     Long insertGraph(GraphSkill graphSkill);
 
     /**
+     * 删除图谱
+     */
+    int deleteGraph(Long graphId);
+
+    /**
      * 更新技能图谱
      */
     Long updateGraph(GraphSkill graphSkill);

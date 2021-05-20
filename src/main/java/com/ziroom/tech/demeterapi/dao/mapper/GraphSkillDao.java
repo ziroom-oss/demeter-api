@@ -16,11 +16,16 @@ public interface GraphSkillDao {
 
     public int countByExample(GraphSkillExample example);
 
-    public int deleteByPrimaryKey(Long id);
+//    public int deleteByPrimaryKey(Long id);
 
     public int insert(GraphSkill record);
 
     public int insertSelective(GraphSkill record);
+
+    /**
+     * 删除指定 id 的图谱
+     */
+    public int deleteByPrimaryKey(Long id);
 
     public List<GraphSkill> selectByExample(GraphSkillExample example);
 

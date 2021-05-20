@@ -7,6 +7,7 @@
         <result column="graph_name" property="graphName" jdbcType="VARCHAR"/>
         <result column="enable" property="enable" jdbcType="INTEGER"/>
         <result column="position" property="position" jdbcType="INTEGER"/>
+        <result column="is_del" property="isDel" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -69,7 +70,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, graph_name, enable, position, create_time, modify_time
+        id, graph_name, enable, position, is_del , create_time, modify_time
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkillExample">
         select
@@ -95,6 +96,8 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM graph_skill
+        WHERE is_del = 0
+        order by create_time desc;
     </select>
     <select id="selectByCondition" resultMap="BaseResultMap">
         SELECT
@@ -105,7 +108,7 @@
                 and id = #{graphSkillListReq.id}
             </if>
             <if test="graphSkillListReq.graphName != null">
-                and graph_name = #{graphSkillListReq.graphName}
+                and graph_name like concat('%', #{graphSkillListReq.graphName}, '%')
             </if>
             <if test="graphSkillListReq.enable != null">
                 and enable = #{graphSkillListReq.enable}
@@ -117,13 +120,14 @@
                 and create_time >= #{graphSkillListReq.createStartTime}
                 and create_time &lt;= #{graphSkillListReq.createEndTime}
             </if>
+            and is_del = 0
         </where>
-        order by modify_time desc;
+        order by create_time desc;
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        DELETE FROM graph_skill
-        WHERE id = #{id,jdbcType=BIGINT}
-    </delete>
+<!--    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
+<!--        DELETE FROM graph_skill-->
+<!--        WHERE id = #{id,jdbcType=BIGINT}-->
+<!--    </delete>-->
     <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkill">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -216,6 +220,11 @@
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
+    </update>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        UPDATE graph_skill
+        SET is_del = 1
+        where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.GraphSkill">
         UPDATE graph_skill

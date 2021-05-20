@@ -72,6 +72,11 @@ public class GraphController {
         }
     }
 
+    @DeleteMapping("/")
+    public Resp<Object> deleteGraph(@RequestParam Long id) {
+        return Resp.success(graphService.deleteGraph(id));
+    }
+
     /**
      * 创建和修改技能领域
      */

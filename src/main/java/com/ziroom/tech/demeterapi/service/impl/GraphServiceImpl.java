@@ -35,6 +35,10 @@ public class GraphServiceImpl implements GraphService {
         return graphSkill.getId();
     }
     @Override
+    public int deleteGraph(Long id) {
+        return graphSkillDao.deleteByPrimaryKey(id);
+    }
+    @Override
     public Long updateGraph(GraphSkill graphSkill) {
         graphSkillDao.updateByPrimaryKeySelective(graphSkill);
         return graphSkill.getId();

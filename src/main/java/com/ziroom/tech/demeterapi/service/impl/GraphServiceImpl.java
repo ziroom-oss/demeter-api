@@ -1,8 +1,10 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterPosition;
 import com.ziroom.tech.demeterapi.dao.entity.GraphAreaSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSkill;
 import com.ziroom.tech.demeterapi.dao.entity.GraphSubSkillTask;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterPositionDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphAreaSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSkillDao;
 import com.ziroom.tech.demeterapi.dao.mapper.GraphSubSkillTaskDao;
@@ -24,6 +26,8 @@ public class GraphServiceImpl implements GraphService {
     private GraphAreaSkillDao graphAreaSkillDao;
     @Resource
     private GraphSubSkillTaskDao graphSubSkillTaskDao;
+    @Resource
+    private DemeterPositionDao demeterPositionDao;
 
     @Override
     public int insertGraph(GraphSkill graphSkill) {
@@ -72,5 +76,9 @@ public class GraphServiceImpl implements GraphService {
     @Override
     public List<GraphSubSkillTask> listGraphSubSkillTask(Long skillId) {
         return graphSubSkillTaskDao.selectBySkillId(skillId);
+    };
+    @Override
+    public List<DemeterPosition> listAllDemeterPosition() {
+        return demeterPositionDao.selectAll();
     };
 }

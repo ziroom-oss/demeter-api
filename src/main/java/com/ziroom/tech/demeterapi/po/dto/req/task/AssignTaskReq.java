@@ -63,9 +63,7 @@ public class AssignTaskReq {
     public void validateAdd() {
         Preconditions.checkArgument(StringUtils.isNotEmpty(taskName), "任务名称不能为空");
         Preconditions.checkArgument(Objects.nonNull(taskEndTime), "任务结束时间不能为空");
-        Preconditions.checkArgument(Objects.nonNull(taskReward), "任务成长值奖励不能为空");
-        Preconditions.checkArgument(Objects.nonNull(needEmailRemind), "任务是否邮件提醒不能为空");
-        Preconditions.checkArgument(Objects.nonNull(needPunishment), "任务是否有惩罚不能为空");
+        Preconditions.checkArgument(Objects.nonNull(taskReward) && taskReward != 0, "任务成长值奖励不能为空");
         Preconditions.checkArgument(Objects.nonNull(needAcceptance), "任务是否需要验收不能为空");
     }
 }

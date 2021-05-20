@@ -56,8 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                // 声明需要被私有云登陆拦截的 url
+                .antMatchers("/api/task/upload/attachment", "/api/task/upload/outcome").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
+                // 声明需要被私有云登陆拦截的 url
                 .antMatchers("/**/*")
                 .authenticated();
 

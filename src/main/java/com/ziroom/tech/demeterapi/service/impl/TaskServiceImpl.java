@@ -73,9 +73,6 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private MessageService messageService;
 
-//    private final static String ASSIGN_PREFIX = "ASSIGN-";
-//    private final static String SKILL_PREFIX = "SKILL-";
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
@@ -343,6 +340,10 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
+    /**
+     * 更新任务认领关系
+     * @param assignTaskReq 指派类任务请求体
+     */
     private void updateTaskUser(AssignTaskReq assignTaskReq) {
         List<String> newReceiverList = assignTaskReq.getTaskReceiver();
         Long taskId = assignTaskReq.getId();
@@ -358,6 +359,7 @@ public class TaskServiceImpl implements TaskService {
                 DemeterTaskUser demeterTaskUser = DemeterTaskUser.builder()
                         .taskId(taskId)
                         .receiverUid(receiver)
+                        .checkResult(assignTaskReq.getNeedAcceptance() == 1 ? CheckoutResult.NEED_CHECKOUT.getCode() : CheckoutResult.NO_CHECKOUT.getCode())
                         // 增加记录但为未认领状态
                         .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
                         .taskType(TaskType.ASSIGN.getCode())
@@ -657,6 +659,7 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.ASSIGN.getCode());
                     resp.setTaskTypeName(TaskType.ASSIGN.getDesc());
                     resp.setReceiver(taskUser.getReceiverUid());
+                    resp.setNeedAcceptance(assign.getNeedAcceptance());
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(assign.getPublisher()).getName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
@@ -1013,30 +1016,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> submitCheckTask(Long taskId, Integer taskType) {
-        if (!checkTaskAccept(taskId, taskType)) {
-            return Resp.error("任务未认领");
-        }
+        checkTaskAccept(taskId, taskType);
         if (TaskType.SKILL.getCode().equals(taskType)) {
             checkSkillForbidden(taskId);
         }
-        // check 任务条件是否完成
-        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
-        taskFinishConditionInfoExample.createCriteria()
-                .andTaskIdEqualTo(taskId)
-                .andTaskTypeEqualTo(taskType)
-                .andUidEqualTo(OperatorContext.getOperator());
-        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
-        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
-            try {
-                taskFinishConditionInfos.forEach(condition -> {
-                    if (condition.getTaskConditionStatus().equals(TaskConditionStatus.UNFINISHED.getCode())) {
-                        throw new BusinessException("无法提交验收/认证，有任务条件未完成");
-                    }
-                });
-            } catch (BusinessException exception) {
-                return Resp.error(exception.getMessage());
-            }
-        }
+        checkTaskCondition(taskId, taskType);
         /// 任务无完成条件
         // 是否上传学习成果
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
@@ -1073,6 +1057,50 @@ public class TaskServiceImpl implements TaskService {
             demeterTaskUserDao.updateByPrimaryKey(updateEntity);
         }
         return Resp.success();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Resp<Object> submitComplete(Long taskId) {
+        checkTaskAccept(taskId, TaskType.ASSIGN.getCode());
+        checkTaskCondition(taskId, TaskType.ASSIGN.getCode());
+        if (checkNeedCheck(taskId)) {
+            throw new BusinessException("任务需要验收，无法直接完成");
+        }
+        DemeterTaskUserExample updateExample = new DemeterTaskUserExample();
+        updateExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
+                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        DemeterTaskUser update = DemeterTaskUser.builder().taskStatus(AssignTaskFlowStatus.FINISHED.getCode()).build();
+        demeterTaskUserDao.updateByExampleSelective(update, updateExample);
+        return Resp.success();
+    }
+
+    /**
+     * 检查当前任务是否需要验收
+     * @param taskId
+     */
+    private boolean checkNeedCheck(Long taskId) {
+        DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
+        return demeterAssignTask.getNeedAcceptance() == 1;
+    }
+
+    private void checkTaskCondition(Long taskId, Integer taskType) {
+        // check 当前登录人 在该任务下的条件是否全部完成
+        TaskFinishConditionInfoExample taskFinishConditionInfoExample = new TaskFinishConditionInfoExample();
+        taskFinishConditionInfoExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(taskType)
+                .andUidEqualTo(OperatorContext.getOperator());
+        List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
+        if (CollectionUtils.isNotEmpty(taskFinishConditionInfos)) {
+            taskFinishConditionInfos.forEach(condition -> {
+                if (condition.getTaskConditionStatus().equals(TaskConditionStatus.UNFINISHED.getCode())) {
+                    throw new BusinessException("无法提交验收/认证，有任务条件未完成");
+                }
+            });
+        }
     }
 
     @Override
@@ -1300,9 +1328,8 @@ public class TaskServiceImpl implements TaskService {
         if (!taskFinishConditionInfo.getUid().equals(OperatorContext.getOperator())) {
             return Resp.error("任务未认领");
         }
-        if (!checkTaskAccept(taskFinishConditionInfo.getTaskId(), taskFinishConditionInfo.getTaskType())) {
-            return Resp.error("任务未认领");
-        }
+        checkTaskAccept(taskFinishConditionInfo.getTaskId(), taskFinishConditionInfo.getTaskType());
+
         if (taskFinishConditionInfo.getTaskConditionStatus().equals(TaskConditionStatus.FINISHED.getCode())) {
             return Resp.error("任务条件已完成，请勿重复完成");
         }
@@ -1320,13 +1347,15 @@ public class TaskServiceImpl implements TaskService {
     /**
      * check 根据id和type查询任务是否被当前登录人认领
      */
-    private boolean checkTaskAccept(Long id, Integer type) {
+    private void checkTaskAccept(Long id, Integer type) {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
                 .andTaskIdEqualTo(id)
                 .andTaskTypeEqualTo(type)
                 .andReceiverUidEqualTo(OperatorContext.getOperator());
-        return CollectionUtils.isNotEmpty(demeterTaskUserDao.selectByExample(demeterTaskUserExample));
+        if (CollectionUtils.isEmpty(demeterTaskUserDao.selectByExample(demeterTaskUserExample))) {
+            throw new BusinessException("任务未认领");
+        }
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortrayalService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -65,22 +66,24 @@ public class PortrayalServiceImpl implements PortrayalService {
             List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(skillExample);
             List<Long> skillIdList = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
-            DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
-            demeterSkillTaskExample.createCriteria()
-                    .andIdIn(skillIdList);
-            List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
-            int skillValue = demeterSkillTasks.stream().mapToInt(DemeterSkillTask::getSkillReward).sum();
-            resp.setSkillTaskCount(demeterSkillTasks.size());
-            resp.setSkillValue(skillValue);
+            if (CollectionUtils.isNotEmpty(skillIdList)) {
+                DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+                demeterSkillTaskExample.createCriteria()
+                        .andIdIn(skillIdList);
+                List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+                int skillValue = demeterSkillTasks.stream().mapToInt(DemeterSkillTask::getSkillReward).sum();
+                resp.setSkillTaskCount(demeterSkillTasks.size());
+                resp.setSkillValue(skillValue);
+            }
             // TODO: 2021/5/18 认证技能数量
             resp.setSkillCount(0);
-
 
             // 无需验收的任务完成状态即可计入总成长值
             DemeterTaskUserExample assignExample1 = new DemeterTaskUserExample();
             assignExample1.createCriteria()
                     .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
                     .andCheckResultEqualTo(CheckoutResult.NO_CHECKOUT.getCode())
+                    .andReceiverUidEqualTo(uid)
                     .andTaskStatusEqualTo(AssignTaskFlowStatus.FINISHED.getCode());
             List<DemeterTaskUser> demeterTaskUsers1 = demeterTaskUserDao.selectByExample(assignExample1);
 
@@ -89,19 +92,22 @@ public class PortrayalServiceImpl implements PortrayalService {
             assignExample2.createCriteria()
                     .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
                     .andCheckResultEqualTo(CheckoutResult.SUCCESS.getCode())
+                    .andReceiverUidEqualTo(uid)
                     .andTaskStatusEqualTo(AssignTaskFlowStatus.ACCEPTANCE.getCode());
             List<DemeterTaskUser> demeterTaskUsers2 = demeterTaskUserDao.selectByExample(assignExample2);
 
             List<Long> assignIdList = Stream.concat(demeterTaskUsers1.stream().map(DemeterTaskUser::getTaskId), demeterTaskUsers2.stream().map(DemeterTaskUser::getTaskId)).collect(Collectors.toList());
 
-            DemeterAssignTaskExample demeterAssignTaskExample = new DemeterAssignTaskExample();
-            demeterAssignTaskExample.createCriteria()
-                    .andIdIn(assignIdList);
-            List<DemeterAssignTask> demeterAssignTasks = demeterAssignTaskDao.selectByExample(demeterAssignTaskExample);
-            int assignValue = demeterAssignTasks.stream().mapToInt(DemeterAssignTask::getTaskReward).sum();
-            resp.setGrowthValue(assignValue);
-            resp.setAssignTaskCount(demeterAssignTasks.size());
+            if (CollectionUtils.isNotEmpty(assignIdList)) {
+                DemeterAssignTaskExample demeterAssignTaskExample = new DemeterAssignTaskExample();
+                demeterAssignTaskExample.createCriteria()
+                        .andIdIn(assignIdList);
+                List<DemeterAssignTask> demeterAssignTasks = demeterAssignTaskDao.selectByExample(demeterAssignTaskExample);
+                int assignValue = demeterAssignTasks.stream().mapToInt(DemeterAssignTask::getTaskReward).sum();
+                resp.setGrowthValue(assignValue);
+                resp.setAssignTaskCount(demeterAssignTasks.size());
 
+            }
             respList.add(resp);
         });
         return respList;

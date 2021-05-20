@@ -44,6 +44,11 @@ public class ReceiveQueryResp {
 
     private String receiverName;
 
+    /**
+     * 指派类任务是否需要验收
+     */
+    private Byte needAcceptance;
+
     private Date createTime;
 
     private Date updateTime;

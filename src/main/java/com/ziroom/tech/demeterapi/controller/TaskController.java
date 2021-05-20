@@ -160,6 +160,12 @@ public class TaskController {
         return taskService.submitCheckTask(taskId, taskType);
     }
 
+    @PostMapping("/submit/complete")
+    @ApiOperation(value = "任务直接完成", httpMethod = "POST")
+    public Resp<Object> submitComplete(@RequestParam Long taskId) {
+        return taskService.submitComplete(taskId);
+    }
+
     @PostMapping("/auth")
     @ApiOperation(value = "任务验收", httpMethod = "POST")
     public Resp<Object> checkTask(@RequestBody CheckTaskReq checkTaskReq) {
@@ -212,8 +218,6 @@ public class TaskController {
         return taskService.readFile(fileUuid);
     }
 
-
-    // TODO: 2021/5/20
     @PostMapping("/graph/search")
     @ApiOperation(value = "技能任务搜索，用来关联技能图谱", httpMethod = "POST")
     public Resp<List<DemeterSkillTask>> searchSkillForGraph(@RequestParam String condition) {

@@ -30,12 +30,14 @@ public class GraphServiceImpl implements GraphService {
     private DemeterPositionDao demeterPositionDao;
 
     @Override
-    public int insertGraph(GraphSkill graphSkill) {
-        return graphSkillDao.insert(graphSkill);
+    public Long insertGraph(GraphSkill graphSkill) {
+        graphSkillDao.insert(graphSkill);
+        return graphSkill.getId();
     }
     @Override
-    public int updateGraph(GraphSkill graphSkill) {
-        return graphSkillDao.updateByPrimaryKeySelective(graphSkill);
+    public Long updateGraph(GraphSkill graphSkill) {
+        graphSkillDao.updateByPrimaryKeySelective(graphSkill);
+        return graphSkill.getId();
     }
     @Override
     public Long insertSkill(GraphAreaSkill graphAreaSkill) {

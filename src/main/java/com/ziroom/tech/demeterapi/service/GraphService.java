@@ -12,12 +12,12 @@ public interface GraphService {
     /**
      * 创建技能图谱
      */
-    int insertGraph(GraphSkill graphSkill);
+    Long insertGraph(GraphSkill graphSkill);
 
     /**
      * 更新技能图谱
      */
-    int updateGraph(GraphSkill graphSkill);
+    Long updateGraph(GraphSkill graphSkill);
 
     /**
      * 创建技能领域

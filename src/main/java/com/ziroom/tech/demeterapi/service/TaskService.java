@@ -2,6 +2,7 @@ package com.ziroom.tech.demeterapi.service;
 
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
@@ -190,4 +191,11 @@ public interface TaskService {
      * @return 是 否
      */
     Boolean checkTaskDelay();
+
+    /**
+     * 技能任务搜索
+     * @param condition
+     * @return
+     */
+    List<DemeterSkillTask> searchSkillForGraph(String condition);
 }

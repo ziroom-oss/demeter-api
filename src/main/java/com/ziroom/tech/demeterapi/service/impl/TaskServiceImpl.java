@@ -1455,4 +1455,22 @@ public class TaskServiceImpl implements TaskService {
             throw new BusinessException("技能任务：" + demeterSkillTask.getTaskName() + " 已被发布者禁用，无法继续操作");
         }
     }
+
+    @Override
+    public List<DemeterSkillTask> searchSkillForGraph(String condition) {
+        if (condition.startsWith(TaskIdPrefix.SKILL_PREFIX.getDesc())) {
+            long id;
+            try {
+                id = Long.parseLong(condition.substring(condition.indexOf("-") + 1));
+            } catch (Exception e) {
+                throw new BusinessException("请输入正确的技能任务编号.");
+            }
+            DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
+            return Lists.newArrayList(demeterSkillTask);
+        }
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        demeterSkillTaskExample.createCriteria()
+                .andTaskNameLike("%" + condition + "%");
+        return demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+    }
 }

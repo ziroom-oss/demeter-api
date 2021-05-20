@@ -1,10 +1,11 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.google.common.base.Preconditions;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
-import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
@@ -12,7 +13,7 @@ import com.ziroom.tech.demeterapi.service.TaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -210,4 +211,14 @@ public class TaskController {
     public Resp<Object> downloadFile(String fileUuid) {
         return taskService.readFile(fileUuid);
     }
+
+
+    // TODO: 2021/5/20
+    @PostMapping("/graph/search")
+    @ApiOperation(value = "技能任务搜索，用来关联技能图谱", httpMethod = "POST")
+    public Resp<List<DemeterSkillTask>> searchSkillForGraph(@RequestParam String condition) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(condition), "搜索条件不能为空");
+        return Resp.success(taskService.searchSkillForGraph(condition));
+    }
+
 }

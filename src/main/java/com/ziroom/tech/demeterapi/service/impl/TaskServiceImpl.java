@@ -413,12 +413,13 @@ public class TaskServiceImpl implements TaskService {
         // 员工只能看到本人创建或接收的任务，部门管理者可以看到本部门员工创建或接收的所有任务，超级管理员可以看到所有部门员工创建或接收的所有任务。
 
         CurrentRole currentRole = this.getCurrentRole();
-        String publisher = taskListQueryReq.getPublisher();
+        String publisher = taskListQueryReq.getSystemCode();
         switch (currentRole) {
             case SUPER:
                 // 查询所有记录
                 if (StringUtils.isNotEmpty(publisher)) {
                     assignTaskExampleCriteria.andPublisherEqualTo(publisher);
+                    skillTaskExampleCriteria.andPublisherEqualTo(publisher);
                 }
                 break;
             case DEPT:
@@ -445,21 +446,23 @@ public class TaskServiceImpl implements TaskService {
             default:
         }
 
-        String receiverUid = taskListQueryReq.getSystemCode();
-        List<DemeterTaskUser> demeterTaskUsers;
-        if (StringUtils.isNotEmpty(receiverUid)) {
-            // 查询任务接收表 List<Long> taskIdList = queryTaskReceive();
-            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-            demeterTaskUserExample.createCriteria().andReceiverUidEqualTo(receiverUid);
-            demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
-            if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
-                List<Long> taskIdList = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
-                assignTaskExampleCriteria.andIdIn(taskIdList);
-                skillTaskExampleCriteria.andIdIn(taskIdList);
-            } else {
-                return PageListResp.emptyList();
-            }
-        }
+//        List<DemeterTaskUser> demeterTaskUsers;
+//        if (StringUtils.isNotEmpty(publisher)) {
+//            // 查询任务接收表 List<Long> taskIdList = queryTaskReceive();
+//            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+//            demeterTaskUserExample.createCriteria().andReceiverUidEqualTo(publisher);
+//            demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+//            if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
+//                List<Long> taskIdList = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+//                assignTaskExampleCriteria.andIdIn(taskIdList);
+//                skillTaskExampleCriteria.andIdIn(taskIdList);
+//            } else {
+//                return PageListResp.emptyList();
+//            }
+//        }
+
+        List<DemeterSkillTask> skillTasks = new ArrayList<>(16);
+        List<DemeterAssignTask> assignTasks = new ArrayList<>(16);
 
         String nameOrNo = taskListQueryReq.getNameOrNo();
         if (StringUtils.isNotEmpty(nameOrNo)) {
@@ -473,8 +476,6 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        List<DemeterSkillTask> skillTasks = new ArrayList<>(16);
-        List<DemeterAssignTask> assignTasks = new ArrayList<>(16);
         if (Objects.nonNull(taskListQueryReq.getTaskType())) {
             if (taskListQueryReq.getTaskType().equals(TaskType.SKILL.getCode())) {
                 if (Objects.nonNull(taskListQueryReq.getTaskStatus())) {

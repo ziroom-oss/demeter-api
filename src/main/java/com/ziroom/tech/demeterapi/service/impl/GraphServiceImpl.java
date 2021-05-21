@@ -44,14 +44,18 @@ public class GraphServiceImpl implements GraphService {
         return graphSkill.getId();
     }
     @Override
-    public Long insertSkill(GraphAreaSkill graphAreaSkill) {
+    public Long insertAreaSkill(GraphAreaSkill graphAreaSkill) {
         graphAreaSkillDao.insertSelective(graphAreaSkill);
         return graphAreaSkill.getId();
     }
     @Override
-    public Long updateSkill(GraphAreaSkill graphAreaSkill) {
+    public Long updateAreaSkill(GraphAreaSkill graphAreaSkill) {
         graphAreaSkillDao.updateByPrimaryKeySelective(graphAreaSkill);
         return graphAreaSkill.getId();
+    }
+    @Override
+    public int deleteAreaSkill(Long id) {
+        return graphAreaSkillDao.deleteByPrimaryKey(id);
     }
     @Override
     public int insertSubSkill(GraphSubSkillTask graphSubSkillTask) {
@@ -60,6 +64,10 @@ public class GraphServiceImpl implements GraphService {
     @Override
     public int updateSubSkill(GraphSubSkillTask graphSubSkillTask) {
         return graphSubSkillTaskDao.updateByPrimaryKeySelective(graphSubSkillTask);
+    }
+    @Override
+    public int deleteSubSkill(Long id) {
+        return graphSubSkillTaskDao.deleteByPrimaryKey(id);
     }
 
     @Override

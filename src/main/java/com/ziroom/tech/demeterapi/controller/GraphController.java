@@ -77,6 +77,16 @@ public class GraphController {
         return Resp.success(graphService.deleteGraph(id));
     }
 
+    @DeleteMapping("/area")
+    public Resp<Object> deleteArea(@RequestParam Long id) {
+        return Resp.success(graphService.deleteAreaSkill(id));
+    }
+
+    @DeleteMapping("/subSkill")
+    public Resp<Object> deleteSubSkill(@RequestParam Long id) {
+        return Resp.success(graphService.deleteSubSkill(id));
+    }
+
     /**
      * 创建和修改技能领域
      */
@@ -84,9 +94,9 @@ public class GraphController {
     public Resp<Object> createArea(@RequestBody GraphAreaSkillReq graphAreaSkillReq) {
         GraphAreaSkill graphAreaSkill = graphAreaSkillReq.getEntity();
         if (Objects.nonNull(graphAreaSkill.getId())) {
-           return Resp.success(graphService.updateSkill(graphAreaSkill));
+           return Resp.success(graphService.updateAreaSkill(graphAreaSkill));
         } else {
-            return Resp.success(graphService.insertSkill(graphAreaSkill));
+            return Resp.success(graphService.insertAreaSkill(graphAreaSkill));
         }
     }
 

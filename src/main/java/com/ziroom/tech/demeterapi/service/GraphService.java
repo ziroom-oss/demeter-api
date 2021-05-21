@@ -28,12 +28,17 @@ public interface GraphService {
      * 创建技能领域
      * 每一个技能领域至少包含一个技能
      */
-    Long insertSkill(GraphAreaSkill graphAreaSkill);
+    Long insertAreaSkill(GraphAreaSkill graphAreaSkill);
 
     /**
      * 更新技能领域
      */
-    Long updateSkill(GraphAreaSkill graphAreaSkill);
+    Long updateAreaSkill(GraphAreaSkill graphAreaSkill);
+
+    /**
+     * 删除技能领域
+     */
+    int deleteAreaSkill(Long skillId);
 
     /**
      * 创建子技能
@@ -45,6 +50,11 @@ public interface GraphService {
      * 更新子技能
      */
     int updateSubSkill(GraphSubSkillTask graphSubSkillTask);
+
+    /**
+     * 删除子技能
+     */
+    int deleteSubSkill(Long id);
 
     /**
      * 按条件查询技能图谱列表

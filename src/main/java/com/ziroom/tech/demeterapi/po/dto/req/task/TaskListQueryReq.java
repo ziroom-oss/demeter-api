@@ -19,11 +19,9 @@ public class TaskListQueryReq extends PageListReq {
     @ApiModelProperty("任务状态")
     private Integer taskStatus;
 
-    @ApiModelProperty("接收者系统号，由前端转换")
+    @ApiModelProperty("发布人或接收人系统号")
     private String systemCode;
 
     @ApiModelProperty("任务名称/编号")
     private String nameOrNo;
-
-    private String publisher;
 }

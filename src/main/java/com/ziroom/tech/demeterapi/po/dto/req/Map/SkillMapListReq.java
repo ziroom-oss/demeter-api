@@ -1,5 +1,6 @@
-package com.ziroom.tech.demeterapi.po.dto.req.Graph;
+package com.ziroom.tech.demeterapi.po.dto.req.Map;
 
+import com.ziroom.tech.demeterapi.common.PageListReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,8 +8,8 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@ApiModel("查询技能图谱列表")
-public class GraphSkillListReq {
+@ApiModel("查询技术图谱")
+public class SkillMapListReq extends PageListReq {
     @ApiModelProperty("创建时间-开始时间段")
     private Date createStartTime;
 
@@ -16,13 +17,13 @@ public class GraphSkillListReq {
     private Date createEndTime;
 
     @ApiModelProperty("图谱状态")
-    private Byte enable;
+    private Byte isEnable;
 
     @ApiModelProperty("职务")
-    private Integer position;
+    private Integer jobId;
 
     @ApiModelProperty("图谱名称")
-    private String graphName;
+    private String name;
 
     @ApiModelProperty("图谱编号")
     private Long id;

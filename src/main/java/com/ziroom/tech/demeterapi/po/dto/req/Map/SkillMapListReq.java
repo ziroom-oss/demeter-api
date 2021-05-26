@@ -4,9 +4,11 @@ import com.ziroom.tech.demeterapi.common.PageListReq;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("查询技术图谱")
 public class SkillMapListReq extends PageListReq {

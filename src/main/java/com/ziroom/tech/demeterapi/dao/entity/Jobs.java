@@ -5,19 +5,21 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class SkillMap {
+public class Jobs {
 
     private Long id;
-
-    private String name;
-
-    private Byte isEnable;
     /**
-     * 关联到 jobs 表
+     * 职务代号与公司同步
      */
-    private Integer jobId;
+    private Integer code;
+    /**
+     * 职务名称
+     */
+    private String name;
 
     private Date createTime;
 
     private Date modifyTime;
+
+    private Byte isDel;
 }

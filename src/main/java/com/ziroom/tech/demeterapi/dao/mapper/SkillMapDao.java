@@ -15,7 +15,7 @@ public interface SkillMapDao {
     /**
      * 计算数量
      */
-    public Integer countBySkillMap(SkillMapListReq record);
+    public Integer countBySkillMap(@Param("skillMapListReq") SkillMapListReq skillMapListReq);
 
     /**
      * 新建技术图谱

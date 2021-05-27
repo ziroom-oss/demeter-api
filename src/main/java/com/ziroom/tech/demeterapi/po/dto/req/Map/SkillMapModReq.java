@@ -10,7 +10,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.Objects;
 
 @Data
-@ApiModel
+@ApiModel("变更技能图谱")
 public class SkillMapModReq {
     @ApiModelProperty("图谱编号")
     private Long id;

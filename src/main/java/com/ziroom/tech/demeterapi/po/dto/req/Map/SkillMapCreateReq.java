@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Objects;
 
 @Data
-@ApiModel
+@ApiModel("创建技能图谱")
 public class SkillMapCreateReq {
     @ApiModelProperty("主键id，也是图谱编号")
     private Long id;

@@ -81,7 +81,7 @@ public class MapController {
     }
 
     @ApiOperation("按 id 更新技能图谱")
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     public Resp<Integer> updateMap(@PathVariable Long id, @RequestBody SkillMapModReq skillMapModReq) {
         skillMapModReq.setId(id);
         SkillMap skillMap = skillMapModReq.getEntity(skillMapModReq);

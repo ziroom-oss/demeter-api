@@ -71,6 +71,10 @@
 <!--               enableSelectByExample="true">-->
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
+<!--        <table tableName="skill_tree" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
 
     </context>
 </generatorConfiguration>

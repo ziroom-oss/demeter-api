@@ -20,12 +20,12 @@ public interface SkillMapDao {
     /**
      * 新建技术图谱
      */
-    public Byte insertSelective(SkillMap record);
+    public Integer insertSelective(SkillMap record);
 
     /**
      * 删除指定 id 的图谱
      */
-    public Byte deleteByPrimaryKey(Long id);
+    public Integer deleteByPrimaryKey(Long id);
 
     /**
      * 按查询条件返回技能图谱列表
@@ -35,7 +35,7 @@ public interface SkillMapDao {
     /**
      * 修改指定技术图谱
      */
-    public Byte updateByPrimaryKeySelective(SkillMap record);
+    public Integer updateByPrimaryKeySelective(SkillMap record);
 
     /**
      * 返回指定 id 的技术图谱

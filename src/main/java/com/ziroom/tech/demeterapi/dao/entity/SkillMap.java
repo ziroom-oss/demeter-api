@@ -20,4 +20,6 @@ public class SkillMap {
     private Date createTime;
 
     private Date modifyTime;
+
+    private Byte isDel;
 }

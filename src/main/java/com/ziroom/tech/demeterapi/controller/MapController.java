@@ -11,16 +11,16 @@ import com.ziroom.tech.demeterapi.po.dto.resp.map.SkillMapResp;
 import com.ziroom.tech.demeterapi.service.JobsService;
 import com.ziroom.tech.demeterapi.service.MapService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.jboss.netty.util.internal.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Api("技能图谱")
 @Slf4j
@@ -32,21 +32,25 @@ public class MapController {
     @Resource
     private JobsService jobsService;
 
+    @ApiOperation("创建技能图谱")
     @PostMapping("/")
-    public Resp<Byte> createMap(@RequestBody SkillMapCreateReq skillMapCreateReq) {
+    public Resp<Integer> createMap(@RequestBody SkillMapCreateReq skillMapCreateReq) {
         return Resp.success(mapService.insertSelective(skillMapCreateReq.getEntity()));
     }
 
+    @ApiOperation("移除指定 id 的技能图谱")
     @DeleteMapping("/{id}")
-    public Resp<Byte> deleteMap(@PathVariable Long id) {
+    public Resp<Integer> deleteMap(@PathVariable Long id) {
         return Resp.success(mapService.deleteByPrimaryKey(id));
     }
 
+    @ApiOperation("获取指定 id 的技能图谱")
     @GetMapping("/{id}")
     public Resp<SkillMap> getMap(@PathVariable Long id) {
         return Resp.success(mapService.selectByPrimaryKey(id));
     }
 
+    @ApiOperation("按条件查询技能图谱")
     @PostMapping("/condition")
     public Resp<PageListResp<SkillMapResp>> selectByConditionSelective(@RequestBody SkillMapListReq skillMapListReq) {
         skillMapListReq.validate();
@@ -61,9 +65,12 @@ public class MapController {
         skillMaps.forEach(skillMap -> {
             SkillMapResp skillMapResp = new SkillMapResp();
             BeanUtils.copyProperties(skillMap, skillMapResp);
-            Optional<String> jobName = Optional.ofNullable(
-                    jobsService.selectByCode(skillMap.getJobId()).getName()
-            );
+            // skillMap.jobId 是 jobs 表的主键
+            Jobs jobs = jobsService.selectByCode(skillMap.getJobId());
+            String jobName = "";
+            if (Objects.nonNull(jobs)) {
+                jobName = jobs.getName();
+            }
             skillMapResp.setJobName(jobName);
             skillMapResps.add(skillMapResp);
         });
@@ -71,10 +78,11 @@ public class MapController {
         return Resp.success(resp);
     }
 
+    @ApiOperation("按 id 更新技能图谱")
     @PostMapping("/{id}")
-    public Resp<Byte> updateMap(@PathVariable Long id, @RequestBody SkillMapModReq skillMapModReq) {
+    public Resp<Integer> updateMap(@PathVariable Long id, @RequestBody SkillMapModReq skillMapModReq) {
+        skillMapModReq.setId(id);
         SkillMap skillMap = skillMapModReq.getEntity(skillMapModReq);
-        skillMap.setId(id);
         return Resp.success(mapService.updateByPrimaryKeySelective(skillMap));
     }
 }

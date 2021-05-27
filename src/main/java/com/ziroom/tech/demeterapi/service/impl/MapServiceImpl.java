@@ -20,11 +20,11 @@ public class MapServiceImpl implements MapService {
         return skillMapDao.countBySkillMap(skillMapListReq);
     }
     @Override
-    public Byte insertSelective(SkillMap skillMap) {
+    public Integer insertSelective(SkillMap skillMap) {
         return skillMapDao.insertSelective(skillMap);
     }
     @Override
-    public Byte deleteByPrimaryKey(Long id) {
+    public Integer deleteByPrimaryKey(Long id) {
         return skillMapDao.deleteByPrimaryKey(id);
     }
     @Override
@@ -32,7 +32,7 @@ public class MapServiceImpl implements MapService {
         return skillMapDao.selectByConditionSelective(skillMapListReq);
     }
     @Override
-    public Byte updateByPrimaryKeySelective(SkillMap skillMap) {
+    public Integer updateByPrimaryKeySelective(SkillMap skillMap) {
         return skillMapDao.updateByPrimaryKeySelective(skillMap);
     }
     @Override

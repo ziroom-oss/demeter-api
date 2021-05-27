@@ -51,11 +51,13 @@ server:
 retrofit:
   endpoints:
     - identity: ehr
-      baseUrl: http://ehrnew.ziroom.com/
+      baseUrl: http://ehrnew.t.ziroom.com/
     - identity: ehrapi
       baseUrl: http://ehr-api.ziroom.com/
     - identity: storage
       baseUrl: http://storage.t.ziroom.com/
+    - identity: ca
+      baseUrl: http://ca.kt.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

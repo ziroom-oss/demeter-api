@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
+import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.*;
@@ -46,6 +47,8 @@ public class PortraitServiceImpl implements PortraitService {
     private DemeterAssignTaskDao demeterAssignTaskDao;
     @Resource
     private DemeterTaskUserDao demeterTaskUserDao;
+    @Resource
+    private CodeAnalysisComponent codeAnalysisComponent;
 
     @Override
     public List<EmployeeListResp> getEmployeeList(EmployeeListReq employeeListReq) {

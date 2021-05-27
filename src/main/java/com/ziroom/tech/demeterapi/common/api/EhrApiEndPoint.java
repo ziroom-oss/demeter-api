@@ -77,4 +77,7 @@ public interface EhrApiEndPoint {
 
     @GET("/api/ehr/getLeaderByCode.action")
     Call<JSONObject> getLeaderByCode(@Query("code") String code, @Query("setId") String setId);
+
+    @GET("/api/ehr/get/jointime")
+    Call<JSONObject> getJointime(@Query("empCode") String empCode, @Query("pageNo") Integer pageNo, @Query("pageSize") Integer pageSize);
 }

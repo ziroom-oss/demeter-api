@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,16 +32,16 @@ public class TaskController {
     @Resource
     private TaskService taskService;
 
-    @PostMapping("save/assign")
+    @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
-    public Resp<Object> createAssignTask(@RequestBody AssignTaskReq assignTaskReq) {
+    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
         assignTaskReq.validateAdd();
         return taskService.createAssignTask(assignTaskReq);
     }
 
-    @PostMapping("save/skill")
+    @PostMapping(value = "save/skill", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "新建技能类任务", httpMethod = "POST")
-    public Resp<Object> createSkillTask(@RequestBody SkillTaskReq skillTaskReq) {
+    public Resp<Object> createSkillTask(SkillTaskReq skillTaskReq) {
         skillTaskReq.validateAdd();
         return taskService.createSkillTask(skillTaskReq);
     }
@@ -82,23 +83,34 @@ public class TaskController {
         return Resp.success(SkillTaskFlowStatus.getAllTaskType());
     }
 
-    @PostMapping("update/assign")
+    @GetMapping("skill/level")
+    public Resp<Object> getAllSkillLevel() {
+        return Resp.success(SkillPointLevel.getAllSkillLevel());
+    }
+
+    // @daijr
+    @PostMapping("skill/move")
+    public Resp<Object> submitSkillMove(@RequestParam Long id, @RequestParam Long skillTreeId) {
+        return Resp.success(taskService.submitSkillMove(id, skillTreeId));
+    }
+
+    @PostMapping(value = "update/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "编辑指派类任务", httpMethod = "POST")
-    public Resp<Object> updateAssignTask(@RequestBody AssignTaskReq assignTaskReq) {
+    public Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq) {
         assignTaskReq.validateAdd();
         return taskService.updateAssignTask(assignTaskReq);
+    }
+
+    @PostMapping(value = "update/skill", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiOperation(value = "编辑技能类任务", httpMethod = "POST")
+    public Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq) {
+        return taskService.updateSkillTask(skillTaskReq);
     }
 
     @PostMapping("status/assign")
     @ApiOperation(value = "任务自身状态更改：指派类：开启 关闭，技能类：启用 禁用", httpMethod = "POST")
     public Resp<Object> updateAssignTaskStatus(@RequestParam Long taskId, Integer taskType, Integer taskStatus) {
         return taskService.updateAssignTaskStatus(taskId, taskType, taskStatus);
-    }
-
-    @PostMapping("update/skill")
-    @ApiOperation(value = "编辑技能类任务", httpMethod = "POST")
-    public Resp<Object> updateSkillTask(@RequestBody SkillTaskReq skillTaskReq) {
-        return taskService.updateSkillTask(skillTaskReq);
     }
 
     @PostMapping("/list/release")
@@ -115,13 +127,8 @@ public class TaskController {
         return Resp.success(taskService.getExecuteList(taskListQueryReq));
     }
 
-    @PostMapping("/detail")
-    @ApiOperation(value = "任务详情", httpMethod = "POST")
-    public Resp<Object> getTaskDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
-        return taskService.getTaskDetails(taskId, taskType);
-    }
-
     @PostMapping("/detail/all")
+    @ApiOperation(value = "任务详情", httpMethod = "POST")
     public Resp<TaskDetailResp> getAllDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
         return taskService.getAllDetails(taskId, taskType);
     }
@@ -160,7 +167,13 @@ public class TaskController {
     @PostMapping("/reject/reason")
     @ApiOperation(value = "查看拒绝原因", httpMethod = "POST")
     public Resp<Object> getRejectReason(@RequestBody RejectTaskReasonReq rejectTaskReasonReq) {
-        return taskService.getRejectReason(rejectTaskReasonReq);
+        return Resp.success(taskService.getRejectReason(rejectTaskReasonReq));
+    }
+
+    @PostMapping("/reassign")
+    @ApiOperation(value = "任务重新指派", httpMethod = "POST")
+    public Resp<Object> reassignTask(@RequestBody ReassignTaskReq reassignTaskReq) {
+        return Resp.success(taskService.reassignTask(reassignTaskReq));
     }
 
     @PostMapping("/submit/auth")
@@ -200,24 +213,19 @@ public class TaskController {
         return null;
     }
 
-    // todo test
-    @PostMapping("/upload/attachment")
-    @ApiOperation(value = "上传附件", httpMethod = "POST")
-    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
-        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
-            return Resp.error("文件为空，请重新上传");
-        }
-        return taskService.uploadAttachment(multipartFile, taskId, taskType);
-    }
+//    @PostMapping("/upload/attachment")
+//    @ApiOperation(value = "上传附件", httpMethod = "POST")
+//    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
+//        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
+//            return Resp.error("文件为空，请重新上传");
+//        }
+//        return taskService.uploadAttachment(multipartFile, taskId, taskType);
+//    }
 
-    // TODO: 2021/5/6 test
-    @PostMapping("/upload/outcome")
+    @PostMapping(value = "/upload/outcome", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "上传学习成果", httpMethod = "POST")
-    public Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType) {
-        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
-            return Resp.error("文件为空，请重新上传");
-        }
-        return taskService.uploadLearningOutcome(multipartFile, taskId, taskType);
+    public Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq) {
+        return taskService.uploadLearningOutcome(uploadOutcomeReq);
     }
 
     // TODO: 2021/5/6 test

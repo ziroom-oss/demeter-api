@@ -39,6 +39,12 @@ public class ReleaseQueryResp {
     @ApiModelProperty("任务创建时间")
     private Date taskCreateTime;
 
+    @ApiModelProperty("所属技能树-技能点属性")
+    private Long skillTreeId;
+
+    @ApiModelProperty("所属技能树-技能点")
+    private String skillTreeName;
+
     @ApiModelProperty("任务成长值")
     private Integer growthValue;
 

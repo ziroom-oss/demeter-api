@@ -523,73 +523,143 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlIsNull() {
-            addCriterion("task_attachment_url is null");
+        public Criteria andAttachmentUrlIsNull() {
+            addCriterion("attachment_url is null");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlIsNotNull() {
-            addCriterion("task_attachment_url is not null");
+        public Criteria andAttachmentUrlIsNotNull() {
+            addCriterion("attachment_url is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlEqualTo(String value) {
-            addCriterion("task_attachment_url =", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlEqualTo(String value) {
+            addCriterion("attachment_url =", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlNotEqualTo(String value) {
-            addCriterion("task_attachment_url <>", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlNotEqualTo(String value) {
+            addCriterion("attachment_url <>", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlGreaterThan(String value) {
-            addCriterion("task_attachment_url >", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlGreaterThan(String value) {
+            addCriterion("attachment_url >", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlGreaterThanOrEqualTo(String value) {
-            addCriterion("task_attachment_url >=", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_url >=", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlLessThan(String value) {
-            addCriterion("task_attachment_url <", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlLessThan(String value) {
+            addCriterion("attachment_url <", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlLessThanOrEqualTo(String value) {
-            addCriterion("task_attachment_url <=", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlLessThanOrEqualTo(String value) {
+            addCriterion("attachment_url <=", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlLike(String value) {
-            addCriterion("task_attachment_url like", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlLike(String value) {
+            addCriterion("attachment_url like", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlNotLike(String value) {
-            addCriterion("task_attachment_url not like", value, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlNotLike(String value) {
+            addCriterion("attachment_url not like", value, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlIn(List<String> values) {
-            addCriterion("task_attachment_url in", values, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlIn(List<String> values) {
+            addCriterion("attachment_url in", values, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlNotIn(List<String> values) {
-            addCriterion("task_attachment_url not in", values, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlNotIn(List<String> values) {
+            addCriterion("attachment_url not in", values, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlBetween(String value1, String value2) {
-            addCriterion("task_attachment_url between", value1, value2, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlBetween(String value1, String value2) {
+            addCriterion("attachment_url between", value1, value2, "attachmentUrl");
             return (Criteria) this;
         }
 
-        public Criteria andTaskAttachmentUrlNotBetween(String value1, String value2) {
-            addCriterion("task_attachment_url not between", value1, value2, "taskAttachmentUrl");
+        public Criteria andAttachmentUrlNotBetween(String value1, String value2) {
+            addCriterion("attachment_url not between", value1, value2, "attachmentUrl");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameIsNull() {
+            addCriterion("attachment_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameIsNotNull() {
+            addCriterion("attachment_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameEqualTo(String value) {
+            addCriterion("attachment_name =", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotEqualTo(String value) {
+            addCriterion("attachment_name <>", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameGreaterThan(String value) {
+            addCriterion("attachment_name >", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_name >=", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLessThan(String value) {
+            addCriterion("attachment_name <", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLessThanOrEqualTo(String value) {
+            addCriterion("attachment_name <=", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLike(String value) {
+            addCriterion("attachment_name like", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotLike(String value) {
+            addCriterion("attachment_name not like", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameIn(List<String> values) {
+            addCriterion("attachment_name in", values, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotIn(List<String> values) {
+            addCriterion("attachment_name not in", values, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameBetween(String value1, String value2) {
+            addCriterion("attachment_name between", value1, value2, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotBetween(String value1, String value2) {
+            addCriterion("attachment_name not between", value1, value2, "attachmentName");
             return (Criteria) this;
         }
 

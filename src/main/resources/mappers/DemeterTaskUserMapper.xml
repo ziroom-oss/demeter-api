@@ -8,6 +8,7 @@
         <result column="task_type" property="taskType" jdbcType="INTEGER"/>
         <result column="receiver_uid" property="receiverUid" jdbcType="VARCHAR"/>
         <result column="task_status" property="taskStatus" jdbcType="INTEGER"/>
+        <result column="reject_reason" property="rejectReason" jdbcType="VARCHAR"/>
         <result column="check_result" property="checkResult" jdbcType="INTEGER"/>
         <result column="check_opinion" property="checkOpinion" jdbcType="VARCHAR"/>
         <result column="checkout_time" property="checkoutTime" jdbcType="TIMESTAMP"/>
@@ -76,7 +77,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_id, task_type, receiver_uid, task_status, check_result, check_opinion, checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
+        id, task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample">
         select
@@ -106,10 +107,12 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, check_result, check_opinion, checkout_time, 
-            task_end_time, create_time, modify_time, create_id, modify_id)
-        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR}, #{checkoutTime,jdbcType=TIMESTAMP}, 
-            #{taskEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, 
+            checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
+            )
+        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{rejectReason,jdbcType=VARCHAR}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR}, 
+            #{checkoutTime,jdbcType=TIMESTAMP}, #{taskEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
+            )
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -128,6 +131,9 @@
             </if>
             <if test="taskStatus != null">
                 task_status,
+            </if>
+            <if test="rejectReason != null">
+                reject_reason,
             </if>
             <if test="checkResult != null">
                 check_result,
@@ -166,6 +172,9 @@
             </if>
             <if test="taskStatus != null">
                 #{taskStatus,jdbcType=INTEGER},
+            </if>
+            <if test="rejectReason != null">
+                #{rejectReason,jdbcType=VARCHAR},
             </if>
             <if test="checkResult != null">
                 #{checkResult,jdbcType=INTEGER},
@@ -217,6 +226,9 @@
             <if test="record.taskStatus != null">
                 task_status = #{record.taskStatus,jdbcType=INTEGER},
             </if>
+            <if test="record.rejectReason != null">
+                reject_reason = #{record.rejectReason,jdbcType=VARCHAR},
+            </if>
             <if test="record.checkResult != null">
                 check_result = #{record.checkResult,jdbcType=INTEGER},
             </if>
@@ -253,6 +265,7 @@
             task_type = #{record.taskType,jdbcType=INTEGER},
             receiver_uid = #{record.receiverUid,jdbcType=VARCHAR},
             task_status = #{record.taskStatus,jdbcType=INTEGER},
+            reject_reason = #{record.rejectReason,jdbcType=VARCHAR},
             check_result = #{record.checkResult,jdbcType=INTEGER},
             check_opinion = #{record.checkOpinion,jdbcType=VARCHAR},
             checkout_time = #{record.checkoutTime,jdbcType=TIMESTAMP},
@@ -279,6 +292,9 @@
             </if>
             <if test="taskStatus != null">
                 task_status = #{taskStatus,jdbcType=INTEGER},
+            </if>
+            <if test="rejectReason != null">
+                reject_reason = #{rejectReason,jdbcType=VARCHAR},
             </if>
             <if test="checkResult != null">
                 check_result = #{checkResult,jdbcType=INTEGER},
@@ -313,6 +329,7 @@
             task_type = #{taskType,jdbcType=INTEGER},
             receiver_uid = #{receiverUid,jdbcType=VARCHAR},
             task_status = #{taskStatus,jdbcType=INTEGER},
+            reject_reason = #{rejectReason,jdbcType=VARCHAR},
             check_result = #{checkResult,jdbcType=INTEGER},
             check_opinion = #{checkOpinion,jdbcType=VARCHAR},
             checkout_time = #{checkoutTime,jdbcType=TIMESTAMP},

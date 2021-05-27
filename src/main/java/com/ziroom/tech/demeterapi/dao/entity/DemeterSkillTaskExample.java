@@ -473,6 +473,76 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andAttachmentNameIsNull() {
+            addCriterion("attachment_name is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameIsNotNull() {
+            addCriterion("attachment_name is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameEqualTo(String value) {
+            addCriterion("attachment_name =", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotEqualTo(String value) {
+            addCriterion("attachment_name <>", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameGreaterThan(String value) {
+            addCriterion("attachment_name >", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_name >=", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLessThan(String value) {
+            addCriterion("attachment_name <", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLessThanOrEqualTo(String value) {
+            addCriterion("attachment_name <=", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameLike(String value) {
+            addCriterion("attachment_name like", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotLike(String value) {
+            addCriterion("attachment_name not like", value, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameIn(List<String> values) {
+            addCriterion("attachment_name in", values, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotIn(List<String> values) {
+            addCriterion("attachment_name not in", values, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameBetween(String value1, String value2) {
+            addCriterion("attachment_name between", value1, value2, "attachmentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentNameNotBetween(String value1, String value2) {
+            addCriterion("attachment_name not between", value1, value2, "attachmentName");
+            return (Criteria) this;
+        }
+
         public Criteria andPublisherIsNull() {
             addCriterion("publisher is null");
             return (Criteria) this;
@@ -610,6 +680,126 @@ protected abstract static class GeneratedCriteria {
 
         public Criteria andTaskRemarkNotBetween(String value1, String value2) {
             addCriterion("task_remark not between", value1, value2, "taskRemark");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdIsNull() {
+            addCriterion("skill_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdIsNotNull() {
+            addCriterion("skill_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdEqualTo(Long value) {
+            addCriterion("skill_id =", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdNotEqualTo(Long value) {
+            addCriterion("skill_id <>", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdGreaterThan(Long value) {
+            addCriterion("skill_id >", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("skill_id >=", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdLessThan(Long value) {
+            addCriterion("skill_id <", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdLessThanOrEqualTo(Long value) {
+            addCriterion("skill_id <=", value, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdIn(List<Long> values) {
+            addCriterion("skill_id in", values, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdNotIn(List<Long> values) {
+            addCriterion("skill_id not in", values, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdBetween(Long value1, Long value2) {
+            addCriterion("skill_id between", value1, value2, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillIdNotBetween(Long value1, Long value2) {
+            addCriterion("skill_id not between", value1, value2, "skillId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelIsNull() {
+            addCriterion("skill_level is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelIsNotNull() {
+            addCriterion("skill_level is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelEqualTo(Integer value) {
+            addCriterion("skill_level =", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelNotEqualTo(Integer value) {
+            addCriterion("skill_level <>", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelGreaterThan(Integer value) {
+            addCriterion("skill_level >", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelGreaterThanOrEqualTo(Integer value) {
+            addCriterion("skill_level >=", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelLessThan(Integer value) {
+            addCriterion("skill_level <", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelLessThanOrEqualTo(Integer value) {
+            addCriterion("skill_level <=", value, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelIn(List<Integer> values) {
+            addCriterion("skill_level in", values, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelNotIn(List<Integer> values) {
+            addCriterion("skill_level not in", values, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelBetween(Integer value1, Integer value2) {
+            addCriterion("skill_level between", value1, value2, "skillLevel");
+            return (Criteria) this;
+        }
+
+        public Criteria andSkillLevelNotBetween(Integer value1, Integer value2) {
+            addCriterion("skill_level not between", value1, value2, "skillLevel");
             return (Criteria) this;
         }
 

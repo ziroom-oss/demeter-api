@@ -7,6 +7,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.storage.QueryParam;
 import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.UploadResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

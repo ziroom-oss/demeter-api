@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.config;
 
 import org.apache.http.HttpStatus;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * @author daijiankun
  */
 @WebFilter
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 public class CorsFilter implements Filter {
 

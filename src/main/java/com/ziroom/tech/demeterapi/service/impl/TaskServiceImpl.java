@@ -11,7 +11,6 @@ import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 
-import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
@@ -19,26 +18,20 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.storage.UploadResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.TaskService;
-import com.ziroom.tech.sia.hunter.taskstatus.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,8 +71,14 @@ public class TaskServiceImpl implements TaskService {
     public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
-        entity.setTaskStatus(AssignTaskStatus.UNCLAIMED.getCode());
+        entity.setTaskStatus(AssignTaskStatus.ONGOING.getCode());
         entity.setPublisher(OperatorContext.getOperator());
+        MultipartFile attachment = assignTaskReq.getAttachment();
+        if (Objects.nonNull(attachment)) {
+            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
+            entity.setAttachmentUrl(ziroomFile.getUrl());
+            entity.setAttachmentName(ziroomFile.getOriginal_filename());
+        }
         entity.setCreateId(OperatorContext.getOperator());
         entity.setModifyId(OperatorContext.getOperator());
         entity.setCreateTime(new Date());
@@ -90,24 +89,7 @@ public class TaskServiceImpl implements TaskService {
         // batchInsert?
 
         List<String> taskReceiver = assignTaskReq.getTaskReceiver();
-        if (CollectionUtils.isNotEmpty(taskReceiver)) {
-            taskReceiver.forEach(receiver -> {
-                DemeterTaskUser demeterTaskUser = DemeterTaskUser.builder()
-                        .taskId(entity.getId())
-                        .receiverUid(receiver)
-                        // 增加记录但为未认领状态
-                        .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
-                        .checkResult(assignTaskReq.getNeedAcceptance() == 1 ? CheckoutResult.NEED_CHECKOUT.getCode() : CheckoutResult.NO_CHECKOUT.getCode())
-                        .taskType(TaskType.ASSIGN.getCode())
-                        .taskEndTime(assignTaskReq.getTaskEndTime())
-                        .createId(OperatorContext.getOperator())
-                        .modifyId(OperatorContext.getOperator())
-                        .createTime(new Date())
-                        .modifyTime(new Date())
-                        .build();
-                demeterTaskUserDao.insertSelective(demeterTaskUser);
-            });
-        }
+        this.assignTask(taskReceiver, entity);
 
         // TaskFinishCondition
         List<String> taskFinishConditionList = assignTaskReq.getTaskFinishCondition();
@@ -129,6 +111,27 @@ public class TaskServiceImpl implements TaskService {
 //        messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
 
         return Resp.success();
+    }
+
+    private void assignTask(List<String> taskReceiver, DemeterAssignTask task) {
+        if (CollectionUtils.isNotEmpty(taskReceiver)) {
+            taskReceiver.forEach(receiver -> {
+                DemeterTaskUser demeterTaskUser = DemeterTaskUser.builder()
+                        .taskId(task.getId())
+                        .receiverUid(receiver)
+                        // 增加记录但为未认领状态
+                        .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
+                        .checkResult(task.getNeedAcceptance() == 1 ? CheckoutResult.NEED_CHECKOUT.getCode() : CheckoutResult.NO_CHECKOUT.getCode())
+                        .taskType(TaskType.ASSIGN.getCode())
+                        .taskEndTime(task.getTaskEndTime())
+                        .createId(OperatorContext.getOperator())
+                        .modifyId(OperatorContext.getOperator())
+                        .createTime(new Date())
+                        .modifyTime(new Date())
+                        .build();
+                demeterTaskUserDao.insertSelective(demeterTaskUser);
+            });
+        }
     }
 
     @Override
@@ -183,7 +186,15 @@ public class TaskServiceImpl implements TaskService {
         entity.setModifyId(OperatorContext.getOperator());
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
+        entity.setSkillId(233L);
+        entity.setSkillLevel(skillTaskReq.getSkillLevel());
         List<String> taskFinishCondition = skillTaskReq.getTaskFinishCondition();
+        MultipartFile attachment = skillTaskReq.getAttachment();
+        if (Objects.nonNull(attachment)) {
+            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
+            entity.setAttachmentUrl(ziroomFile.getUrl());
+            entity.setAttachmentName(ziroomFile.getOriginal_filename());
+        }
         demeterSkillTaskDao.insertSelective(entity);
         if (CollectionUtils.isNotEmpty(taskFinishCondition)) {
             taskFinishCondition.forEach(condition -> {
@@ -233,6 +244,14 @@ public class TaskServiceImpl implements TaskService {
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
         entity.setUpdateTime(new Date());
+
+        MultipartFile attachment = assignTaskReq.getAttachment();
+        if (Objects.nonNull(attachment)) {
+            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
+            entity.setAttachmentUrl(ziroomFile.getUrl());
+            entity.setAttachmentName(ziroomFile.getOriginal_filename());
+        }
+
         demeterAssignTaskDao.updateByPrimaryKeySelective(entity);
         try {
             updateTaskFinishCondition(assignTaskReq.getTaskFinishCondition(), assignTaskReq.getId(), TaskType.ASSIGN.getCode());
@@ -282,16 +301,16 @@ public class TaskServiceImpl implements TaskService {
             return Resp.success();
         } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
             DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(taskId);
-            if (taskStatus.equals(AssignTaskStatus.UNCLAIMED.getCode())) {
+            if (taskStatus.equals(AssignTaskStatus.ONGOING.getCode())) {
                 if (Objects.isNull(demeterAssignTask)) {
                     return Resp.error("任务不存在！taskId = " + taskId);
                 }
-                if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.UNCLAIMED.getCode())) {
+                if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.ONGOING.getCode())) {
                     return Resp.error("此任务已经为开启状态，请勿重复开启！");
                 }
                 DemeterAssignTask update = new DemeterAssignTask();
                 update.setId(taskId);
-                update.setTaskStatus(AssignTaskStatus.UNCLAIMED.getCode());
+                update.setTaskStatus(AssignTaskStatus.ONGOING.getCode());
                 demeterAssignTaskDao.updateByPrimaryKeySelective(update);
             } else if (taskStatus.equals(AssignTaskStatus.CLOSED.getCode())) {
                 if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.CLOSED.getCode())) {
@@ -476,6 +495,16 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
+        Long skillTreeId = taskListQueryReq.getSkillTreeId();
+        if (Objects.nonNull(skillTreeId)) {
+            skillTaskExampleCriteria.andSkillIdEqualTo(skillTreeId);
+        }
+
+        Integer skillPointLevel = taskListQueryReq.getSkillPointLevel();
+        if (Objects.nonNull(skillPointLevel)) {
+            skillTaskExampleCriteria.andSkillLevelEqualTo(skillPointLevel);
+        }
+
         if (Objects.nonNull(taskListQueryReq.getTaskType())) {
             if (taskListQueryReq.getTaskType().equals(TaskType.SKILL.getCode())) {
                 if (Objects.nonNull(taskListQueryReq.getTaskStatus())) {
@@ -498,17 +527,20 @@ public class TaskServiceImpl implements TaskService {
             Set<UserResp> userDetail = ehrComponent.getUserDetail(publisherSet);
             Map<String, UserResp> userRespMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
             skillTasks.forEach(task -> {
+                List<String> receiverList = this.getReceiverListFromSkillPointId(task.getId());
                 ReleaseQueryResp releaseQueryResp = ReleaseQueryResp.builder()
                         .id(task.getId())
                         .taskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + task.getId())
                         .taskName(task.getTaskName())
-                        // TODO: 2021/5/14
-                        .taskReceiverName("")
+                        .taskReceiverName(String.join(",", receiverList))
                         .taskStatus(task.getTaskStatus())
                         .taskStatusName(SkillTaskStatus.getByCode(task.getTaskStatus()).getDesc())
                         .taskType(TaskType.SKILL.getCode())
                         .taskTypeName(TaskType.SKILL.getDesc())
                         .taskCreateTime(task.getCreateTime())
+                        .skillTreeId(task.getSkillId())
+                        // TODO: 2021/5/27  
+                        .skillTreeName("技能树待做")
                         .growthValue(task.getSkillReward())
                         .publisher(task.getPublisher())
                         .publisherName(userRespMap.get(task.getPublisher()).getName())
@@ -705,6 +737,15 @@ public class TaskServiceImpl implements TaskService {
         return null;
     }
 
+    private List<String> getReceiverListFromSkillPointId(Long skillId) {
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                .andTaskIdEqualTo(skillId);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        return demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
+    }
+
     private List<String> getReceiverListFromTaskUserEntity(DemeterAssignTask entity) {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -809,8 +850,8 @@ public class TaskServiceImpl implements TaskService {
                 .createId(OperatorContext.getOperator())
                 .createTime(new Date())
                 .taskId(id)
-                .fileAddress("https://www.ziroom.com")
-                .fileName("文件上传功能待做.jpg")
+//                .fileAddress("https://www.ziroom.com")
+//                .fileName("文件上传功能待做.jpg")
                 .taskType(TaskType.getByCode(type).getCode())
                 .modifyId(OperatorContext.getOperator())
                 .receiverUid(OperatorContext.getOperator())
@@ -824,10 +865,11 @@ public class TaskServiceImpl implements TaskService {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
                 .andTaskIdEqualTo(id)
-                .andReceiverUidEqualTo(OperatorContext.getOperator());
+                .andReceiverUidEqualTo(OperatorContext.getOperator())
+                .andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers) && demeterTaskUsers.size() == 1) {
-            // 一个任务对应某个人只有一条记录
+            // 一个任务对应某个人只有一条未拒绝的记录
             DemeterTaskUser demeterTaskUser = demeterTaskUsers.get(0);
             Integer taskType = demeterTaskUser.getTaskType();
             if (TaskType.ASSIGN.getCode().equals(taskType)) {
@@ -839,7 +881,7 @@ public class TaskServiceImpl implements TaskService {
             demeterTaskUser.setModifyTime(new Date());
             demeterTaskUserDao.updateByPrimaryKeySelective(demeterTaskUser);
         } else {
-            log.error("task assign duplicated = {}", demeterTaskUsers);
+            log.error("重复认领任务 = {}", demeterTaskUsers);
             throw new BusinessException("task assign duplicated");
         }
     }
@@ -874,6 +916,7 @@ public class TaskServiceImpl implements TaskService {
     public Resp<Object> rejectTask(RejectTaskReq rejectTaskReq) {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
+                .andReceiverUidEqualTo(OperatorContext.getOperator())
                 .andTaskIdEqualTo(rejectTaskReq.getTaskId());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isEmpty(demeterTaskUsers)) {
@@ -883,7 +926,8 @@ public class TaskServiceImpl implements TaskService {
         // 更新DemeterTaskUser任务状态为拒绝
         DemeterTaskUser entity = DemeterTaskUser.builder()
                 .id(demeterTaskUser.getId())
-                .taskStatus(AssignTaskFlowStatus.FORBIDDEN.getCode())
+                .taskStatus(AssignTaskFlowStatus.REJECTED.getCode())
+                .rejectReason(rejectTaskReq.getReason())
                 .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
@@ -1105,8 +1149,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Resp<Object> getRejectReason(RejectTaskReasonReq rejectTaskReasonReq) {
-        return null;
+    public DemeterTaskUser getRejectReason(RejectTaskReasonReq rejectTaskReasonReq) {
+        return demeterTaskUserDao.selectByPrimaryKey(rejectTaskReasonReq.getId());
     }
 
     @Override
@@ -1179,7 +1223,9 @@ public class TaskServiceImpl implements TaskService {
             TaskFinishCondition taskFinishCondition = taskFinishConditionDao.selectByPrimaryKey(taskFinishConditionId);
             BeanUtils.copyProperties(taskFinishConditionInfo, infoResp);
             infoResp.setTaskConditionStatusName(TaskConditionStatus.getByCode(taskFinishConditionInfo.getTaskConditionStatus()).getDesc());
-            infoResp.setTaskFinishContent(taskFinishCondition.getTaskFinishContent());
+            if (Objects.nonNull(taskFinishCondition)) {
+                infoResp.setTaskFinishContent(taskFinishCondition.getTaskFinishContent());
+            }
             taskFinishConditionInfoRespList.add(infoResp);
         });
         resp.setTaskFinishConditionInfoRespList(taskFinishConditionInfoRespList);
@@ -1360,21 +1406,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Deprecated
     public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
-        UploadResp uploadResp = this.uploadFile(multipartFile);
-        ZiroomFile file = uploadResp.getFile();
-        String uuid = file.getUuid();
+        ZiroomFile ziroomFile = storageComponent.uploadFile(multipartFile);
         if (TaskType.SKILL.getCode().equals(taskType)) {
             DemeterSkillTask demeterSkillTask = new DemeterSkillTask();
             demeterSkillTask.setId(taskId);
-            demeterSkillTask.setAttachmentUrl(uuid);
+            demeterSkillTask.setAttachmentUrl(ziroomFile.getUrl());
+            demeterSkillTask.setAttachmentName(ziroomFile.getOriginal_filename());
             demeterSkillTask.setUpdateTime(new Date());
             demeterSkillTask.setModifyId(OperatorContext.getOperator());
             demeterSkillTaskDao.updateByPrimaryKeySelective(demeterSkillTask);
         } else if (TaskType.ASSIGN.getCode().equals(taskType)) {
             DemeterAssignTask demeterAssignTask = new DemeterAssignTask();
             demeterAssignTask.setId(taskId);
-            demeterAssignTask.setTaskAttachmentUrl(uuid);
+            demeterAssignTask.setAttachmentUrl(ziroomFile.getUrl());
+            demeterAssignTask.setAttachmentName(ziroomFile.getOriginal_filename());
             demeterAssignTask.setModifyId(OperatorContext.getOperator());
             demeterAssignTask.setUpdateTime(new Date());
             demeterAssignTaskDao.updateByPrimaryKeySelective(demeterAssignTask);
@@ -1384,13 +1431,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType) {
+    public Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq) {
+        Long taskId = uploadOutcomeReq.getTaskId();
+        Integer taskType = uploadOutcomeReq.getTaskType();
         if (TaskType.SKILL.getCode().equals(taskType)) {
             checkSkillForbidden(taskId);
         }
-        UploadResp uploadResp = this.uploadFile(multipartFile);
-        ZiroomFile file = uploadResp.getFile();
-        String uuid = file.getUuid();
+//        UploadResp uploadResp = this.uploadFile(multipartFile);
+//        ZiroomFile file = uploadResp.getFile();
+        ZiroomFile ziroomFile = storageComponent.uploadFile(uploadOutcomeReq.getMultipartFile());
+//        String uuid = file.getUuid();
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
         taskFinishOutcomeExample.createCriteria()
                 .andReceiverUidEqualTo(OperatorContext.getOperator())
@@ -1403,7 +1453,8 @@ public class TaskServiceImpl implements TaskService {
         TaskFinishOutcome taskFinishOutcome = taskFinishOutcomes.get(0);
         TaskFinishOutcome update = TaskFinishOutcome.builder()
                 .id(taskFinishOutcome.getId())
-                .fileAddress(uuid)
+                .fileAddress(ziroomFile.getUrl())
+                .fileName(ziroomFile.getOriginal_filename())
                 .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
@@ -1411,35 +1462,35 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
-    private UploadResp uploadFile(MultipartFile multipartFile) {
-        File file;
-        String originalFilename = multipartFile.getOriginalFilename();
-        String[] filename = Objects.requireNonNull(originalFilename).split("\\.");
-        try {
-            file= File.createTempFile(filename[0], filename[1]);
-            multipartFile.transferTo(file);
-            file.deleteOnExit();
-        } catch (IOException e) {
-            throw new BusinessException(e.getMessage());
-        }
-        String fileBase64String;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            byte[] buffer = new byte[fileInputStream.available()];
-            fileInputStream.read(buffer);
-            fileBase64String = Base64.getEncoder().encodeToString(buffer);
-        } catch (IOException e) {
-            throw new BusinessException(e.getMessage());
-        }
-
-        UploadParam uploadParam = UploadParam.builder()
-                .source("")
-                .filename(file.getName())
-                .base64(fileBase64String)
-                .type("if")
-                .build();
-        return storageComponent.uploadFile(uploadParam);
-    }
+//    private UploadResp uploadFile(MultipartFile multipartFile) {
+//        File file;
+//        String originalFilename = multipartFile.getOriginalFilename();
+//        String[] filename = Objects.requireNonNull(originalFilename).split("\\.");
+//        try {
+//            file= File.createTempFile(filename[0], filename[1]);
+//            multipartFile.transferTo(file);
+//            file.deleteOnExit();
+//        } catch (IOException e) {
+//            throw new BusinessException(e.getMessage());
+//        }
+//        String fileBase64String;
+//        try {
+//            FileInputStream fileInputStream = new FileInputStream(file);
+//            byte[] buffer = new byte[fileInputStream.available()];
+//            fileInputStream.read(buffer);
+//            fileBase64String = Base64.getEncoder().encodeToString(buffer);
+//        } catch (IOException e) {
+//            throw new BusinessException(e.getMessage());
+//        }
+//
+//        UploadParam uploadParam = UploadParam.builder()
+//                .source("")
+//                .filename(file.getName())
+//                .base64(fileBase64String)
+//                .type("if")
+//                .build();
+//        return storageComponent.uploadFile(uploadParam);
+//    }
 
     // TODO: 2021/5/7
     @Override
@@ -1502,5 +1553,21 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskNameLike("%" + condition + "%")
                 .andTaskStatusEqualTo(SkillTaskStatus.UNFORBIDDEN.getCode());
         return demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+    }
+
+    @Override
+    public boolean submitSkillMove(Long id, Long skillTreeId) {
+        DemeterSkillTask update = new DemeterSkillTask();
+        update.setId(id);
+        update.setSkillId(skillTreeId);
+        demeterSkillTaskDao.updateByPrimaryKeySelective(update);
+        return true;
+    }
+
+    @Override
+    public boolean reassignTask(ReassignTaskReq reassignTaskReq) {
+        DemeterAssignTask demeterAssignTask = demeterAssignTaskDao.selectByPrimaryKey(reassignTaskReq.getId());
+        this.assignTask(reassignTaskReq.getReassignList(), demeterAssignTask);
+        return true;
     }
 }

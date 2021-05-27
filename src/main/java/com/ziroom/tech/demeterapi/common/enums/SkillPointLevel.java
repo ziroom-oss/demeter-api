@@ -12,13 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 指派类任务自身状态
+ * 技能点等级
  * @author daijiankun
  */
+
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum AssignTaskStatus {
+public enum SkillPointLevel {
 
     /**
      * 全部
@@ -26,36 +27,33 @@ public enum AssignTaskStatus {
     ALL(0, "全部"),
 
     /**
-     * 进行中
+     * 初级
      */
-    ONGOING(1, "进行中"),
+    BEGINNER(1, "初级"),
 
     /**
-     * 已拒绝
+     * 中级
      */
-    CLOSED(2, "已关闭"),
-
-
-    COMPLETED(3, "已完成");
+    INTERMEDIATE(2, "中级"),
 
     /**
-     * 类型码
+     * 高级
      */
+    ADVANCE(3, "高级");
+
     private Integer code;
-    /**
-     * 类型描述
-     */
+
     private String desc;
 
-    private static Map<Integer, AssignTaskStatus> map = Arrays.stream(AssignTaskStatus.values())
-            .collect(Collectors.toMap(AssignTaskStatus::getCode, Function.identity()));
+    private static Map<Integer, SkillPointLevel> map = Arrays.stream(SkillPointLevel.values())
+            .collect(Collectors.toMap(SkillPointLevel::getCode, Function.identity()));
 
     /**
      * 根据类型码获取指定的类型枚举
      * @param code 类型码
      * @return 类型枚举
      */
-    public static AssignTaskStatus getByCode(Integer code) {
+    public static SkillPointLevel getByCode(Integer code) {
         return map.get(code);
     }
 
@@ -63,8 +61,8 @@ public enum AssignTaskStatus {
      * 获取所有的任务类型
      * @return List<SkillTaskStatus>
      */
-    public static List<AssignTaskStatus> getAllTaskType() {
-        return Arrays.stream(AssignTaskStatus.values()).collect(Collectors.toList());
+    public static List<SkillPointLevel> getAllSkillLevel() {
+        return Arrays.stream(SkillPointLevel.values()).collect(Collectors.toList());
     }
 
     /**
@@ -76,7 +74,7 @@ public enum AssignTaskStatus {
         if(Objects.isNull(code)) {
             return false;
         }
-        for(AssignTaskStatus taskType : AssignTaskStatus.values()) {
+        for(SkillPointLevel taskType : SkillPointLevel.values()) {
             if(Objects.equals(taskType.code, code)) {
                 return true;
             }

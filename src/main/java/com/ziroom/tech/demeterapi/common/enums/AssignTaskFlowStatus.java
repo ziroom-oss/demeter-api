@@ -34,7 +34,7 @@ public enum AssignTaskFlowStatus {
     /**
      * 已拒绝，指接收者拒绝任务的状态。
      */
-    FORBIDDEN(2, "已拒绝"),
+    REJECTED(2, "已拒绝"),
 
     /**
      * 进行中，指接收任务后，处于任务周期内的状态。

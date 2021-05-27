@@ -10,7 +10,7 @@ public class ZiroomFile {
 
     private String uuid;
 
-    private String origin_filename;
+    private String original_filename;
 
     private String url;
 

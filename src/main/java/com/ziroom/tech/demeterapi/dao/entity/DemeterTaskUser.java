@@ -40,6 +40,8 @@ public class DemeterTaskUser {
 
     private Integer taskStatus;
 
+    private String rejectReason;
+
     private Integer checkResult;
 
     private String checkOpinion;
@@ -94,6 +96,14 @@ public class DemeterTaskUser {
 
     public void setTaskStatus(Integer taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     public Integer getCheckResult() {

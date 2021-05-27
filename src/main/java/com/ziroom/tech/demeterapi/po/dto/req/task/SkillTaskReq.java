@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,8 +33,12 @@ public class SkillTaskReq {
 
     private List<String> taskFinishCondition;
 
-    @ApiModelProperty("附件")
-    private String attachmentUrl;
+    private Integer skillLevel;
+
+    /**
+     * 任务附件
+     */
+    private MultipartFile attachment;
 
     @ApiModelProperty("备注")
     private String taskRemark;

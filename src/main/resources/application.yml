@@ -1,6 +1,10 @@
 spring:
   application:
     name: demeter-api
+  servlet:
+    multipart:
+      max-request-size: 40MB
+      max-file-size: 40MB
   datasource:
     name: mysql_test
     #基本属性
@@ -47,7 +51,7 @@ server:
 retrofit:
   endpoints:
     - identity: ehr
-      baseUrl: http://ehrnew.t.ziroom.com/
+      baseUrl: http://ehrnew.ziroom.com/
     - identity: ehrapi
       baseUrl: http://ehr-api.ziroom.com/
     - identity: storage

@@ -35,4 +35,15 @@ public class UserDetailResp {
 
     @ApiModelProperty("邮箱")
     private String email;
+
+    private String highestEducation;
+
+    private String levelName;
+
+    private String photo;
+
+    /**
+     * 转正日期？
+     */
+    private String effdt;
 }

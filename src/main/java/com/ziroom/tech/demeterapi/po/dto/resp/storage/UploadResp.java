@@ -21,4 +21,8 @@ public class UploadResp {
     private String error_info;
 
     private ZiroomFile file;
+
+    private Object porn;
+
+    private Object face;
 }

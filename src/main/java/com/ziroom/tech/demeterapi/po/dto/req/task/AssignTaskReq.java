@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -55,7 +56,7 @@ public class AssignTaskReq {
     private Byte needAcceptance;
 
     @ApiModelProperty("附件")
-    private String taskAttachmentUrl;
+    private MultipartFile attachment;
 
     @ApiModelProperty("备注")
     private String taskDescription;

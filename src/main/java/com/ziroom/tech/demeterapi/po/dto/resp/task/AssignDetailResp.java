@@ -27,7 +27,9 @@ public class AssignDetailResp {
 
     private Integer taskReward;
 
-    private String taskAttachmentUrl;
+    private String attachmentUrl;
+
+    private String attachmentName;
 
     private Integer taskStatus;
 

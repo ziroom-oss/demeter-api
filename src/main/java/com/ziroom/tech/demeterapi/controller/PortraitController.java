@@ -2,6 +2,10 @@ package com.ziroom.tech.demeterapi.controller;
 
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PortrayalInfoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,17 +46,17 @@ public class PortraitController {
      * @return
      */
     @PostMapping("/info")
-    public Resp<Object> getPortrayalInfo() {
-        return Resp.success();
+    public Resp<PortrayalInfoResp> getPortrayalInfo(@RequestBody PortrayalInfoReq portrayalInfoReq) {
+        return Resp.success(portraitService.getPortrayalInfo(portrayalInfoReq));
     }
 
     /**
      * 日常任务
-     * @return
+     * @return Resp<DailyTaskResp>
      */
     @PostMapping("/task")
-    public Resp<Object> getDailyTaskInfo() {
-        return Resp.success();
+    public Resp<DailyTaskResp> getDailyTaskInfo(@RequestBody DailyTaskReq dailyTaskReq) {
+        return Resp.success(portraitService.getDailyTaskInfo(dailyTaskReq));
     }
 
     /**

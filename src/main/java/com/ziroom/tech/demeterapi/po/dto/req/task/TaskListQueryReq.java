@@ -24,4 +24,10 @@ public class TaskListQueryReq extends PageListReq {
 
     @ApiModelProperty("任务名称/编号")
     private String nameOrNo;
+
+    @ApiModelProperty("技能树id-技能点属性")
+    private Long skillTreeId;
+
+    @ApiModelProperty("技能点等级-技能点属性")
+    private Integer skillPointLevel;
 }

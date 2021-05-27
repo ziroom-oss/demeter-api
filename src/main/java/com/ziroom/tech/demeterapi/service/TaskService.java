@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.service;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
@@ -135,7 +136,7 @@ public interface TaskService {
      * @param rejectTaskReasonReq 指派类任务-查看拒绝原因请求体
      * @return Resp
      */
-    Resp<Object> getRejectReason(RejectTaskReasonReq rejectTaskReasonReq);
+    DemeterTaskUser getRejectReason(RejectTaskReasonReq rejectTaskReasonReq);
 
     /**
      * 任务查看进度
@@ -179,10 +180,10 @@ public interface TaskService {
 
     /**
      * 上传学习成果
-     * @param multipartFile
-     * @return
+     * @param uploadOutcomeReq 请求体
+     * @return Resp<Object>
      */
-    Resp<Object> uploadLearningOutcome(MultipartFile multipartFile, Long taskId, Integer taskType);
+    Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq);
 
     // TODO: 2021/5/7 test
     /**
@@ -205,4 +206,19 @@ public interface TaskService {
      * @return
      */
     List<DemeterSkillTask> searchSkillForGraph(String condition);
+
+    /**
+     * 移动技能点
+     * @param id 技能点id
+     * @param skillTreeId 技能树id
+     * @return
+     */
+    boolean submitSkillMove(Long id, Long skillTreeId);
+
+    /**
+     * 重新指派任务
+     * @param reassignTaskReq 请求体
+     * @return boolean
+     */
+    boolean reassignTask(ReassignTaskReq reassignTaskReq);
 }

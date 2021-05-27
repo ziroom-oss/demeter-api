@@ -25,7 +25,13 @@ public class SkillDetailResp {
 
     private Integer skillReward;
 
+    private Long skillTreeId;
+
+    private Integer skillLevel;
+
     private String attachmentUrl;
+
+    private String attachmentName;
 
     private String publisher;
 

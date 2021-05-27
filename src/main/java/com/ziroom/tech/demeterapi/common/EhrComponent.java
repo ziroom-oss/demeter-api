@@ -35,10 +35,14 @@ public class EhrComponent {
      * ehr响应中的错误信息属性名
      */
     private final static String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+
+    private final static String MESSAGE_ATTRIBUTE = "message";
     /**
      * ehr响应中的错误码属性名
      */
     private final static String ERROR_CODE_ATTRIBUTE = "errorCode";
+
+    private final static String CODE_ATTRIBUTE = "code";
     /**
      * ehr响应中的数据属性名
      */
@@ -212,6 +216,10 @@ public class EhrComponent {
                     userDetailResp.setEmail(jsonObject.getString("email"));
                     userDetailResp.setUserCode(jsonObject.getString("emplid"));
                     userDetailResp.setUserName(jsonObject.getString("name"));
+                    userDetailResp.setHighestEducation(jsonObject.getString("highestEducation"));
+                    userDetailResp.setLevelName(jsonObject.getString("levelName"));
+                    userDetailResp.setPhoto(jsonObject.getString("photo"));
+                    userDetailResp.setEffdt(jsonObject.getString("effdt"));
                 });
             }
         });
@@ -424,6 +432,28 @@ public class EhrComponent {
         allFuture.thenApply(e -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList())).join();
         log.info("EhrService.getOrgByCodeList request success result:{}", ehrDeptRespMap);
         return ehrDeptRespMap;
+    }
+
+    public List<EhrJoinTimeResp> getJointime(String empCode) {
+        Call<JSONObject> call = ehrApiEndPoint.getJointime(empCode, 1, 10);
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "20000";
+        if (!success.equals(response.getString(ERROR_CODE_ATTRIBUTE))) {
+            String errorMessage = response.getString(MESSAGE_ATTRIBUTE);
+            log.error("EhrComponent.getJointime has occurred error message: {}", errorMessage);
+            return null;
+        }
+        JSONObject data = response.getJSONObject(DATA_ATTRIBUTE);
+        JSONArray list = data.getJSONArray("list");
+        List<EhrJoinTimeResp> respList = new ArrayList<>(16);
+        for (int i = 0; i < list.size(); i++) {
+            JSONObject jsonObject = list.getJSONObject(i);
+            EhrJoinTimeResp ehrJoinTime = new EhrJoinTimeResp();
+            ehrJoinTime.setEmpCode(jsonObject.getString("empCode"));
+            ehrJoinTime.setEntryTime(jsonObject.getString("entryTime"));
+            respList.add(ehrJoinTime);
+        }
+        return respList;
     }
 
 

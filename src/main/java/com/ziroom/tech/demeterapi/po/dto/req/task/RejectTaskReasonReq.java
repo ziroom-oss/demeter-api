@@ -10,6 +10,4 @@ import lombok.Data;
 public class RejectTaskReasonReq {
 
     private Long id;
-
-    private Long taskId;
 }

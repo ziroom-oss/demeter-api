@@ -24,7 +24,7 @@
         select
         <include refid="Base_Column_List"/>
         from skill_tree
-        where parent_id = #{parentId,,jdbcType=INTEGER} and is_del = 0
+        where parent_id = #{parentId,jdbcType=INTEGER} and is_del = 0
     </select>
     <update id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         update skill_tree set is_del = 1

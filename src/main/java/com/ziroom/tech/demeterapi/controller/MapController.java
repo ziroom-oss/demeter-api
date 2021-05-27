@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.google.common.base.Preconditions;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.Jobs;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMap;
@@ -41,6 +42,7 @@ public class MapController {
     @ApiOperation("移除指定 id 的技能图谱")
     @DeleteMapping("/{id}")
     public Resp<Integer> deleteMap(@PathVariable Long id) {
+        Preconditions.checkArgument(Objects.nonNull(id), "删除技能图谱的 id 不能为空");
         return Resp.success(mapService.deleteByPrimaryKey(id));
     }
 

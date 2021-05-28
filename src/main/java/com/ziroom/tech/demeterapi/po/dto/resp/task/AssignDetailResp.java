@@ -19,8 +19,6 @@ public class AssignDetailResp {
 
     private String taskName;
 
-    private Byte taskEffectiveImmediate;
-
     private Date taskStartTime;
 
     private Date taskEndTime;

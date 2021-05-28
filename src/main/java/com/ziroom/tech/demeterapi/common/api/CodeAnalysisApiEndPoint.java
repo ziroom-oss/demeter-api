@@ -1,8 +1,7 @@
 package com.ziroom.tech.demeterapi.common.api;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.boot.annotation.RetrofitService;
-import com.ziroom.tech.demeterapi.po.dto.resp.storage.UploadResp;
-import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

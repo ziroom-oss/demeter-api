@@ -5,7 +5,6 @@
     <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="task_name" property="taskName" jdbcType="VARCHAR"/>
-        <result column="task_effective_immediate" property="taskEffectiveImmediate" jdbcType="TINYINT"/>
         <result column="task_start_time" property="taskStartTime" jdbcType="TIMESTAMP"/>
         <result column="task_end_time" property="taskEndTime" jdbcType="TIMESTAMP"/>
         <result column="task_reward" property="taskReward" jdbcType="INTEGER"/>
@@ -81,8 +80,8 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_name, task_effective_immediate, task_start_time, task_end_time, task_reward, attachment_url, attachment_name, task_status, task_description, publisher, need_email_remind, need_punishment, need_acceptance, 
-        create_time, update_time, create_id, modify_id
+        id, task_name, task_start_time, task_end_time, task_reward, attachment_url, attachment_name, task_status, task_description, publisher, need_email_remind, need_punishment, need_acceptance, create_time, 
+        update_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTaskExample">
         select
@@ -112,12 +111,12 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_assign_task (task_name, task_effective_immediate, task_start_time, task_end_time, task_reward, attachment_url, 
-            attachment_name, task_status, task_description, publisher, need_email_remind, need_punishment, 
-            need_acceptance, create_time, update_time, create_id, modify_id)
-        VALUES (#{taskName,jdbcType=VARCHAR}, #{taskEffectiveImmediate,jdbcType=TINYINT}, #{taskStartTime,jdbcType=TIMESTAMP}, #{taskEndTime,jdbcType=TIMESTAMP}, #{taskReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, 
-            #{attachmentName,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{taskDescription,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR}, #{needEmailRemind,jdbcType=TINYINT}, #{needPunishment,jdbcType=TINYINT}, 
-            #{needAcceptance,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
+        INSERT INTO demeter_assign_task (task_name, task_start_time, task_end_time, task_reward, attachment_url, attachment_name, 
+            task_status, task_description, publisher, need_email_remind, need_punishment, need_acceptance, 
+            create_time, update_time, create_id, modify_id)
+        VALUES (#{taskName,jdbcType=VARCHAR}, #{taskStartTime,jdbcType=TIMESTAMP}, #{taskEndTime,jdbcType=TIMESTAMP}, #{taskReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{attachmentName,jdbcType=VARCHAR}, 
+            #{taskStatus,jdbcType=INTEGER}, #{taskDescription,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR}, #{needEmailRemind,jdbcType=TINYINT}, #{needPunishment,jdbcType=TINYINT}, #{needAcceptance,jdbcType=TINYINT}, 
+            #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -127,9 +126,6 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="taskName != null">
                 task_name,
-            </if>
-            <if test="taskEffectiveImmediate != null">
-                task_effective_immediate,
             </if>
             <if test="taskStartTime != null">
                 task_start_time,
@@ -180,9 +176,6 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="taskName != null">
                 #{taskName,jdbcType=VARCHAR},
-            </if>
-            <if test="taskEffectiveImmediate != null">
-                #{taskEffectiveImmediate,jdbcType=TINYINT},
             </if>
             <if test="taskStartTime != null">
                 #{taskStartTime,jdbcType=TIMESTAMP},
@@ -246,9 +239,6 @@
             <if test="record.taskName != null">
                 task_name = #{record.taskName,jdbcType=VARCHAR},
             </if>
-            <if test="record.taskEffectiveImmediate != null">
-                task_effective_immediate = #{record.taskEffectiveImmediate,jdbcType=TINYINT},
-            </if>
             <if test="record.taskStartTime != null">
                 task_start_time = #{record.taskStartTime,jdbcType=TIMESTAMP},
             </if>
@@ -303,7 +293,6 @@
         UPDATE demeter_assign_task
         SET id = #{record.id,jdbcType=BIGINT},
             task_name = #{record.taskName,jdbcType=VARCHAR},
-            task_effective_immediate = #{record.taskEffectiveImmediate,jdbcType=TINYINT},
             task_start_time = #{record.taskStartTime,jdbcType=TIMESTAMP},
             task_end_time = #{record.taskEndTime,jdbcType=TIMESTAMP},
             task_reward = #{record.taskReward,jdbcType=INTEGER},
@@ -328,9 +317,6 @@
         <set>
             <if test="taskName != null">
                 task_name = #{taskName,jdbcType=VARCHAR},
-            </if>
-            <if test="taskEffectiveImmediate != null">
-                task_effective_immediate = #{taskEffectiveImmediate,jdbcType=TINYINT},
             </if>
             <if test="taskStartTime != null">
                 task_start_time = #{taskStartTime,jdbcType=TIMESTAMP},
@@ -383,7 +369,6 @@
     <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterAssignTask">
         UPDATE demeter_assign_task
         SET task_name = #{taskName,jdbcType=VARCHAR},
-            task_effective_immediate = #{taskEffectiveImmediate,jdbcType=TINYINT},
             task_start_time = #{taskStartTime,jdbcType=TIMESTAMP},
             task_end_time = #{taskEndTime,jdbcType=TIMESTAMP},
             task_reward = #{taskReward,jdbcType=INTEGER},

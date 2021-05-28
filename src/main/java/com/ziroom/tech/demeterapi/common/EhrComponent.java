@@ -220,6 +220,7 @@ public class EhrComponent {
                     userDetailResp.setLevelName(jsonObject.getString("levelName"));
                     userDetailResp.setPhoto(jsonObject.getString("photo"));
                     userDetailResp.setEffdt(jsonObject.getString("effdt"));
+                    userDetailResp.setTreePath(jsonObject.getString("treePath"));
                 });
             }
         });

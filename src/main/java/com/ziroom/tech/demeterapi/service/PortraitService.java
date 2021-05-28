@@ -2,8 +2,10 @@ package com.ziroom.tech.demeterapi.service;
 
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PortrayalInfoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 
@@ -33,4 +35,6 @@ public interface PortraitService {
      * @param portrayalInfoReq 请求体
      */
     PortrayalInfoResp getPortrayalInfo(PortrayalInfoReq portrayalInfoReq);
+
+    EngineeringMetricResp getEngineeringMetrics(EngineeringMetricReq engineeringMetricReq);
 }

@@ -46,4 +46,6 @@ public class UserDetailResp {
      * 转正日期？
      */
     private String effdt;
+
+    private String treePath;
 }

@@ -283,66 +283,6 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andTaskEffectiveImmediateIsNull() {
-            addCriterion("task_effective_immediate is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateIsNotNull() {
-            addCriterion("task_effective_immediate is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateEqualTo(Byte value) {
-            addCriterion("task_effective_immediate =", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotEqualTo(Byte value) {
-            addCriterion("task_effective_immediate <>", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateGreaterThan(Byte value) {
-            addCriterion("task_effective_immediate >", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateGreaterThanOrEqualTo(Byte value) {
-            addCriterion("task_effective_immediate >=", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateLessThan(Byte value) {
-            addCriterion("task_effective_immediate <", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateLessThanOrEqualTo(Byte value) {
-            addCriterion("task_effective_immediate <=", value, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateIn(List<Byte> values) {
-            addCriterion("task_effective_immediate in", values, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotIn(List<Byte> values) {
-            addCriterion("task_effective_immediate not in", values, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateBetween(Byte value1, Byte value2) {
-            addCriterion("task_effective_immediate between", value1, value2, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
-        public Criteria andTaskEffectiveImmediateNotBetween(Byte value1, Byte value2) {
-            addCriterion("task_effective_immediate not between", value1, value2, "taskEffectiveImmediate");
-            return (Criteria) this;
-        }
-
         public Criteria andTaskStartTimeIsNull() {
             addCriterion("task_start_time is null");
             return (Criteria) this;

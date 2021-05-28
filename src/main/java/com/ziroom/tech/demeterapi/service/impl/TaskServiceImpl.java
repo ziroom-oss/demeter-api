@@ -17,7 +17,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.HaloService;
@@ -798,9 +797,7 @@ public class TaskServiceImpl implements TaskService {
                 return Resp.error();
             }
             this.acceptAssignTask(id);
-            if (demeterAssignTask.getNeedAcceptance() == 1) {
-                this.createTaskOutcome(id, type);
-            }
+            this.createTaskOutcome(id, type);
         } else if (TaskType.SKILL.getCode().equals(type)) {
             checkSkillForbidden(id);
             DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
@@ -1231,6 +1228,7 @@ public class TaskServiceImpl implements TaskService {
         resp.setTaskFinishConditionInfoRespList(taskFinishConditionInfoRespList);
 
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
+        taskFinishOutcomeExample.setDistinct(true);
         taskFinishOutcomeExample.createCriteria()
                 .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(taskType)
@@ -1491,16 +1489,6 @@ public class TaskServiceImpl implements TaskService {
 //                .build();
 //        return storageComponent.uploadFile(uploadParam);
 //    }
-
-    // TODO: 2021/5/7
-    @Override
-    public Resp<Object> readFile(String uuidString) {
-        DownloadResp downloadResp = storageComponent.downloadFile(uuidString);
-        // 1、浏览器预览pdf形式
-
-        // 2、传统下载文件
-        return null;
-    }
 
     @Override
     public Boolean checkTaskDelay() {

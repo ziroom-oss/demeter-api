@@ -228,13 +228,6 @@ public class TaskController {
         return taskService.uploadLearningOutcome(uploadOutcomeReq);
     }
 
-    // TODO: 2021/5/6 test
-    @PostMapping("/download/file")
-    @ApiOperation(value = "查看文件", httpMethod = "POST")
-    public Resp<Object> downloadFile(String fileUuid) {
-        return taskService.readFile(fileUuid);
-    }
-
     @PostMapping("/graph/search")
     @ApiOperation(value = "技能任务搜索，用来关联技能图谱", httpMethod = "POST")
     public Resp<List<DemeterSkillTask>> searchSkillForGraph(@RequestParam String condition) {

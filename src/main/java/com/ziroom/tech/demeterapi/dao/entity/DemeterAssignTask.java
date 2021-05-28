@@ -31,8 +31,6 @@ public class DemeterAssignTask {
 
     private String taskName;
 
-    private Byte taskEffectiveImmediate;
-
     private Date taskStartTime;
 
     private Date taskEndTime;
@@ -77,14 +75,6 @@ public class DemeterAssignTask {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
-    }
-
-    public Byte getTaskEffectiveImmediate() {
-        return taskEffectiveImmediate;
-    }
-
-    public void setTaskEffectiveImmediate(Byte taskEffectiveImmediate) {
-        this.taskEffectiveImmediate = taskEffectiveImmediate;
     }
 
     public Date getTaskStartTime() {

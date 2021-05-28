@@ -25,9 +25,6 @@ public class AssignTaskReq {
     @ApiModelProperty("任务名称")
     private String taskName;
 
-    @ApiModelProperty("是否立即生效")
-    private Byte taskEffectiveImmediate;
-
     @ApiModelProperty("任务周期-开始时间")
     private Date taskStartTime;
 

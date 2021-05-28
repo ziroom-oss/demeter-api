@@ -185,15 +185,6 @@ public interface TaskService {
      */
     Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq);
 
-    // TODO: 2021/5/7 test
-    /**
-     * 查看文件
-     * @param uuidString 文件的uuid
-     * @return Resp
-     */
-    Resp<Object> readFile(String uuidString);
-
-
     /**
      * 检查指派任务是否延期
      * @return 是 否

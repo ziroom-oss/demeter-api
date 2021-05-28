@@ -3,7 +3,6 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterAssignTaskDao;
@@ -11,22 +10,19 @@ import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrJoinTimeResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
@@ -64,7 +60,7 @@ public class PortraitServiceImpl implements PortraitService {
         // 我接收的
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         DemeterTaskUserExample.Criteria demeterTaskUserExampleCriteria = demeterTaskUserExample.createCriteria();
-        demeterTaskUserExampleCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
+        demeterTaskUserExampleCriteria.andReceiverUidEqualTo(dailyTaskReq.getUid());
         Date startTime = dailyTaskReq.getStartTime();
         Date endTime = dailyTaskReq.getEndTime();
         if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
@@ -86,7 +82,7 @@ public class PortraitServiceImpl implements PortraitService {
         ReleaseMetricsResp releaseMetricsResp = new ReleaseMetricsResp();
         DemeterAssignTaskExample demeterAssignTaskExample = new DemeterAssignTaskExample();
         DemeterAssignTaskExample.Criteria criteria = demeterAssignTaskExample.createCriteria();
-        criteria.andPublisherEqualTo(OperatorContext.getOperator());
+        criteria.andPublisherEqualTo(dailyTaskReq.getUid());
         if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {
             criteria.andCreateTimeBetween(dailyTaskReq.getStartTime(), dailyTaskReq.getEndTime());
         }
@@ -251,5 +247,10 @@ public class PortraitServiceImpl implements PortraitService {
             respList.add(resp);
         });
         return respList;
+    }
+
+    @Override
+    public EngineeringMetricResp getEngineeringMetrics(EngineeringMetricReq req) {
+        return codeAnalysisComponent.getDevelopmentEquivalent(req.getUid(), req.getStartTime(), req.getEndTime());
     }
 }

@@ -3,8 +3,10 @@ package com.ziroom.tech.demeterapi.controller;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PortrayalInfoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortraitService;
@@ -63,9 +65,9 @@ public class PortraitController {
      * 工程指标
      * @return
      */
-    @PostMapping("/metrics")
-    public Resp<Object> getEngineeringMetrics() {
-        return Resp.success();
+    @PostMapping("/metric")
+    public Resp<EngineeringMetricResp> getEngineeringMetrics(@RequestBody EngineeringMetricReq engineeringMetricReq) {
+        return Resp.success(portraitService.getEngineeringMetrics(engineeringMetricReq));
     }
 
 }

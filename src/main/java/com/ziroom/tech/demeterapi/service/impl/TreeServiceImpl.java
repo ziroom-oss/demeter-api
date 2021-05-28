@@ -38,4 +38,9 @@ public class TreeServiceImpl implements TreeService {
     public Integer updateByPrimaryKeySelective(SkillTree skillTree) {
         return skillTreeDao.updateByPrimaryKeySelective(skillTree);
     }
+
+    @Override
+    public List<SkillTree> selectAll() {
+        return skillTreeDao.selectAll();
+    }
 }

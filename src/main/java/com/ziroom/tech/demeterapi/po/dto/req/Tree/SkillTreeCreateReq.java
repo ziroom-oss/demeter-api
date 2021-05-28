@@ -31,6 +31,5 @@ public class SkillTreeCreateReq {
     public void validate() {
         Preconditions.checkArgument(Objects.nonNull(parentId), "父节点 id 不能为空");
         Preconditions.checkArgument(Objects.nonNull(name), "节点名称不能为空");
-        Preconditions.checkArgument(Objects.nonNull(sort), "排序值不能为空");
     }
 }

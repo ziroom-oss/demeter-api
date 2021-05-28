@@ -17,4 +17,6 @@ public interface SkillTreeDao {
     public SkillTree selectByPrimaryKey(Integer id);
 
     public Integer updateByPrimaryKeySelective(SkillTree record);
+
+    public List<SkillTree> selectAll();
 }

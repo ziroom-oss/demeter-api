@@ -25,4 +25,8 @@ public interface TreeService {
      * 按 id 更新节点
      */
     public Integer updateByPrimaryKeySelective(SkillTree skillTree);
+    /**
+     * 返回所有节点数据
+     */
+    public List<SkillTree> selectAll();
 }

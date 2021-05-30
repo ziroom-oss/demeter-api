@@ -26,7 +26,8 @@ public class TreeServiceImpl implements TreeService {
 
     @Override
     public Integer insertSelective(SkillTree skillTree) {
-        return skillTreeDao.insertSelective(skillTree);
+        skillTreeDao.insertSelective(skillTree);
+        return skillTree.getId();
     }
 
     @Override
@@ -36,7 +37,8 @@ public class TreeServiceImpl implements TreeService {
 
     @Override
     public Integer updateByPrimaryKeySelective(SkillTree skillTree) {
-        return skillTreeDao.updateByPrimaryKeySelective(skillTree);
+        skillTreeDao.updateByPrimaryKeySelective(skillTree);
+        return skillTree.getId();
     }
 
     @Override

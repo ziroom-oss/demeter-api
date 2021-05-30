@@ -22,7 +22,7 @@ public class SkillTreeModReq {
     private Byte sort;
 
     @ApiModelProperty("父节点 id")
-    private Byte parentId;
+    private Integer parentId;
 
     @ApiModelProperty("已删除 0 否 1 是")
     private Byte isDel;

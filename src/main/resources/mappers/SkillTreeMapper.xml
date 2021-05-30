@@ -27,7 +27,7 @@
         where parent_id = #{parentId,jdbcType=INTEGER} and is_del = 0
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
-        SELECT * FROM skill_tree where is_del = 0 order by create_time desc
+        SELECT * FROM skill_tree where is_del = 0 order by create_time asc
     </select>
     <update id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         update skill_tree set is_del = 1

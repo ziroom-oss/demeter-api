@@ -22,6 +22,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.TaskService;
+import com.ziroom.tech.sia.hunter.taskstatus.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -540,7 +541,12 @@ public class TaskServiceImpl implements TaskService {
                 skillTasks = demeterSkillTaskDao.selectByExample(skillTaskExample);
             } else if (taskListQueryReq.getTaskType().equals(TaskType.ASSIGN.getCode())) {
                 if (Objects.nonNull(taskListQueryReq.getTaskStatus())) {
-                    assignTaskExampleCriteria.andTaskStatusEqualTo(taskListQueryReq.getTaskStatus());
+                    if (taskListQueryReq.getTaskStatus().equals(AssignTaskStatus.ALL.getCode())) {
+                        skillTaskExampleCriteria.andTaskStatusIn(AssignTaskStatus.getAllTaskType().stream()
+                                .map(AssignTaskStatus::getCode).collect(Collectors.toList()));
+                    } else {
+                        assignTaskExampleCriteria.andTaskStatusEqualTo(taskListQueryReq.getTaskStatus());
+                    }
                 }
                 assignTasks = demeterAssignTaskDao.selectByExample(assignTaskExample);
             } else if (taskListQueryReq.getTaskType().equals(TaskType.ALL.getCode())){
@@ -654,13 +660,23 @@ public class TaskServiceImpl implements TaskService {
                 case SKILL:
                     demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode());
                     if (taskStatus != null && SkillTaskFlowStatus.isValid(taskStatus)) {
-                        demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                        if (taskStatus.equals(SkillTaskFlowStatus.ALL.getCode())) {
+                            demeterTaskUserCriteria.andTaskStatusIn(SkillTaskStatus.getAllTaskType().stream()
+                                    .map(SkillTaskStatus::getCode).collect(Collectors.toList()));
+                        } else {
+                            demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                        }
                     }
                     break;
                 case ASSIGN:
                     demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
                     if (taskStatus != null && AssignTaskFlowStatus.isValid(taskStatus)) {
-                        demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                        if (taskStatus.equals(AssignTaskStatus.ALL.getCode())) {
+                            demeterTaskUserCriteria.andTaskStatusIn(AssignTaskStatus.getAllTaskType().stream()
+                                    .map(AssignTaskStatus::getCode).collect(Collectors.toList()));
+                        } else {
+                            demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                        }
                     }
                 default:
             }
@@ -1471,10 +1487,7 @@ public class TaskServiceImpl implements TaskService {
         if (TaskType.SKILL.getCode().equals(taskType)) {
             checkSkillForbidden(taskId);
         }
-//        UploadResp uploadResp = this.uploadFile(multipartFile);
-//        ZiroomFile file = uploadResp.getFile();
         ZiroomFile ziroomFile = storageComponent.uploadFile(uploadOutcomeReq.getMultipartFile());
-//        String uuid = file.getUuid();
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
         taskFinishOutcomeExample.createCriteria()
                 .andReceiverUidEqualTo(OperatorContext.getOperator())
@@ -1495,36 +1508,6 @@ public class TaskServiceImpl implements TaskService {
         taskFinishOutcomeDao.updateByPrimaryKeySelective(update);
         return Resp.success();
     }
-
-//    private UploadResp uploadFile(MultipartFile multipartFile) {
-//        File file;
-//        String originalFilename = multipartFile.getOriginalFilename();
-//        String[] filename = Objects.requireNonNull(originalFilename).split("\\.");
-//        try {
-//            file= File.createTempFile(filename[0], filename[1]);
-//            multipartFile.transferTo(file);
-//            file.deleteOnExit();
-//        } catch (IOException e) {
-//            throw new BusinessException(e.getMessage());
-//        }
-//        String fileBase64String;
-//        try {
-//            FileInputStream fileInputStream = new FileInputStream(file);
-//            byte[] buffer = new byte[fileInputStream.available()];
-//            fileInputStream.read(buffer);
-//            fileBase64String = Base64.getEncoder().encodeToString(buffer);
-//        } catch (IOException e) {
-//            throw new BusinessException(e.getMessage());
-//        }
-//
-//        UploadParam uploadParam = UploadParam.builder()
-//                .source("")
-//                .filename(file.getName())
-//                .base64(fileBase64String)
-//                .type("if")
-//                .build();
-//        return storageComponent.uploadFile(uploadParam);
-//    }
 
     @Override
     public Boolean checkTaskDelay() {

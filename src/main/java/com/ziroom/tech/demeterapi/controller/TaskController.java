@@ -14,11 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author daijiankun
@@ -194,12 +192,6 @@ public class TaskController {
         return taskService.checkTask(checkTaskReq);
     }
 
-//    @PostMapping("/receiver/list")
-//    @ApiOperation(value = "两类任务-查看接收人清单", httpMethod = "POST")
-//    public Resp<List<ReceiverListResp>> getAssignTaskCheckList(@RequestParam Long taskId, @RequestParam Integer taskType) {
-//        return taskService.getTaskCheckList(taskId, taskType);
-//    }
-
     // todo test
     @PostMapping("/detail/progress")
     @ApiOperation(value = "任务查看进度/验收任务预览", httpMethod = "POST")
@@ -212,15 +204,6 @@ public class TaskController {
     public Resp<Object> getSkillGraphOfTask(@RequestParam Long id, @RequestParam Integer taskType) {
         return null;
     }
-
-//    @PostMapping("/upload/attachment")
-//    @ApiOperation(value = "上传附件", httpMethod = "POST")
-//    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
-//        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
-//            return Resp.error("文件为空，请重新上传");
-//        }
-//        return taskService.uploadAttachment(multipartFile, taskId, taskType);
-//    }
 
     @PostMapping(value = "/upload/outcome", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "上传学习成果", httpMethod = "POST")

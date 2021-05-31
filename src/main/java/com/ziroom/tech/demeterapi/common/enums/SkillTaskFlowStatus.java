@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum SkillTaskFlowStatus {
 
+    ALL(0, "全部"),
+
     ONGOING(2, "进行中"),
 
     TO_AUTHENTICATE(3, "待认证"),

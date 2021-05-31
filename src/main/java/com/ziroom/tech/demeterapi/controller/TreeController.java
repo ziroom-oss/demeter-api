@@ -70,6 +70,24 @@ public class TreeController {
     @ApiOperation("移除指定 id 的 tree")
     @DeleteMapping("/{id}")
     public Resp<Integer> deleteTree(@PathVariable Integer id) {
+        if (id < 100001) {
+            return Resp.error("根节点不允许删除");
+        }
         return Resp.success(treeService.deleteByPrimaryKey(id));
+    }
+
+    @ApiOperation("返回所有节点数据")
+    @GetMapping("/all")
+    public Resp<List<SkillTreeResp>> getTrees() {
+        List<SkillTree> skillTrees = treeService.selectAll();
+        List<SkillTreeResp> skillTreeResps = new ArrayList<>();
+        Optional.ofNullable(treeService.selectAll()).ifPresent(trees -> {
+            trees.forEach(tree -> {
+                SkillTreeResp skillTreeResp = new SkillTreeResp();
+                BeanUtils.copyProperties(tree, skillTreeResp);
+                skillTreeResps.add(skillTreeResp);
+            });
+        });
+        return Resp.success(skillTreeResps);
     }
 }

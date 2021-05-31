@@ -29,6 +29,8 @@ public class SkillDetailResp {
 
     private Integer skillLevel;
 
+    private String skillLevelName;
+
     private String attachmentUrl;
 
     private String attachmentName;

@@ -1,7 +1,7 @@
 package com.ziroom.tech.demeterapi.common;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.demeterapi.common.api.StorageApiEndPoint;
+import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.req.storage.QueryParam;
 import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
@@ -27,6 +27,8 @@ public class StorageComponent {
     @Resource
     private StorageApiEndPoint storageApiEndPoint;
 
+    private static final String SUCCESS = "0";
+
     public ZiroomFile uploadFile(MultipartFile multipartFile) {
         String fileBase64String = null;
         try {
@@ -42,6 +44,9 @@ public class StorageComponent {
                 .build();
         Call<UploadResp> call = storageApiEndPoint.uploadFile(uploadParam);
         UploadResp response = RetrofitCallAdaptor.execute(call);
+        if (!response.getResponse_code().equals(SUCCESS)) {
+            throw new BusinessException(response.getError_info());
+        }
         return response.getFile();
     }
 

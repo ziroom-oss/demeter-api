@@ -12,20 +12,20 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 技能类任务请求体
+ * 技能点请求体
  * @author daijiankun
  */
 @Data
-@ApiModel("技能类任务请求体")
+@ApiModel("技能点请求体")
 public class SkillTaskReq {
 
     @ApiModelProperty("主键")
     private Long id;
 
-    @ApiModelProperty("任务名")
+    @ApiModelProperty("技能点名称")
     private String taskName;
 
-    @ApiModelProperty("任务状态")
+    @ApiModelProperty("技能点状态")
     private Integer taskStatus;
 
     @ApiModelProperty("技能值奖励")
@@ -36,7 +36,7 @@ public class SkillTaskReq {
     private Integer skillLevel;
 
     /**
-     * 任务附件
+     * 技能点附件
      */
     private MultipartFile attachment;
 
@@ -44,9 +44,9 @@ public class SkillTaskReq {
     private String taskRemark;
 
     public void validateAdd() {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(taskName), "任务名称不能为空");
-        Preconditions.checkArgument(Objects.nonNull(taskStatus), "任务启用状态不能为空");
-        Preconditions.checkArgument(Objects.nonNull(skillReward) && skillReward != 0, "任务技能值奖励不能为空");
-        Preconditions.checkArgument(CollectionUtils.isNotEmpty(taskFinishCondition), "至少有一个任务完成条件");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(taskName), "技能点名称不能为空");
+        Preconditions.checkArgument(Objects.nonNull(taskStatus), "技能点启用状态不能为空");
+        Preconditions.checkArgument(Objects.nonNull(skillReward) && skillReward != 0, "技能点技能值奖励不能为空");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(taskFinishCondition), "至少有一个技能点验收标准");
     }
 }

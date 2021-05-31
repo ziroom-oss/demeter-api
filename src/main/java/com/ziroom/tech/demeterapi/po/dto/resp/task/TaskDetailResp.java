@@ -17,7 +17,8 @@ public class TaskDetailResp {
 
     private List<ReceiverListResp> receiverList;
 
-    private Object graphInfo;
+
+    private Object graphInfo; // @daijr
 
     private List<TaskFinishCondition> taskFinishConditionList;
 

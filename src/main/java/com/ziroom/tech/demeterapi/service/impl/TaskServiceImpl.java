@@ -1297,6 +1297,8 @@ public class TaskServiceImpl implements TaskService {
         });
         resp.setTaskFinishOutcomeRespList(taskFinishOutcomeRespList);
         // 技能类任务所有人可查看关联的技能图谱信息
+        // @daijr
+        resp.setGraphInfo(new Object());
         return Resp.success(resp);
     }
 

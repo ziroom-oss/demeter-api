@@ -114,7 +114,7 @@ public class PortraitServiceImpl implements PortraitService {
                 .education(userDetail.getHighestEducation())
                 .job(userDetail.getJob())
                 .position(userDetail.getLevelName())
-                .skills("数据结构与算法，设计模式，Tomcat")
+                .skills("@daijr，@daijr，@daijr")
                 .username(userDetail.getUserName())
                 .build();
         resp.setUserInfo(userInfo);

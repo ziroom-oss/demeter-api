@@ -28,10 +28,10 @@
                              targetProject="src/main/java">
         </javaClientGenerator>
 
-        <table tableName="demeter_assign_task" enableCountByExample="true" enableUpdateByExample="true"
-               enableSelectByExample="true">
-            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
-        </table>
+<!--        <table tableName="demeter_assign_task" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
 
 <!--        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
@@ -72,6 +72,11 @@
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
 <!--        <table tableName="skill_tree" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="skill_map_skill" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->

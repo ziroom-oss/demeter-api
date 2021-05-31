@@ -1134,11 +1134,15 @@ public class TaskServiceImpl implements TaskService {
         }
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-        demeterTaskUserExample.createCriteria()
-                .andTaskIdEqualTo(taskId)
-                .andTaskTypeEqualTo(taskType)
-                .andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode())
-                .andReceiverUidEqualTo(OperatorContext.getOperator());
+        DemeterTaskUserExample.Criteria demeterTaskUserExampleCriteria = demeterTaskUserExample.createCriteria();
+        if (taskType.equals(TaskType.SKILL.getCode())) {
+            demeterTaskUserExampleCriteria
+                    .andTaskIdEqualTo(taskId)
+                    .andTaskTypeEqualTo(taskType)
+                    .andReceiverUidEqualTo(OperatorContext.getOperator());
+        } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
+            demeterTaskUserExampleCriteria.andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
+        }
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
             DemeterTaskUser updateEntity = demeterTaskUsers.get(0);

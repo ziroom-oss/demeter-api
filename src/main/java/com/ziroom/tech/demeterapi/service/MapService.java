@@ -15,7 +15,7 @@ public interface MapService {
     /**
      * 新建技术图谱
      */
-    Integer insertSelective(SkillMap record);
+    Long insertSelective(SkillMap record);
 
     /**
      * 删除指定 id 的图谱

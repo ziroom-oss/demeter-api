@@ -35,7 +35,7 @@ public class MapController {
 
     @ApiOperation("创建技能图谱")
     @PostMapping("/")
-    public Resp<Integer> createMap(@RequestBody SkillMapCreateReq skillMapCreateReq) {
+    public Resp<Long> createMap(@RequestBody SkillMapCreateReq skillMapCreateReq) {
         return Resp.success(mapService.insertSelective(skillMapCreateReq.getEntity()));
     }
 

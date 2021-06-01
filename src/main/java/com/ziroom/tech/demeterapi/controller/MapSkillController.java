@@ -72,7 +72,7 @@ public class MapSkillController {
     @PostMapping("/")
     @ApiOperation("创建图谱和技能点的关联")
     public Resp<Integer> createMapSkill(@RequestBody MapSkillCreateReq mapSkillCreateReq) {
-        return Resp.success(skillMapSkillService.insertSelective(mapSkillCreateReq.getEntity()));
+        return Resp.success(skillMapSkillService.insertSelective(mapSkillCreateReq.getEntity(mapSkillCreateReq)));
     }
 
     @DeleteMapping("/{id}")

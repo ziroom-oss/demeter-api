@@ -5,6 +5,7 @@ import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
 
@@ -17,11 +18,13 @@ public class MapSkillCreateReq {
     @ApiModelProperty("技能点 id")
     private Long skillTaskId;
 
-    public SkillMapSkill getEntity() {
+    @ApiModelProperty("职级")
+    private Byte jobLevel;
+
+    public SkillMapSkill getEntity(MapSkillCreateReq mapSkillCreateReq) {
         SkillMapSkill skillMapSkill = new SkillMapSkill();
         validate();
-        skillMapSkill.setSkillMapId(skillMapId);
-        skillMapSkill.setSkillTaskId(skillTaskId);
+        BeanUtils.copyProperties(mapSkillCreateReq, skillMapSkill);
         return skillMapSkill;
     }
 

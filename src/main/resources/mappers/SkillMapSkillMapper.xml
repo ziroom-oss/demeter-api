@@ -12,7 +12,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id, skill_map_id, skill_task_id, jobLevel , create_time, modify_time
+        id, skill_map_id, skill_task_id, job_level , create_time, modify_time
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT 
@@ -25,6 +25,20 @@
         <include refid="Base_Column_List"/>
         from skill_map_skill
         where skill_map_id = #{skillMapId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByConditionSelective" resultMap="BaseResultMap">
+        select distinct
+        <include refid="Base_Column_List"/>
+        from skill_map_skill
+        <where>
+            <if test="mapSkillListReq.skillMapId != null">
+                and skill_map_id = #{mapSkillListReq.skillMapId}
+            </if>
+            <if test="mapSkillListReq.skillTaskId != null">
+                and skill_task_id = #{mapSkillListReq.skillTaskId}
+            </if>
+            and is_del = 0
+        </where>
     </select>
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
         update skill_map_skill set is_del = 1

@@ -1,10 +1,8 @@
 package com.ziroom.tech.demeterapi.controller;
 
-import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillCreateReq;
-import com.ziroom.tech.demeterapi.po.dto.resp.MapSkill.MapSkillResp;
 import com.ziroom.tech.demeterapi.service.SkillMapSkillService;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import io.swagger.annotations.Api;
@@ -13,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -21,13 +20,12 @@ import javax.annotation.Resource;
 public class MapSkillController {
     @Resource
     private SkillMapSkillService skillMapSkillService;
-    @Resource
-    private TaskService taskService;
 
-    @GetMapping("/{mapId}/skills")
-    @ApiOperation("按图谱 id 查询技能点")
-    public Resp<PageListResp<MapSkillResp>> getMapSkills(@PathVariable Integer mapId) {
-        return Resp.success();
+    @PostMapping("/{mapId}/skills")
+    @ApiOperation("按 mapId 查询关联记录")
+    public Resp<List<SkillMapSkill>> getMapSkills(@PathVariable Integer mapId) {
+        // 按 mapId 返回所有的关联
+        return Resp.success(skillMapSkillService.selectByMapId(mapId));
     }
 
     @PostMapping("/")

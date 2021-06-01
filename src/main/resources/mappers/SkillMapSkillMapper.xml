@@ -7,11 +7,12 @@
         <result column="skill_map_id" property="skillMapId" jdbcType="INTEGER"/>
         <result column="skill_task_id" property="skillTaskId" jdbcType="BIGINT"/>
         <result column="is_del" property="isDel" jdbcType="TINYINT"/>
+        <result column="job_level" property="jobLevel" jdbcType="TINYINT"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id, skill_map_id, skill_task_id, create_time, modify_time
+        id, skill_map_id, skill_task_id, jobLevel , create_time, modify_time
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT 
@@ -44,6 +45,9 @@
             <if test="isDel != null">
                 is_del,
             </if>
+            <if test="jobLevel != null">
+                job_level,
+            </if>
             <if test="createTime != null">
                 create_time,
             </if>
@@ -61,6 +65,9 @@
             <if test="isDel != null">
                 #{isDel,jdbcType=TINYINT},
             </if>
+            <if test="jobLevel != null">
+                #{jobLevel,jdbcType=TINYINT},
+            </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -77,6 +84,9 @@
             </if>
             <if test="skillTaskId != null">
                 skill_task_id = #{skillTaskId,jdbcType=BIGINT},
+            </if>
+            <if test="jobLevel != null">
+                job_level = #{jobLevel}
             </if>
             <if test="isDel != null">
                 is_del = #{isDel,jdbcType=TINYINT},

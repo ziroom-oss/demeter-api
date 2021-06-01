@@ -37,4 +37,11 @@ public interface SkillMapSkillDao {
      * @return
      */
     public List<SkillMapSkill> selectByMapId(Integer skillMapId);
+
+    /**
+     * 按 id 更新数据
+     * @param skillMapSkill
+     * @return
+     */
+    public Integer updateByPrimaryKeySelective(SkillMapSkill skillMapSkill);
 }

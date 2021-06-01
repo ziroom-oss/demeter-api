@@ -32,4 +32,9 @@ public class SkillMapSkillServiceImpl implements SkillMapSkillService {
     public List<SkillMapSkill> selectByMapId(Integer skillMapId) {
         return skillMapSkillDao.selectByMapId(skillMapId);
     }
+
+    @Override
+    public Integer updateByPrimaryKeySelective(SkillMapSkill skillMapSkill) {
+        return skillMapSkillDao.updateByPrimaryKeySelective(skillMapSkill);
+    }
 }

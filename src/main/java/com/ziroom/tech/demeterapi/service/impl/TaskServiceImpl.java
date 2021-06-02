@@ -22,7 +22,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.TaskService;
-import com.ziroom.tech.sia.hunter.taskstatus.TaskStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +58,8 @@ public class TaskServiceImpl implements TaskService {
     private EhrComponent ehrComponent;
     @Resource
     private StorageComponent storageComponent;
+    @Resource
+    private SkillTreeDao skillTreeDao;
 
     @Resource
     private HaloService haloService;
@@ -170,67 +171,6 @@ public class TaskServiceImpl implements TaskService {
         List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
         resp.setTaskFinishConditionList(taskFinishConditions);
         return Resp.success(resp);
-    }
-
-    @Override
-    public Resp<SkillDetailResp> getSkillTask(Long id) {
-        SkillDetailResp resp = new SkillDetailResp();
-        DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
-        BeanUtils.copyProperties(demeterSkillTask, resp);
-        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-        demeterTaskUserExample.createCriteria()
-                .andTaskIdEqualTo(id)
-                .andTaskTypeEqualTo(TaskType.SKILL.getCode());
-        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
-        List<String> receiverList = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
-        resp.setTaskReceiver(receiverList);
-        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
-        taskFinishConditionExample.createCriteria()
-                .andTaskIdEqualTo(id)
-                .andTaskTypeEqualTo(TaskType.SKILL.getCode());
-        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
-        resp.setTaskFinishConditionList(taskFinishConditions);
-        return Resp.success(resp);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Resp<Object> createSkillTask(SkillTaskReq skillTaskReq) {
-        DemeterSkillTask entity = new DemeterSkillTask();
-        BeanUtils.copyProperties(skillTaskReq, entity);
-        entity.setPublisher(OperatorContext.getOperator());
-        entity.setCreateId(OperatorContext.getOperator());
-        entity.setModifyId(OperatorContext.getOperator());
-        entity.setCreateTime(new Date());
-        entity.setUpdateTime(new Date());
-        entity.setSkillId(233L);
-        entity.setSkillLevel(skillTaskReq.getSkillLevel());
-        List<String> taskFinishCondition = skillTaskReq.getTaskFinishCondition();
-        MultipartFile attachment = skillTaskReq.getAttachment();
-        if (Objects.nonNull(attachment)) {
-            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
-            entity.setAttachmentUrl(ziroomFile.getUrl());
-            entity.setAttachmentName(ziroomFile.getOriginal_filename());
-        }
-        demeterSkillTaskDao.insertSelective(entity);
-        if (CollectionUtils.isNotEmpty(taskFinishCondition)) {
-            taskFinishCondition.forEach(condition -> {
-                if (StringUtils.isEmpty(condition)) {
-                    throw new BusinessException("任务条件内容不能为空");
-                }
-                TaskFinishCondition taskFinishEntity = TaskFinishCondition.builder()
-                        .modifyId(OperatorContext.getOperator())
-                        .createId(OperatorContext.getOperator())
-                        .taskFinishContent(condition)
-                        .modifyTime(new Date())
-                        .createTime(new Date())
-                        .taskType(TaskType.SKILL.getCode())
-                        .taskId(entity.getId())
-                        .build();
-                taskFinishConditionDao.insertSelective(taskFinishEntity);
-            });
-        }
-        return Resp.success();
     }
 
     // todo test
@@ -358,24 +298,6 @@ public class TaskServiceImpl implements TaskService {
         return Resp.error("未知的任务类型");
     }
 
-    // todo test
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq) {
-        DemeterSkillTask entity = new DemeterSkillTask();
-        BeanUtils.copyProperties(skillTaskReq, entity);
-        entity.setModifyId(OperatorContext.getOperator());
-        entity.setUpdateTime(new Date());
-        demeterSkillTaskDao.updateByPrimaryKeySelective(entity);
-        try {
-            updateTaskFinishCondition(skillTaskReq.getTaskFinishCondition(), skillTaskReq.getId(), TaskType.SKILL.getCode());
-        } catch (BusinessException exception) {
-            log.info("update task finish condition occur exception = {}", exception.getMessage());
-            return Resp.error(exception.getMessage());
-        }
-        return Resp.success();
-    }
-
     /**
      * 更新任务认领关系
      * @param assignTaskReq 指派类任务请求体
@@ -435,6 +357,7 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    // TODO: 2021/6/1 split task and skill & true paging
     @Override
     public PageListResp<ReleaseQueryResp> getReleaseList(TaskListQueryReq taskListQueryReq) {
         PageListResp<ReleaseQueryResp> pageListResp = new PageListResp<>();
@@ -512,9 +435,11 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        Long skillTreeId = taskListQueryReq.getSkillTreeId();
-        if (Objects.nonNull(skillTreeId)) {
-            skillTaskExampleCriteria.andSkillIdEqualTo(skillTreeId);
+        List<Integer> skillTreeId = taskListQueryReq.getSkillTreeIds();
+        if (CollectionUtils.isNotEmpty(skillTreeId)) {
+            skillTaskExampleCriteria.andSkillIdIn(skillTreeId);
+        } else {
+            return pageListResp;
         }
 
         Integer skillPointLevel = taskListQueryReq.getSkillPointLevel();
@@ -562,6 +487,7 @@ public class TaskServiceImpl implements TaskService {
             Map<String, UserResp> userRespMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
             skillTasks.forEach(task -> {
                 List<String> receiverList = this.getReceiverListFromSkillPointId(task.getId());
+                SkillTree skillTree = skillTreeDao.selectByPrimaryKey(task.getSkillId());
                 ReleaseQueryResp releaseQueryResp = ReleaseQueryResp.builder()
                         .id(task.getId())
                         .taskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + task.getId())
@@ -575,8 +501,7 @@ public class TaskServiceImpl implements TaskService {
                         .skillLevel(task.getSkillLevel())
                         .skillLevelName(SkillPointLevel.getByCode(task.getSkillLevel()).getDesc())
                         .skillTreeId(task.getSkillId())
-                        // TODO: 2021/5/27  
-                        .skillTreeName("技能树待做")
+                        .skillTreeName(skillTree.getName())
                         .growthValue(task.getSkillReward())
                         .publisher(task.getPublisher())
                         .publisherName(userRespMap.get(task.getPublisher()).getName())
@@ -1298,7 +1223,7 @@ public class TaskServiceImpl implements TaskService {
         resp.setTaskFinishOutcomeRespList(taskFinishOutcomeRespList);
         // 技能类任务所有人可查看关联的技能图谱信息
         // @daijr
-        resp.setGraphInfo(new Object());
+//        resp.setGraphInfo(new Object());
         return Resp.success(resp);
     }
 
@@ -1569,10 +1494,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public boolean submitSkillMove(Long id, Long skillTreeId) {
+    public boolean submitSkillMove(Long id, Integer skillTreeId) {
         DemeterSkillTask update = new DemeterSkillTask();
         update.setId(id);
-        update.setSkillId(skillTreeId);
+//        update.setSkillId(skillTreeId);
         demeterSkillTaskDao.updateByPrimaryKeySelective(update);
         return true;
     }

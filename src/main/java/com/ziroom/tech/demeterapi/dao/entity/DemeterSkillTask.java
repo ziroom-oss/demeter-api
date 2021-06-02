@@ -37,13 +37,15 @@ public class DemeterSkillTask {
 
     private String attachmentUrl;
 
+    private String attachmentUuid;
+
     private String attachmentName;
 
     private String publisher;
 
     private String taskRemark;
 
-    private Long skillId;
+    private Integer skillId;
 
     private Integer skillLevel;
 
@@ -95,6 +97,14 @@ public class DemeterSkillTask {
         this.attachmentUrl = attachmentUrl;
     }
 
+    public String getAttachmentUuid() {
+        return attachmentUuid;
+    }
+
+    public void setAttachmentUuid(String attachmentUuid) {
+        this.attachmentUuid = attachmentUuid;
+    }
+
     public String getAttachmentName() {
         return attachmentName;
     }
@@ -119,11 +129,11 @@ public class DemeterSkillTask {
         this.taskRemark = taskRemark;
     }
 
-    public Long getSkillId() {
+    public Integer getSkillId() {
         return skillId;
     }
 
-    public void setSkillId(Long skillId) {
+    public void setSkillId(Integer skillId) {
         this.skillId = skillId;
     }
 

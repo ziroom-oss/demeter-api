@@ -37,23 +37,10 @@ public class TaskController {
         return taskService.createAssignTask(assignTaskReq);
     }
 
-    @PostMapping(value = "save/skill", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "新建技能类任务", httpMethod = "POST")
-    public Resp<Object> createSkillTask(SkillTaskReq skillTaskReq) {
-        skillTaskReq.validateAdd();
-        return taskService.createSkillTask(skillTaskReq);
-    }
-
     @PostMapping("get/assign")
     @ApiOperation(value = "查看指派类任务", httpMethod = "POST")
     public Resp<AssignDetailResp> getAssignTask(@RequestParam Long id) {
         return taskService.getAssignTask(id);
-    }
-
-    @PostMapping("get/skill")
-    @ApiOperation(value = "查看技能类任务", httpMethod = "POST")
-    public Resp<SkillDetailResp> getSkillTask(@RequestParam Long id) {
-        return taskService.getSkillTask(id);
     }
 
     @GetMapping("type/all")
@@ -88,7 +75,7 @@ public class TaskController {
 
     // @daijr
     @PostMapping("skill/move")
-    public Resp<Object> submitSkillMove(@RequestParam Long id, @RequestParam Long skillTreeId) {
+    public Resp<Object> submitSkillMove(@RequestParam Long id, @RequestParam Integer skillTreeId) {
         return Resp.success(taskService.submitSkillMove(id, skillTreeId));
     }
 
@@ -97,12 +84,6 @@ public class TaskController {
     public Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq) {
         assignTaskReq.validateAdd();
         return taskService.updateAssignTask(assignTaskReq);
-    }
-
-    @PostMapping(value = "update/skill", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "编辑技能类任务", httpMethod = "POST")
-    public Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq) {
-        return taskService.updateSkillTask(skillTaskReq);
     }
 
     @PostMapping("status/assign")

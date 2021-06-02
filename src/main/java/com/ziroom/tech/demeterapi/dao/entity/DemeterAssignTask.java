@@ -41,6 +41,8 @@ public class DemeterAssignTask {
 
     private String attachmentName;
 
+    private String attachmentUuid;
+
     private Integer taskStatus;
 
     private String taskDescription;
@@ -115,6 +117,14 @@ public class DemeterAssignTask {
 
     public void setAttachmentName(String attachmentName) {
         this.attachmentName = attachmentName;
+    }
+
+    public String getAttachmentUuid() {
+        return attachmentUuid;
+    }
+
+    public void setAttachmentUuid(String attachmentUuid) {
+        this.attachmentUuid = attachmentUuid;
     }
 
     public Integer getTaskStatus() {

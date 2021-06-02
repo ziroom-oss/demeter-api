@@ -40,13 +40,22 @@ public class SkillTaskReq {
      */
     private MultipartFile attachment;
 
+    private Integer skillTreeId;
+
     @ApiModelProperty("备注")
     private String taskRemark;
 
     public void validateAdd() {
         Preconditions.checkArgument(StringUtils.isNotEmpty(taskName), "技能点名称不能为空");
         Preconditions.checkArgument(Objects.nonNull(taskStatus), "技能点启用状态不能为空");
+        Preconditions.checkArgument(Objects.nonNull(skillLevel) && skillLevel != 0, "技能点等级不能为空");
         Preconditions.checkArgument(Objects.nonNull(skillReward) && skillReward != 0, "技能点技能值奖励不能为空");
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(taskFinishCondition), "至少有一个技能点验收标准");
+//        Preconditions.checkArgument(Objects.nonNull(skillTreeId), "Please select one skill tree node at least.");
+    }
+
+    public void validateEdit() {
+        Preconditions.checkArgument(Objects.nonNull(id), "主键不能为空");
+        this.validateAdd();
     }
 }

@@ -473,6 +473,76 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andAttachmentUuidIsNull() {
+            addCriterion("attachment_uuid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidIsNotNull() {
+            addCriterion("attachment_uuid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidEqualTo(String value) {
+            addCriterion("attachment_uuid =", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotEqualTo(String value) {
+            addCriterion("attachment_uuid <>", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidGreaterThan(String value) {
+            addCriterion("attachment_uuid >", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_uuid >=", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLessThan(String value) {
+            addCriterion("attachment_uuid <", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLessThanOrEqualTo(String value) {
+            addCriterion("attachment_uuid <=", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLike(String value) {
+            addCriterion("attachment_uuid like", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotLike(String value) {
+            addCriterion("attachment_uuid not like", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidIn(List<String> values) {
+            addCriterion("attachment_uuid in", values, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotIn(List<String> values) {
+            addCriterion("attachment_uuid not in", values, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidBetween(String value1, String value2) {
+            addCriterion("attachment_uuid between", value1, value2, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotBetween(String value1, String value2) {
+            addCriterion("attachment_uuid not between", value1, value2, "attachmentUuid");
+            return (Criteria) this;
+        }
+
         public Criteria andAttachmentNameIsNull() {
             addCriterion("attachment_name is null");
             return (Criteria) this;
@@ -693,52 +763,52 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdEqualTo(Long value) {
+        public Criteria andSkillIdEqualTo(Integer value) {
             addCriterion("skill_id =", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdNotEqualTo(Long value) {
+        public Criteria andSkillIdNotEqualTo(Integer value) {
             addCriterion("skill_id <>", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdGreaterThan(Long value) {
+        public Criteria andSkillIdGreaterThan(Integer value) {
             addCriterion("skill_id >", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdGreaterThanOrEqualTo(Long value) {
+        public Criteria andSkillIdGreaterThanOrEqualTo(Integer value) {
             addCriterion("skill_id >=", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdLessThan(Long value) {
+        public Criteria andSkillIdLessThan(Integer value) {
             addCriterion("skill_id <", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdLessThanOrEqualTo(Long value) {
+        public Criteria andSkillIdLessThanOrEqualTo(Integer value) {
             addCriterion("skill_id <=", value, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdIn(List<Long> values) {
+        public Criteria andSkillIdIn(List<Integer> values) {
             addCriterion("skill_id in", values, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdNotIn(List<Long> values) {
+        public Criteria andSkillIdNotIn(List<Integer> values) {
             addCriterion("skill_id not in", values, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdBetween(Long value1, Long value2) {
+        public Criteria andSkillIdBetween(Integer value1, Integer value2) {
             addCriterion("skill_id between", value1, value2, "skillId");
             return (Criteria) this;
         }
 
-        public Criteria andSkillIdNotBetween(Long value1, Long value2) {
+        public Criteria andSkillIdNotBetween(Integer value1, Integer value2) {
             addCriterion("skill_id not between", value1, value2, "skillId");
             return (Criteria) this;
         }

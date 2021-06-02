@@ -25,7 +25,7 @@ public class SkillDetailResp {
 
     private Integer skillReward;
 
-    private Long skillTreeId;
+    private Integer skillTreeId;
 
     private Integer skillLevel;
 

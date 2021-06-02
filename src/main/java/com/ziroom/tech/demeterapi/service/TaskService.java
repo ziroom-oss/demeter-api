@@ -24,15 +24,6 @@ public interface TaskService {
 
     Resp<AssignDetailResp> getAssignTask(Long id);
 
-    Resp<SkillDetailResp> getSkillTask(Long id);
-
-    /**
-     * 创建技能类任务
-     * @param skillTaskReq 技能类任务请求体
-     * @return Resp
-     */
-    Resp<Object> createSkillTask(SkillTaskReq skillTaskReq);
-
     /**
      * 编辑指派类任务
      * @param assignTaskReq 指派类任务请求体
@@ -46,13 +37,6 @@ public interface TaskService {
      * @return
      */
     Resp<Object> updateAssignTaskStatus(Long taskId, Integer taskType, Integer taskStatus);
-
-    /**
-     * 编辑技能类任务
-     * @param skillTaskReq  技能类任务请求体
-     * @return Resp
-     */
-    Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq);
 
     /**
      * 发布任务列表
@@ -203,7 +187,7 @@ public interface TaskService {
      * @param skillTreeId 技能树id
      * @return
      */
-    boolean submitSkillMove(Long id, Long skillTreeId);
+    boolean submitSkillMove(Long id, Integer skillTreeId);
 
     /**
      * 重新指派任务

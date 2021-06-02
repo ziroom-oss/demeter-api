@@ -8,10 +8,11 @@
         <result column="task_status" property="taskStatus" jdbcType="INTEGER"/>
         <result column="skill_reward" property="skillReward" jdbcType="INTEGER"/>
         <result column="attachment_url" property="attachmentUrl" jdbcType="VARCHAR"/>
+        <result column="attachment_uuid" property="attachmentUuid" jdbcType="VARCHAR"/>
         <result column="attachment_name" property="attachmentName" jdbcType="VARCHAR"/>
         <result column="publisher" property="publisher" jdbcType="VARCHAR"/>
         <result column="task_remark" property="taskRemark" jdbcType="VARCHAR"/>
-        <result column="skill_id" property="skillId" jdbcType="BIGINT"/>
+        <result column="skill_id" property="skillId" jdbcType="INTEGER"/>
         <result column="skill_level" property="skillLevel" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -77,7 +78,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_name, task_status, skill_reward, attachment_url, attachment_name, publisher, task_remark, skill_id, skill_level, create_time, update_time, create_id, modify_id
+        id, task_name, task_status, skill_reward, attachment_url, attachment_uuid, attachment_name, publisher, task_remark, skill_id, skill_level, create_time, update_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample">
         select
@@ -107,12 +108,12 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_skill_task (task_name, task_status, skill_reward, attachment_url, attachment_name, publisher, 
-            task_remark, skill_id, skill_level, create_time, update_time, create_id, modify_id
-            )
-        VALUES (#{taskName,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{skillReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{attachmentName,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR}, 
-            #{taskRemark,jdbcType=VARCHAR}, #{skillId,jdbcType=BIGINT}, #{skillLevel,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
-            )
+        INSERT INTO demeter_skill_task (task_name, task_status, skill_reward, attachment_url, attachment_uuid, attachment_name, 
+            publisher, task_remark, skill_id, skill_level, create_time, update_time, create_id, 
+            modify_id)
+        VALUES (#{taskName,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{skillReward,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{attachmentUuid,jdbcType=VARCHAR}, #{attachmentName,jdbcType=VARCHAR}, 
+            #{publisher,jdbcType=VARCHAR}, #{taskRemark,jdbcType=VARCHAR}, #{skillId,jdbcType=INTEGER}, #{skillLevel,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, 
+            #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -131,6 +132,9 @@
             </if>
             <if test="attachmentUrl != null">
                 attachment_url,
+            </if>
+            <if test="attachmentUuid != null">
+                attachment_uuid,
             </if>
             <if test="attachmentName != null">
                 attachment_name,
@@ -173,6 +177,9 @@
             <if test="attachmentUrl != null">
                 #{attachmentUrl,jdbcType=VARCHAR},
             </if>
+            <if test="attachmentUuid != null">
+                #{attachmentUuid,jdbcType=VARCHAR},
+            </if>
             <if test="attachmentName != null">
                 #{attachmentName,jdbcType=VARCHAR},
             </if>
@@ -183,7 +190,7 @@
                 #{taskRemark,jdbcType=VARCHAR},
             </if>
             <if test="skillId != null">
-                #{skillId,jdbcType=BIGINT},
+                #{skillId,jdbcType=INTEGER},
             </if>
             <if test="skillLevel != null">
                 #{skillLevel,jdbcType=INTEGER},
@@ -226,6 +233,9 @@
             <if test="record.attachmentUrl != null">
                 attachment_url = #{record.attachmentUrl,jdbcType=VARCHAR},
             </if>
+            <if test="record.attachmentUuid != null">
+                attachment_uuid = #{record.attachmentUuid,jdbcType=VARCHAR},
+            </if>
             <if test="record.attachmentName != null">
                 attachment_name = #{record.attachmentName,jdbcType=VARCHAR},
             </if>
@@ -236,7 +246,7 @@
                 task_remark = #{record.taskRemark,jdbcType=VARCHAR},
             </if>
             <if test="record.skillId != null">
-                skill_id = #{record.skillId,jdbcType=BIGINT},
+                skill_id = #{record.skillId,jdbcType=INTEGER},
             </if>
             <if test="record.skillLevel != null">
                 skill_level = #{record.skillLevel,jdbcType=INTEGER},
@@ -265,10 +275,11 @@
             task_status = #{record.taskStatus,jdbcType=INTEGER},
             skill_reward = #{record.skillReward,jdbcType=INTEGER},
             attachment_url = #{record.attachmentUrl,jdbcType=VARCHAR},
+            attachment_uuid = #{record.attachmentUuid,jdbcType=VARCHAR},
             attachment_name = #{record.attachmentName,jdbcType=VARCHAR},
             publisher = #{record.publisher,jdbcType=VARCHAR},
             task_remark = #{record.taskRemark,jdbcType=VARCHAR},
-            skill_id = #{record.skillId,jdbcType=BIGINT},
+            skill_id = #{record.skillId,jdbcType=INTEGER},
             skill_level = #{record.skillLevel,jdbcType=INTEGER},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
             update_time = #{record.updateTime,jdbcType=TIMESTAMP},
@@ -293,6 +304,9 @@
             <if test="attachmentUrl != null">
                 attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
             </if>
+            <if test="attachmentUuid != null">
+                attachment_uuid = #{attachmentUuid,jdbcType=VARCHAR},
+            </if>
             <if test="attachmentName != null">
                 attachment_name = #{attachmentName,jdbcType=VARCHAR},
             </if>
@@ -303,7 +317,7 @@
                 task_remark = #{taskRemark,jdbcType=VARCHAR},
             </if>
             <if test="skillId != null">
-                skill_id = #{skillId,jdbcType=BIGINT},
+                skill_id = #{skillId,jdbcType=INTEGER},
             </if>
             <if test="skillLevel != null">
                 skill_level = #{skillLevel,jdbcType=INTEGER},
@@ -329,10 +343,11 @@
             task_status = #{taskStatus,jdbcType=INTEGER},
             skill_reward = #{skillReward,jdbcType=INTEGER},
             attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+            attachment_uuid = #{attachmentUuid,jdbcType=VARCHAR},
             attachment_name = #{attachmentName,jdbcType=VARCHAR},
             publisher = #{publisher,jdbcType=VARCHAR},
             task_remark = #{taskRemark,jdbcType=VARCHAR},
-            skill_id = #{skillId,jdbcType=BIGINT},
+            skill_id = #{skillId,jdbcType=INTEGER},
             skill_level = #{skillLevel,jdbcType=INTEGER},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             update_time = #{updateTime,jdbcType=TIMESTAMP},

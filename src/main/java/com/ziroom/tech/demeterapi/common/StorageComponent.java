@@ -1,8 +1,10 @@
 package com.ziroom.tech.demeterapi.common;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.demeterapi.common.api.StorageApiEndPoint;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
+import com.ziroom.tech.demeterapi.po.dto.req.storage.DeleteParam;
 import com.ziroom.tech.demeterapi.po.dto.req.storage.QueryParam;
 import com.ziroom.tech.demeterapi.po.dto.req.storage.UploadParam;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.DownloadResp;
@@ -48,6 +50,15 @@ public class StorageComponent {
             throw new BusinessException(response.getError_info());
         }
         return response.getFile();
+    }
+
+    public void deleteFile(String uuid) {
+        DeleteParam deleteParam = DeleteParam.builder()
+                .source("ceph.tech.demeter")
+                .uuid(uuid)
+                .build();
+        Call<JSONObject> call = storageApiEndPoint.deleteFile(deleteParam);
+        JSONObject response = RetrofitCallAdaptor.execute(call);
     }
 
     public DownloadResp downloadFile(String uuidString) {

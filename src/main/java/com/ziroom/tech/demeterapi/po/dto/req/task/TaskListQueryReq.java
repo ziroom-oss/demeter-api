@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 任务列表查询请求体
  * @author daijiankun
@@ -26,7 +28,7 @@ public class TaskListQueryReq extends PageListReq {
     private String nameOrNo;
 
     @ApiModelProperty("技能树id-技能点属性")
-    private Long skillTreeId;
+    private List<Integer> skillTreeIds;
 
     @ApiModelProperty("技能点等级-技能点属性")
     private Integer skillPointLevel;

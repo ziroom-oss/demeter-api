@@ -603,6 +603,76 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andAttachmentUuidIsNull() {
+            addCriterion("attachment_uuid is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidIsNotNull() {
+            addCriterion("attachment_uuid is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidEqualTo(String value) {
+            addCriterion("attachment_uuid =", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotEqualTo(String value) {
+            addCriterion("attachment_uuid <>", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidGreaterThan(String value) {
+            addCriterion("attachment_uuid >", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidGreaterThanOrEqualTo(String value) {
+            addCriterion("attachment_uuid >=", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLessThan(String value) {
+            addCriterion("attachment_uuid <", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLessThanOrEqualTo(String value) {
+            addCriterion("attachment_uuid <=", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidLike(String value) {
+            addCriterion("attachment_uuid like", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotLike(String value) {
+            addCriterion("attachment_uuid not like", value, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidIn(List<String> values) {
+            addCriterion("attachment_uuid in", values, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotIn(List<String> values) {
+            addCriterion("attachment_uuid not in", values, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidBetween(String value1, String value2) {
+            addCriterion("attachment_uuid between", value1, value2, "attachmentUuid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttachmentUuidNotBetween(String value1, String value2) {
+            addCriterion("attachment_uuid not between", value1, value2, "attachmentUuid");
+            return (Criteria) this;
+        }
+
         public Criteria andTaskStatusIsNull() {
             addCriterion("task_status is null");
             return (Criteria) this;

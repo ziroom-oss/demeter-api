@@ -44,7 +44,7 @@ public class ReleaseQueryResp {
     private String skillLevelName;
 
     @ApiModelProperty("所属技能树-技能点属性")
-    private Long skillTreeId;
+    private Integer skillTreeId;
 
     @ApiModelProperty("所属技能树-技能点")
     private String skillTreeName;

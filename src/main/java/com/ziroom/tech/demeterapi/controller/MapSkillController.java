@@ -33,27 +33,29 @@ public class MapSkillController {
     @Resource
     private DemeterSkillTaskDao demeterSkillTaskDao;
 
-//    @GetMapping("/{mapId}/skills")
-//    @ApiOperation("按 mapId 查询关联记录")
-//    public Resp<List<MapSkillResp>> getMapSkills(@PathVariable Integer mapId) {
-//        // 按 mapId 返回所有的关联
-//        List<SkillMapSkill> skillMapSkills = skillMapSkillService.selectByMapId(mapId);
-//        List<MapSkillResp> mapSkillResps = new ArrayList<>();
-//        Optional.ofNullable(skillMapSkills).ifPresent(records -> {
-//            records.forEach(record -> {
-//                MapSkillResp mapSkillResp = new MapSkillResp();
-//                BeanUtils.copyProperties(record, mapSkillResp);
-//                DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(record.getSkillTaskId());
-//                // skillTreeId 是 demterSkillTask 中的 skillId
-//                mapSkillResp.setSkillTreeId(demeterSkillTask.getSkillId());
-//                mapSkillResp.setSkillLevel(demeterSkillTask.getSkillLevel());
-//                // 技能点名称对应 taskName
-//                mapSkillResp.setSkillName(demeterSkillTask.getTaskName());
-//                mapSkillResps.add(mapSkillResp);
-//            });
-//        });
-//        return Resp.success(mapSkillResps);
-//    }
+    @GetMapping("/{mapId}/tree")
+    @ApiOperation("按 mapId 返回图形树")
+    public Resp<List<MapSkillResp>> getMapSkillsTree(@PathVariable Integer mapId) {
+        // 按 mapId 返回所有的关联
+        List<SkillMapSkill> skillMapSkills = skillMapSkillService.selectByMapId(mapId);
+        List<MapSkillResp> mapSkillResps = new ArrayList<>();
+        Optional.ofNullable(skillMapSkills).ifPresent(records -> {
+            records.forEach(record -> {
+                MapSkillResp mapSkillResp = new MapSkillResp();
+                BeanUtils.copyProperties(record, mapSkillResp);
+                DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(record.getSkillTaskId());
+                // skillTreeId 对应 demeterSkillTask.skillId
+                mapSkillResp.setSkillTreeId(demeterSkillTask.getSkillId());
+                mapSkillResp.setSkillLevel(demeterSkillTask.getSkillLevel());
+                // 技能点名称对应 demeterSkillTask.taskName
+                mapSkillResp.setSkillName(demeterSkillTask.getTaskName());
+                mapSkillResp.setSkillReward(demeterSkillTask.getSkillReward());
+                mapSkillResp.setPublisher(demeterSkillTask.getPublisher());
+                mapSkillResps.add(mapSkillResp);
+            });
+        });
+        return Resp.success(mapSkillResps);
+    }
 
     @PostMapping("/{mapId}/skills")
     @ApiOperation("按 skillId 数组批量查询记录")

@@ -25,6 +25,12 @@ public class MapSkillResp {
     @ApiModelProperty("技能名称")
     private String skillName;
 
+    @ApiModelProperty("技能奖励")
+    private Integer skillReward;
+
+    @ApiModelProperty("发布人")
+    private String publisher;
+
     @ApiModelProperty("记录中的技能所属的树节点id，该值返回前端以后组合数组用于批量查询技能点")
-    private Long skillTreeId;
+    private Integer skillTreeId;
 }

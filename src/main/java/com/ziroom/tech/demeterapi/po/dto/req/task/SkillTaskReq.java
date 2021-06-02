@@ -51,7 +51,7 @@ public class SkillTaskReq {
         Preconditions.checkArgument(Objects.nonNull(skillLevel) && skillLevel != 0, "技能点等级不能为空");
         Preconditions.checkArgument(Objects.nonNull(skillReward) && skillReward != 0, "技能点技能值奖励不能为空");
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(taskFinishCondition), "至少有一个技能点验收标准");
-//        Preconditions.checkArgument(Objects.nonNull(skillTreeId), "Please select one skill tree node at least.");
+        Preconditions.checkArgument(Objects.nonNull(skillTreeId), "Please select one skill tree node at least.");
     }
 
     public void validateEdit() {

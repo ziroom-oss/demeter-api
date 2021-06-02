@@ -3,7 +3,9 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
+import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.*;
+import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterAssignTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
@@ -15,8 +17,10 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrJoinTimeResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
+import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -45,6 +49,9 @@ public class PortraitServiceImpl implements PortraitService {
     private DemeterTaskUserDao demeterTaskUserDao;
     @Resource
     private CodeAnalysisComponent codeAnalysisComponent;
+
+    @Resource
+    private HaloService haloService;
 
     @Override
     public List<EmployeeListResp> getEmployeeList(EmployeeListReq employeeListReq) {
@@ -97,6 +104,24 @@ public class PortraitServiceImpl implements PortraitService {
 
     @Override
     public PortrayalInfoResp getPortrayalInfo(PortrayalInfoReq portrayalInfoReq) {
+        CurrentRole currentRole = this.getCurrentRole();
+        if (currentRole.equals(CurrentRole.PLAIN)) {
+            if (!portrayalInfoReq.getUid().equals(OperatorContext.getOperator())) {
+                throw new BusinessException("无权限");
+            }
+        } else if (currentRole.equals(CurrentRole.DEPT)) {
+            UserDetailResp userDetail = ehrComponent.getUserDetail(OperatorContext.getOperator());
+            if (Objects.nonNull(userDetail)) {
+                Set<EhrUserResp> users = ehrComponent.getUsers(userDetail.getDeptCode(), 101);
+                List<String> uidList = users.stream().map(EhrUserResp::getUserCode).collect(Collectors.toList());
+                if (!uidList.contains(portrayalInfoReq.getUid())) {
+                    throw new BusinessException("无权限");
+                }
+            } else {
+                throw new BusinessException("当前登录用户在ehr查询信息失败。");
+            }
+        }
+
         PortrayalInfoResp resp = new PortrayalInfoResp();
         Date startTime = portrayalInfoReq.getStartTime();
         Date endTime = portrayalInfoReq.getEndTime();
@@ -108,6 +133,34 @@ public class PortraitServiceImpl implements PortraitService {
             LocalDate entryDate = LocalDate.parse(ehrJoinTimeResp.getEntryTime(), DateTimeFormatter.ofPattern("yyyyMMdd"));
             days = LocalDate.now().toEpochDay() - entryDate.toEpochDay();
         }
+
+        // 雷达图数据：技能
+        DemeterTaskUserExample taskUserExample = new DemeterTaskUserExample();
+        taskUserExample.createCriteria()
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                .andReceiverUidEqualTo(portrayalInfoReq.getUid())
+                .andTaskStatusEqualTo(SkillTaskFlowStatus.PASS.getCode())
+                .andCheckoutTimeBetween(startTime, endTime);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(taskUserExample);
+        List<Long> skillPoints = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(skillPoints)) {
+            DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+            demeterSkillTaskExample.createCriteria()
+                    .andIdIn(skillPoints);
+            List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+            Map<Integer, List<DemeterSkillTask>> skillMap = demeterSkillTasks.parallelStream().collect(Collectors.groupingBy(DemeterSkillTask::getSkillId));
+            Map<Integer, Long> res = new HashMap<>(16);
+            skillMap.keySet().forEach(skillId -> {
+                long count = skillMap.get(skillId).stream().map(DemeterSkillTask::getSkillReward).count();
+                res.put(skillId, count);
+            });
+//            res.entrySet().stream()
+//                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toMap())
+        }
+
+
+
         UserInfo userInfo = UserInfo.builder()
                 .email(userDetail.getEmail())
                 .hireDays(days)
@@ -252,5 +305,17 @@ public class PortraitServiceImpl implements PortraitService {
     @Override
     public EngineeringMetricResp getEngineeringMetrics(EngineeringMetricReq req) {
         return codeAnalysisComponent.getDevelopmentEquivalent(req.getUid(), req.getStartTime(), req.getEndTime());
+    }
+
+    private CurrentRole getCurrentRole() {
+        AuthResp permission = haloService.getAuth();
+        List<String> roles = permission.getRoles();
+        if (roles.contains(CurrentRole.SUPER.getCode())) {
+            return CurrentRole.SUPER;
+        } else if (roles.contains(CurrentRole.DEPT.getCode())) {
+            return CurrentRole.DEPT;
+        } else {
+            return CurrentRole.PLAIN;
+        }
     }
 }

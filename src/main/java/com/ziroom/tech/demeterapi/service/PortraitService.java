@@ -31,7 +31,7 @@ public interface PortraitService {
     DailyTaskResp getDailyTaskInfo(DailyTaskReq dailyTaskReq);
 
     /**
-     * 查询当前登录人画像信息
+     * 查询画像信息
      * @param portrayalInfoReq 请求体
      */
     PortrayalInfoResp getPortrayalInfo(PortrayalInfoReq portrayalInfoReq);

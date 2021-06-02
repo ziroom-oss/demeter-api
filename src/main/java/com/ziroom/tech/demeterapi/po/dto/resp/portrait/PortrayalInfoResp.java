@@ -2,6 +2,8 @@ package com.ziroom.tech.demeterapi.po.dto.resp.portrait;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author daijiankun
  */
@@ -22,5 +24,5 @@ public class PortrayalInfoResp {
     /**
      * 雷达图
      */
-    private RadarGraph radarGraph;
+    private List<RadarGraph> radarGraphs;
 }

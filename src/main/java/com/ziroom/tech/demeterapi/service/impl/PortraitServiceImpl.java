@@ -22,6 +22,8 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
+import com.ziroom.tech.demeterapi.service.TreeService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,7 @@ import java.util.stream.Stream;
  * @author daijiankun
  */
 @Service
+@Slf4j
 public class PortraitServiceImpl implements PortraitService {
 
     @Resource
@@ -49,6 +52,8 @@ public class PortraitServiceImpl implements PortraitService {
     private DemeterTaskUserDao demeterTaskUserDao;
     @Resource
     private CodeAnalysisComponent codeAnalysisComponent;
+    @Resource
+    private TreeService treeService;
 
     @Resource
     private HaloService haloService;
@@ -134,6 +139,15 @@ public class PortraitServiceImpl implements PortraitService {
             days = LocalDate.now().toEpochDay() - entryDate.toEpochDay();
         }
 
+        UserInfo userInfo = UserInfo.builder()
+                .email(userDetail.getEmail())
+                .hireDays(days)
+                .education(userDetail.getHighestEducation())
+                .job(userDetail.getJob())
+                .position(userDetail.getLevelName())
+                .username(userDetail.getUserName())
+                .build();
+
         // 雷达图数据：技能
         DemeterTaskUserExample taskUserExample = new DemeterTaskUserExample();
         taskUserExample.createCriteria()
@@ -150,26 +164,26 @@ public class PortraitServiceImpl implements PortraitService {
                     .andIdIn(skillPoints);
             List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
             Map<Integer, List<DemeterSkillTask>> skillMap = demeterSkillTasks.parallelStream().collect(Collectors.groupingBy(DemeterSkillTask::getSkillId));
-            Map<Integer, Long> res = new HashMap<>(16);
+            Map<Integer, Long> res = new TreeMap<>();
             skillMap.keySet().forEach(skillId -> {
-                long count = skillMap.get(skillId).stream().map(DemeterSkillTask::getSkillReward).count();
+                long count = skillMap.get(skillId).stream().mapToInt(DemeterSkillTask::getSkillReward).sum();
                 res.put(skillId, count);
             });
-//            res.entrySet().stream()
-//                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toMap())
+            List<Map.Entry<Integer, Long>> skillList = res.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toList());
+            List<Map.Entry<Integer, Long>> radarGraphs = skillList.stream().limit(6).collect(Collectors.toList());
+            List<RadarGraph> radarGraphList = new ArrayList<>(6);
+            radarGraphs.forEach(item -> {
+                SkillTree skillTree = treeService.selectByPrimaryKey(item.getKey());
+                RadarGraph graph = new RadarGraph();
+                graph.setText(skillTree.getName());
+                graph.setMax(item.getValue());
+                radarGraphList.add(graph);
+            });
+            resp.setRadarGraphs(radarGraphList);
+            userInfo.setSkills(radarGraphList.stream().map(RadarGraph::getText).collect(Collectors.joining("|")));
         }
 
-
-
-        UserInfo userInfo = UserInfo.builder()
-                .email(userDetail.getEmail())
-                .hireDays(days)
-                .education(userDetail.getHighestEducation())
-                .job(userDetail.getJob())
-                .position(userDetail.getLevelName())
-                .skills("@daijr，@daijr，@daijr")
-                .username(userDetail.getUserName())
-                .build();
         resp.setUserInfo(userInfo);
         List<EmployeeListResp> respList = this.queryEmployeeInfo(Lists.newArrayList(portrayalInfoReq.getUid()), startTime, endTime);
         if (CollectionUtils.isNotEmpty(respList)) {

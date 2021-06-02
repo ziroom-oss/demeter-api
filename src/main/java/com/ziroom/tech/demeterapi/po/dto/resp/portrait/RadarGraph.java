@@ -8,5 +8,7 @@ import lombok.Data;
 @Data
 public class RadarGraph {
 
+    private String text;
 
+    private Long max;
 }

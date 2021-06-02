@@ -2,6 +2,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 import com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillDao;
+import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillListReq;
 import com.ziroom.tech.demeterapi.service.SkillMapSkillService;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,15 @@ public class SkillMapSkillServiceImpl implements SkillMapSkillService {
     @Override
     public List<SkillMapSkill> selectByMapId(Integer skillMapId) {
         return skillMapSkillDao.selectByMapId(skillMapId);
+    }
+
+    @Override
+    public Integer updateByPrimaryKeySelective(SkillMapSkill skillMapSkill) {
+        return skillMapSkillDao.updateByPrimaryKeySelective(skillMapSkill);
+    }
+
+    @Override
+    public List<SkillMapSkill> selectByConditionSelective(MapSkillListReq mapSkillListReq) {
+        return skillMapSkillDao.selectByConditionSelective(mapSkillListReq);
     }
 }

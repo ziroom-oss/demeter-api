@@ -9,27 +9,25 @@ import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
 
+/**
+ * @author daijinru
+ */
 @Data
-@ApiModel("创建图谱和技能点关联")
-public class MapSkillCreateReq {
-    @ApiModelProperty("图谱编号 id")
-    private Integer skillMapId;
-
-    @ApiModelProperty("技能点 id")
-    private Long skillTaskId;
-
+@ApiModel("修改图谱和技能点关联记录")
+public class MapSkillModReq {
+    @ApiModelProperty("主键")
+    private Long id;
     @ApiModelProperty("职级")
     private Byte jobLevel;
 
-    public SkillMapSkill getEntity(MapSkillCreateReq mapSkillCreateReq) {
+    public SkillMapSkill getEntity(MapSkillModReq mapSkillModReq) {
         SkillMapSkill skillMapSkill = new SkillMapSkill();
         validate();
-        BeanUtils.copyProperties(mapSkillCreateReq, skillMapSkill);
+        BeanUtils.copyProperties(mapSkillModReq, skillMapSkill);
         return skillMapSkill;
     }
 
     public void validate() {
-        Preconditions.checkArgument(Objects.nonNull(skillMapId), "图谱 id 不能为空");
-        Preconditions.checkArgument(Objects.nonNull(skillTaskId), "技能点 id 不能为空");
+        Preconditions.checkArgument(Objects.nonNull(id), "主键 id 不能为空");
     }
 }

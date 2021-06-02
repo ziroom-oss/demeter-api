@@ -20,8 +20,9 @@ public class MapServiceImpl implements MapService {
         return skillMapDao.countBySkillMap(skillMapListReq);
     }
     @Override
-    public Integer insertSelective(SkillMap skillMap) {
-        return skillMapDao.insertSelective(skillMap);
+    public Long insertSelective(SkillMap skillMap) {
+        skillMapDao.insertSelective(skillMap);
+        return skillMap.getId();
     }
     @Override
     public Integer deleteByPrimaryKey(Long id) {

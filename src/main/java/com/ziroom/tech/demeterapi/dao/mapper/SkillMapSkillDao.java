@@ -2,6 +2,8 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 
 import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 
+import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillListReq;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,4 +39,16 @@ public interface SkillMapSkillDao {
      * @return
      */
     public List<SkillMapSkill> selectByMapId(Integer skillMapId);
+
+    /**
+     * 按 id 更新数据
+     * @param skillMapSkill
+     * @return
+     */
+    public Integer updateByPrimaryKeySelective(SkillMapSkill skillMapSkill);
+
+    /**
+     * 按查询条件返回记录
+     */
+    public List<SkillMapSkill> selectByConditionSelective(@Param("mapSkillListReq") MapSkillListReq mapSkillListReq);
 }

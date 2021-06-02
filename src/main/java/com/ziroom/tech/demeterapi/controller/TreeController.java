@@ -9,7 +9,6 @@ import com.ziroom.tech.demeterapi.service.TreeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -79,7 +78,6 @@ public class TreeController {
     @ApiOperation("返回所有节点数据")
     @GetMapping("/all")
     public Resp<List<SkillTreeResp>> getTrees() {
-        List<SkillTree> skillTrees = treeService.selectAll();
         List<SkillTreeResp> skillTreeResps = new ArrayList<>();
         Optional.ofNullable(treeService.selectAll()).ifPresent(trees -> {
             trees.forEach(tree -> {

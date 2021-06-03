@@ -5,6 +5,7 @@ import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
+import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillCreateReq;
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillModReq;
@@ -95,6 +96,12 @@ public class MapSkillController {
         mapSkillModReq.setId(id);
         SkillMapSkill skillMapSkill = mapSkillModReq.getEntity(mapSkillModReq);
         return Resp.success(skillMapSkillService.updateByPrimaryKeySelective(skillMapSkill));
+    }
+
+    @PostMapping("/search")
+    @ApiOperation(("按图谱 id 和技能 id 查询记录"))
+    public Resp<List<SkillMapSkill>> getMapSkillsByCondition(@RequestBody MapSkillListReq mapSkillListReq) {
+        return Resp.success(skillMapSkillService.selectByConditionSelective(mapSkillListReq));
     }
 
     @GetMapping("/job/levels")

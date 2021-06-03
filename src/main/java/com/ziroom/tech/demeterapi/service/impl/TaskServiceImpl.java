@@ -1336,6 +1336,7 @@ public class TaskServiceImpl implements TaskService {
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
         SkillDetailResp detailResp = new SkillDetailResp();
         BeanUtils.copyProperties(demeterSkillTask, detailResp);
+        detailResp.setSkillTreeId(demeterSkillTask.getSkillId());
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
                 .andTaskIdEqualTo(id)

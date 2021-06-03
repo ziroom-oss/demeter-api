@@ -44,10 +44,22 @@ public class CodeAnalysisComponent {
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONObject jsonObject = response.getJSONObject(DATA_ATTRIBUTE);
             EngineeringMetricResp resp = new EngineeringMetricResp();
-            resp.setInsertions(jsonObject.getInteger("insertions"));
-            resp.setDeletions(jsonObject.getInteger("deletions"));
-            resp.setDevEquivalent(jsonObject.getInteger("dev_equivalent"));
-            resp.setCommitCount(jsonObject.getInteger("commit_count"));
+            Integer insertions = jsonObject.getInteger("insertions");
+            if (insertions != null) {
+                resp.setInsertions(insertions);
+            }
+            Integer deletions = jsonObject.getInteger("deletions");
+            if (deletions != null) {
+                resp.setDeletions(deletions);
+            }
+            Integer devEquivalent = jsonObject.getInteger("dev_equivalent");
+            if (devEquivalent != null) {
+                resp.setDevEquivalent(devEquivalent);
+            }
+            Integer commitCount = jsonObject.getInteger("commit_count");
+            if (commitCount != null) {
+                resp.setCommitCount(commitCount);
+            }
             return resp;
         }
         return null;

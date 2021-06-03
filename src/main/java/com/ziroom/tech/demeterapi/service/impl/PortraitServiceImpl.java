@@ -180,7 +180,6 @@ public class PortraitServiceImpl implements PortraitService {
                     SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
                     RadarGraph graph = new RadarGraph();
                     graph.setText(skillTree.getName());
-//                    graph.setText("待认证技能待认证技能待认证技能");
                     graph.setMax(entry.getValue());
                     radarGraphList.add(graph);
                     skills.add(graph);

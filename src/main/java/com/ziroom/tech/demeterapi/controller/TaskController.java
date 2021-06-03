@@ -73,7 +73,6 @@ public class TaskController {
         return Resp.success(SkillPointLevel.getAllSkillLevel());
     }
 
-    // @daijr
     @PostMapping("skill/move")
     public Resp<Object> submitSkillMove(@RequestParam Long id, @RequestParam Integer skillTreeId) {
         return Resp.success(taskService.submitSkillMove(id, skillTreeId));

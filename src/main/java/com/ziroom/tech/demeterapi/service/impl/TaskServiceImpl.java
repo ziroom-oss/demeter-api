@@ -90,6 +90,7 @@ public class TaskServiceImpl implements TaskService {
         // batchInsert?
 
         List<String> taskReceiver = assignTaskReq.getTaskReceiver();
+        String taskReceiverString = String.join(",", taskReceiver);
         this.assignTask(taskReceiver, entity);
 
         // TaskFinishCondition
@@ -108,9 +109,7 @@ public class TaskServiceImpl implements TaskService {
                 taskFinishConditionDao.insertSelective(taskFinishCondition);
             });
         }
-
-//        messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
-
+        messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
         return Resp.success();
     }
 
@@ -436,10 +435,12 @@ public class TaskServiceImpl implements TaskService {
         }
 
         List<Integer> skillTreeId = taskListQueryReq.getSkillTreeIds();
-        if (CollectionUtils.isNotEmpty(skillTreeId)) {
-            skillTaskExampleCriteria.andSkillIdIn(skillTreeId);
-        } else {
-            return pageListResp;
+        if (TaskType.SKILL.getCode().equals(taskListQueryReq.getTaskType())) {
+            if (CollectionUtils.isNotEmpty(skillTreeId)) {
+                skillTaskExampleCriteria.andSkillIdIn(skillTreeId);
+            } else {
+                return pageListResp;
+            }
         }
 
         Integer skillPointLevel = taskListQueryReq.getSkillPointLevel();
@@ -770,6 +771,7 @@ public class TaskServiceImpl implements TaskService {
             }
             this.acceptAssignTask(id);
             this.createTaskOutcome(id, type);
+            messageService.acceptNotice(id, type, demeterAssignTask.getPublisher());
         } else if (TaskType.SKILL.getCode().equals(type)) {
             checkSkillForbidden(id);
             DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
@@ -784,6 +786,7 @@ public class TaskServiceImpl implements TaskService {
             }
             // 技能类任务必须认证
             this.createTaskOutcome(id, type);
+            messageService.acceptNotice(id, type, demeterSkillTask.getPublisher());
         }
 
         // 任务完成条件
@@ -810,7 +813,7 @@ public class TaskServiceImpl implements TaskService {
             });
         }
 
-        messageService.acceptTaskNotice(id, type, OperatorContext.getOperator());
+
         return Resp.success();
     }
 
@@ -902,6 +905,7 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(entity);
         // 拒绝原因处理
+        messageService.rejectTaskNotice(rejectTaskReq.getTaskId());
         return Resp.success();
     }
 
@@ -1027,6 +1031,8 @@ public class TaskServiceImpl implements TaskService {
                 .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
+
+        messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();
     }
 
@@ -1065,8 +1071,14 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskIdEqualTo(taskId)
                     .andTaskTypeEqualTo(taskType)
                     .andReceiverUidEqualTo(OperatorContext.getOperator());
+            messageService.startCheckoutNotice(taskId, TaskType.SKILL.getCode());
         } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
-            demeterTaskUserExampleCriteria.andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
+            demeterTaskUserExampleCriteria
+                    .andTaskIdEqualTo(taskId)
+                    .andTaskTypeEqualTo(taskType)
+                    .andReceiverUidEqualTo(OperatorContext.getOperator())
+                    .andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
+            messageService.startCheckoutNotice(taskId, TaskType.ASSIGN.getCode());
         }
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {

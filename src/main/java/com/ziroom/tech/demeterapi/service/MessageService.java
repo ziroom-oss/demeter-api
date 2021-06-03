@@ -15,12 +15,11 @@ public interface MessageService {
     boolean sendAssignTaskCreated(Long taskId, String taskPublisher, String taskReceiver);
 
     /**
-     * 任务接收者认领任务，向发布者发出消息
+     * 任务接收者认领任务或技能，向发布者发出消息
      * 包括技能类任务和指派类任务
      * @return boolean
      */
-    boolean acceptTaskNotice(Long taskId, Integer taskType, String taskReceiver);
-
+    boolean acceptNotice(Long taskId, Integer taskType, String skillReleaser);
 
     /**
      * 任务接收者拒绝任务，向发布者发出消息
@@ -33,19 +32,14 @@ public interface MessageService {
      * 任务接收者发起验收，向发布者发出消息
      * @return boolean
      */
-    boolean startCheckoutToReleaser(Long taskId, Integer taskType);
+    boolean startCheckoutNotice(Long taskId, Integer taskType);
 
-    /**
-     * 任务接收者发起验收，向接收者发出消息
-     * @return boolean
-     */
-    boolean startCheckoutToReceivers(Long taskId, Integer taskType);
 
     /**
      * 任务验收结果，通过/不通过，向接收者发出消息
      * @return boolean
      */
-    boolean checkoutResultNotice();
+    boolean checkoutResultNotice(Long taskId, Integer taskType, String receiverId, Integer result);
 
     /**
      * 点亮某个技能-本部门全体员工

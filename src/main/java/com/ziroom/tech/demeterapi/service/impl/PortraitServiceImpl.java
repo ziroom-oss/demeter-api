@@ -173,15 +173,26 @@ public class PortraitServiceImpl implements PortraitService {
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toList());
             List<Map.Entry<Integer, Long>> radarGraphs = skillList.stream().limit(6).collect(Collectors.toList());
             List<RadarGraph> radarGraphList = new ArrayList<>(6);
-            radarGraphs.forEach(item -> {
-                SkillTree skillTree = treeService.selectByPrimaryKey(item.getKey());
-                RadarGraph graph = new RadarGraph();
-                graph.setText(skillTree.getName());
-                graph.setMax(item.getValue());
-                radarGraphList.add(graph);
-            });
+            List<RadarGraph> skills = new ArrayList<>(6);
+            for (int i = 0; i < 6; i++) {
+                if (radarGraphs.size() - 1 > i) {
+                    Map.Entry<Integer, Long> entry = radarGraphs.get(i);
+                    SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
+                    RadarGraph graph = new RadarGraph();
+                    graph.setText(skillTree.getName());
+//                    graph.setText("待认证技能待认证技能待认证技能");
+                    graph.setMax(entry.getValue());
+                    radarGraphList.add(graph);
+                    skills.add(graph);
+                } else {
+                    RadarGraph graph = new RadarGraph();
+                    graph.setText("待认证技能");
+                    graph.setMax(0L);
+                    radarGraphList.add(graph);
+                }
+            }
             resp.setRadarGraphs(radarGraphList);
-            userInfo.setSkills(radarGraphList.stream().map(RadarGraph::getText).collect(Collectors.joining("|")));
+            userInfo.setSkills(skills.stream().map(RadarGraph::getText).collect(Collectors.joining("|")));
         }
 
         resp.setUserInfo(userInfo);

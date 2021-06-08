@@ -18,13 +18,13 @@
         SELECT 
         <include refid="Base_Column_List"/>
         FROM skill_map_skill
-        WHERE id = #{id,jdbcType=BIGINT}
+        WHERE id = #{id,jdbcType=BIGINT} and is_del = 0
     </select>
     <select id="selectByMapId" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from skill_map_skill
-        where skill_map_id = #{skillMapId,jdbcType=INTEGER}
+        where skill_map_id = #{skillMapId,jdbcType=INTEGER} and is_del = 0
     </select>
     <select id="selectByConditionSelective" resultMap="BaseResultMap">
         select distinct

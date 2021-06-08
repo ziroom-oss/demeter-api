@@ -69,6 +69,7 @@ public class TreeController {
     @ApiOperation("移除指定 id 的 tree")
     @DeleteMapping("/{id}")
     public Resp<Integer> deleteTree(@PathVariable Integer id) {
+        // 100001 及之后的编号都是技能，100000不能删除作为根节点
         if (id < 100001) {
             return Resp.error("根节点不允许删除");
         }

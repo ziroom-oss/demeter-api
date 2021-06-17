@@ -58,4 +58,11 @@ public class EhrUserDetailResp {
 
     @ApiModelProperty("公司编码")
     private String setId;
+
+    @ApiModelProperty("职务编码")
+    private String jobCode;
+
+    @ApiModelProperty("职务编码-New")
+    private String jobCodeNew;
+
 }

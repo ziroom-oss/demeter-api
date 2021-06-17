@@ -10,19 +10,25 @@ import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterAssignTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrDeptResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrJoinTimeResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import com.ziroom.tech.demeterapi.service.TreeService;
+import java.time.temporal.ChronoUnit;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -342,4 +348,113 @@ public class PortraitServiceImpl implements PortraitService {
             return CurrentRole.PLAIN;
         }
     }
+
+    @Override
+    public CtoResp getCtoData(CTOReq ctoReq) {
+        CtoResp ctoResp = new CtoResp();
+
+        // 部门占比 name:技术保障中心 value: 45
+        Set<EhrDeptResp> childOrgList = ehrComponent.getChildOrgs(ctoReq.getDeptId(), "101");
+        List<Struct> deptList = new ArrayList<>(16);
+        childOrgList.forEach(dept -> {
+            Set<EhrUserResp> users = ehrComponent.getUsers(dept.getCode(), 101);
+            Struct dep = Struct.builder()
+                    .name(dept.getName())
+                    .value(users.size())
+                    .build();
+            deptList.add(dep);
+        });
+        deptList.sort(Comparator.comparing(Struct::getValue).reversed());
+        ctoResp.setDeptInfo(deptList);
+
+        // 职务占比
+        Set<EhrUserResp> users = ehrComponent.getUsers(ctoReq.getDeptId(), 101);
+        List<String> userCodes = users.stream().map(EhrUserResp::getUserCode).distinct().collect(Collectors.toList());
+        Set<EhrUserDetailResp> userRespSet = new HashSet<>(512);
+
+        List<List<String>> partition = Lists.partition(userCodes, 10);
+        partition.forEach(codeGroup -> {
+            String codeString = codeGroup.stream().collect(Collectors.joining(","));
+            List<EhrUserDetailResp> ehrUserDetail = ehrComponent.getEhrUserDetail(codeString);
+            if (CollectionUtils.isNotEmpty(ehrUserDetail)) {
+                userRespSet.addAll(ehrUserDetail);
+            }
+        });
+
+        List<Struct> jobList = new ArrayList<>(16);
+        userRespSet.stream().collect(
+                Collectors.groupingBy(x -> Optional.ofNullable(x.getDesc()).orElse(""), Collectors.counting()))
+        .forEach((key, value) -> {
+            Struct job = Struct.builder()
+                    .name(key)
+                    .value(value.intValue())
+                    .build();
+            jobList.add(job);
+        });
+        jobList.sort(Comparator.comparing(Struct::getValue).reversed());
+        ctoResp.setJobInfo(jobList);
+
+        // 职级占比
+        List<Struct> levelList = new ArrayList<>(16);
+        userRespSet.stream().collect(
+                Collectors.groupingBy(x -> Optional.ofNullable(x.getLevelName()).orElse(""), Collectors.counting()))
+                .forEach((key, value) -> {
+                    Struct level = Struct.builder()
+                            .name(key)
+                            .value(value.intValue())
+                            .build();
+                    levelList.add(level);
+                });
+        levelList.sort(Comparator.comparing(Struct::getValue).reversed());
+        ctoResp.setLevelInfo(levelList);
+
+        // 入职年限占比
+        List<Struct> hireDateList = new ArrayList<>(16);
+        Map<String, Integer> hireDateInfo = new HashMap<>(16);
+        hireDateInfo.put("<1年", 0);
+        hireDateInfo.put("1-3年", 0);
+        hireDateInfo.put("3-5年", 0);
+        hireDateInfo.put("5-10年", 0);
+        hireDateInfo.put(">10年", 0);
+        userCodes.forEach(userCode -> {
+            List<EhrJoinTimeResp> jointime = ehrComponent.getJointime(userCode);
+            if (CollectionUtils.isNotEmpty(jointime)) {
+                EhrJoinTimeResp ehrJoinTimeResp = jointime.get(0);
+                LocalDate entryDate = LocalDate.parse(ehrJoinTimeResp.getEntryTime(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+                long between = ChronoUnit.YEARS.between(entryDate, LocalDate.now());
+                if (between == 0) {
+                    Integer value = hireDateInfo.get("<1年");
+                    hireDateInfo.put("<1年", ++value);
+                } else if (between >= 1 && between < 3) {
+                    Integer value = hireDateInfo.get("1-3年");
+                    hireDateInfo.put("1-3年", ++value);
+                } else if (between >= 3 && between < 5) {
+                    Integer value = hireDateInfo.get("3-5年");
+                    hireDateInfo.put("3-5年", ++value);
+                } else if (between >= 5 && between < 10) {
+                    Integer value = hireDateInfo.get("5-10年");
+                    hireDateInfo.put("5-10年", ++value);
+                } else if (between >= 10) {
+                    Integer value = hireDateInfo.get(">10年");
+                    hireDateInfo.put(">10年", ++value);
+                }
+            }
+        });
+        hireDateInfo.forEach((key, value) -> {
+            Struct level = Struct.builder()
+                    .name(key)
+                    .value(value)
+                    .build();
+            hireDateList.add(level);
+        });
+        hireDateList.sort(Comparator.comparing(Struct::getValue).reversed());
+        ctoResp.setHireDateInfo(hireDateList);
+        return ctoResp;
+    }
+
+    @Override
+    public CtoDevResp getCtoDevData(CTOReq ctoReq) {
+        return codeAnalysisComponent.getDepartmentDe(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+    }
 }
+

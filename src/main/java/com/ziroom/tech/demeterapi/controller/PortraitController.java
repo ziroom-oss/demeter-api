@@ -1,16 +1,20 @@
 package com.ziroom.tech.demeterapi.controller;
 
 import com.ziroom.tech.demeterapi.po.dto.Resp;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PortrayalInfoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,6 +72,19 @@ public class PortraitController {
     @PostMapping("/metric")
     public Resp<EngineeringMetricResp> getEngineeringMetrics(@RequestBody EngineeringMetricReq engineeringMetricReq) {
         return Resp.success(portraitService.getEngineeringMetrics(engineeringMetricReq));
+    }
+
+
+    /**
+     * CTO视角
+     */
+    @PostMapping("/cto")
+    public Resp<CtoResp> getCtoData(@RequestBody CTOReq ctoReq) {
+        return Resp.success(portraitService.getCtoData(ctoReq));
+    }
+    @PostMapping("/cto/dev")
+    public Resp<CtoDevResp> getCtoDevData(@RequestBody CTOReq ctoReq) {
+        return Resp.success(portraitService.getCtoDevData(ctoReq));
     }
 
 }

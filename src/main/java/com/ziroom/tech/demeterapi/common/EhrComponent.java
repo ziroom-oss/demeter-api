@@ -130,6 +130,7 @@ public class EhrComponent {
             ehrUserDetailResp.setCenter(ehrUser.getString("center"));
             ehrUserDetailResp.setCenterId(ehrUser.getString("centerCode"));
             ehrUserDetailResp.setDesc(ehrUser.getString("descr"));
+            ehrUserDetailResp.setJobCodeNew(ehrUser.getString("jobCodeNew"));
             userList.add(ehrUserDetailResp);
         }
         log.info("EhrService.getEhrUserDetail request success result:{}", userList);

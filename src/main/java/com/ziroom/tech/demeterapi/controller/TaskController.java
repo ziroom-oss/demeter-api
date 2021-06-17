@@ -91,8 +91,9 @@ public class TaskController {
         return taskService.updateAssignTaskStatus(taskId, taskType, taskStatus);
     }
 
-    @PostMapping("/list/release")
-    @ApiOperation(value = "发布任务列表", httpMethod = "POST")
+//    @PostMapping("/list/release")
+//    @ApiOperation(value = "发布任务列表", httpMethod = "POST")
+    @RequestMapping(value = "/list/release")
     public Resp<PageListResp<ReleaseQueryResp>> getReleaseList(@RequestBody TaskListQueryReq taskListQueryReq) {
         taskListQueryReq.validate();
         return Resp.success(taskService.getReleaseList(taskListQueryReq));

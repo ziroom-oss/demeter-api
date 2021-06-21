@@ -82,6 +82,7 @@ public class PortraitController {
     public Resp<CtoResp> getCtoData(@RequestBody CTOReq ctoReq) {
         return Resp.success(portraitService.getCtoData(ctoReq));
     }
+
     @PostMapping("/cto/dev")
     public Resp<CtoDevResp> getCtoDevData(@RequestBody CTOReq ctoReq) {
         return Resp.success(portraitService.getCtoDevData(ctoReq));

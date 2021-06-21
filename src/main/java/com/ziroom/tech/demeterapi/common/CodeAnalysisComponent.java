@@ -9,8 +9,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DevOverviewStruct;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DevStruct;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
-import io.swagger.models.auth.In;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,7 +21,6 @@ import retrofit2.Call;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import retrofit2.http.Query;
 
 /**
  * @author daijiankun
@@ -44,6 +41,7 @@ public class CodeAnalysisComponent {
 
     public EngineeringMetricResp getDevelopmentEquivalent(String uid, Date fromDate, Date toDate) {
 
+        // TODO: 2021/6/18 terrible code structure!
         UserDetailResp userDetail = ehrComponent.getUserDetail(uid);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
@@ -136,6 +134,26 @@ public class CodeAnalysisComponent {
                 ctoDevResp.setProjectDevList(devStructList);
             }
         }
+
+        Call<JSONObject> call3 =
+                codeAnalysisApiEndPoint.getDEByMonth(departmentCode, formatter.format(from), formatter.format(to));
+        JSONObject response3 = RetrofitCallAdaptor.execute(call3);
+        if (Objects.nonNull(response3)) {
+            if (response1.getInteger("code").equals(200)) {
+                List<LinkedHashMap> list = (ArrayList) response3.get("data");
+                List<DevStruct> periodList = new ArrayList<>(16);
+                list.forEach(item -> {
+                    DevStruct devStruct = DevStruct.builder()
+                            .name((String) item.get("month"))
+                            .insertions((Integer) item.get("insertions"))
+                            .devEquivalent((Integer) item.get("devEquivalent"))
+                            .build();
+                    periodList.add(devStruct);
+                });
+                ctoDevResp.setPeriodList(periodList);
+            }
+        }
+
         return ctoDevResp;
     }
 }

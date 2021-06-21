@@ -1,6 +1,8 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
+import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
 import com.ziroom.tech.demeterapi.service.SkillPointService;
@@ -8,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +53,16 @@ public class SkillPointController {
     @PostMapping("/query")
     public Resp<Object> querySkillPoint(@RequestParam List<Integer> skillTreeId) {
         return Resp.success(skillPointService.querySkillPointFromTreeId(skillTreeId));
+    }
+
+    /**
+     * batch query someone skill points information
+     * @param batchQueryReq
+     * @return
+     */
+    @PostMapping("/batchQuery")
+    public Resp<List<DemeterTaskUser>> batchQuerySkillPoints(@RequestBody BatchQueryReq batchQueryReq) {
+        return Resp.success(skillPointService.batchQuerySkillPoints(batchQueryReq));
     }
 
 }

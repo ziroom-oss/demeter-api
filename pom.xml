@@ -170,7 +170,11 @@
 			<version>30.1.1-jre</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.ziroom.tech</groupId>
+			<artifactId>magic-starter-cache-springdata</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>demeter-api</finalName>

@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.magicframework.core.cache.CacheType;
+import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
@@ -379,6 +381,7 @@ public class EhrComponent {
      * @param setId    公司编码
      * @return Set<EhrDeptResp>
      */
+    @Cached(expire = 36000, cacheType = CacheType.BOTH)
     public Set<EhrDeptResp> getChildOrgs(String parentId, String setId) {
         log.info("EhrService.getChildOrgs params:{} {}", parentId, setId);
         Call<JSONObject> call = ehrApiEndPoint.getChildOrgs(parentId, setId);

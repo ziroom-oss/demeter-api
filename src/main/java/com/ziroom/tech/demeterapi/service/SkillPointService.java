@@ -1,7 +1,9 @@
 package com.ziroom.tech.demeterapi.service;
 
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
+import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
 
@@ -31,4 +33,6 @@ public interface SkillPointService {
     Resp<Object> updateSkillTask(SkillTaskReq skillTaskReq);
 
     Map<Integer, List<DemeterSkillTask>> querySkillPointFromTreeId(List<Integer> skillTreeId);
+
+    List<DemeterTaskUser> batchQuerySkillPoints(BatchQueryReq batchQueryReq);
 }

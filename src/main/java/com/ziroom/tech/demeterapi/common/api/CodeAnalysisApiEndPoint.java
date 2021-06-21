@@ -38,4 +38,11 @@ public interface CodeAnalysisApiEndPoint {
     @POST("/report/getDEBydepartmentGroupByProject")
     Call<JSONObject> getDByDepartmentProject(@Query("departmentCode") String departmentCode, @Query("fromDate") String fromDate, @Query("toDate") String toDate);
 
+    /**
+     * 周期工程指标
+     */
+    @POST("/report/getDEByMonth")
+    Call<JSONObject> getDEByMonth(@Query("departmentCode") String departmentCode, @Query("fromDate") String fromDate, @Query("toDate") String toDate);
+
+
 }

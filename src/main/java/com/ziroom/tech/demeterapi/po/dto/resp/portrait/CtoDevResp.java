@@ -27,5 +27,10 @@ public class CtoDevResp {
     /**
      * 周期工程指标统计
      */
-//    private List<DevStruct> period
+    private List<DevStruct> periodList;
+
+    /**
+     * 职级工程指标统计
+     */
+    private List<DevStruct> levelList;
 }

@@ -11,6 +11,7 @@ import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
 import com.ziroom.tech.demeterapi.dao.mapper.TaskFinishConditionDao;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
+import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
@@ -181,4 +182,13 @@ public class SkillPointServiceImpl implements SkillPointService {
         return Maps.newHashMap();
     }
 
+    @Override
+    public List<DemeterTaskUser> batchQuerySkillPoints(BatchQueryReq batchQueryReq) {
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskIdIn(batchQueryReq.getSkillIds())
+                .andReceiverUidEqualTo(batchQueryReq.getUid())
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode());
+        return demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+    }
 }

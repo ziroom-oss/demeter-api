@@ -683,6 +683,76 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andCheckRoleIsNull() {
+            addCriterion("check_role is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleIsNotNull() {
+            addCriterion("check_role is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleEqualTo(String value) {
+            addCriterion("check_role =", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleNotEqualTo(String value) {
+            addCriterion("check_role <>", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleGreaterThan(String value) {
+            addCriterion("check_role >", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleGreaterThanOrEqualTo(String value) {
+            addCriterion("check_role >=", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleLessThan(String value) {
+            addCriterion("check_role <", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleLessThanOrEqualTo(String value) {
+            addCriterion("check_role <=", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleLike(String value) {
+            addCriterion("check_role like", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleNotLike(String value) {
+            addCriterion("check_role not like", value, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleIn(List<String> values) {
+            addCriterion("check_role in", values, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleNotIn(List<String> values) {
+            addCriterion("check_role not in", values, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleBetween(String value1, String value2) {
+            addCriterion("check_role between", value1, value2, "checkRole");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckRoleNotBetween(String value1, String value2) {
+            addCriterion("check_role not between", value1, value2, "checkRole");
+            return (Criteria) this;
+        }
+
         public Criteria andTaskRemarkIsNull() {
             addCriterion("task_remark is null");
             return (Criteria) this;

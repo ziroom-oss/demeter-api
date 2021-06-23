@@ -43,6 +43,8 @@ public class DemeterSkillTask {
 
     private String publisher;
 
+    private String checkRole;
+
     private String taskRemark;
 
     private Integer skillId;
@@ -119,6 +121,14 @@ public class DemeterSkillTask {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public String getCheckRole() {
+        return checkRole;
+    }
+
+    public void setCheckRole(String checkRole) {
+        this.checkRole = checkRole;
     }
 
     public String getTaskRemark() {

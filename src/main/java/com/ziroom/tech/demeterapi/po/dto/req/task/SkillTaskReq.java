@@ -31,6 +31,8 @@ public class SkillTaskReq {
     @ApiModelProperty("技能值奖励")
     private Integer skillReward;
 
+    private List<Long> checkRoles;
+
     private List<String> taskFinishCondition;
 
     private Integer skillLevel;

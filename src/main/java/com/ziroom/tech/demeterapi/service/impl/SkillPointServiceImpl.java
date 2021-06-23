@@ -57,6 +57,7 @@ public class SkillPointServiceImpl implements SkillPointService {
         entity.setUpdateTime(new Date());
         entity.setSkillId(skillTaskReq.getSkillTreeId());
         entity.setSkillLevel(skillTaskReq.getSkillLevel());
+        entity.setCheckRole(skillTaskReq.getCheckRoles().stream().map(String::valueOf).collect(Collectors.joining(",")));
         List<String> taskFinishCondition = skillTaskReq.getTaskFinishCondition();
         MultipartFile attachment = skillTaskReq.getAttachment();
         if (Objects.nonNull(attachment)) {

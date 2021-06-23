@@ -33,10 +33,10 @@
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"
-               enableSelectByExample="true">
-            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
-        </table>
+<!--        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
 
 <!--        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
@@ -77,6 +77,16 @@
 <!--        </table>-->
 
 <!--        <table tableName="skill_map_skill" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="demeter_role" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="role_user" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->

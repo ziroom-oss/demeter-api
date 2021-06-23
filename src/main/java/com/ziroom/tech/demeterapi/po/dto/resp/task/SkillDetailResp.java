@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
+import com.ziroom.tech.demeterapi.dao.entity.DemeterRole;
 import com.ziroom.tech.demeterapi.dao.entity.TaskFinishCondition;
 import com.ziroom.tech.demeterapi.dao.entity.TaskFinishOutcome;
 import lombok.Data;
@@ -38,6 +39,12 @@ public class SkillDetailResp {
     private String publisher;
 
     private String publisherName;
+
+    private List<DemeterRole> checkRole;
+
+    private List<String> checkRoleUserList;
+
+    private List<String> checkRoleUserNameList;
 
     private List<String> taskReceiver;
 

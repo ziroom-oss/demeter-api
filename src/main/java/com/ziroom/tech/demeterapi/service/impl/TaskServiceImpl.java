@@ -23,6 +23,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
+import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,6 +69,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Resource
     private MessageService messageService;
+
+    @Resource
+    private RoleService roleService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1235,9 +1239,6 @@ public class TaskServiceImpl implements TaskService {
             taskFinishOutcomeRespList.add(outcomeResp);
         });
         resp.setTaskFinishOutcomeRespList(taskFinishOutcomeRespList);
-        // 技能类任务所有人可查看关联的技能图谱信息
-        // @daijr
-//        resp.setGraphInfo(new Object());
         return Resp.success(resp);
     }
 
@@ -1357,6 +1358,21 @@ public class TaskServiceImpl implements TaskService {
         UserDetailResp publisher = ehrComponent.getUserDetail(demeterSkillTask.getPublisher());
         if (Objects.nonNull(publisher)) {
             detailResp.setPublisherName(publisher.getUserName());
+        }
+        String checkRole = demeterSkillTask.getCheckRole();
+        if (StringUtils.isNotEmpty(checkRole)) {
+            List<Long> roleIds = Arrays.stream(checkRole.split(",")).map(Long::parseLong).collect(Collectors.toList());
+            List<DemeterRole> demeterRoles = roleService.batchQueryByIds(roleIds);
+            detailResp.setCheckRole(demeterRoles);
+            List<RoleUser> roleUsers = roleService.batchQueryUserByIds(roleIds);
+            if (CollectionUtils.isNotEmpty(roleUsers)) {
+                List<String> roleUserList = roleUsers.stream().map(RoleUser::getSystemCode).collect(Collectors.toList());
+                detailResp.setCheckRoleUserList(roleUserList);
+                Set<UserResp> userRespSet = ehrComponent.getUserDetail(new HashSet<>(roleUserList));
+                if (CollectionUtils.isNotEmpty(userRespSet)) {
+                    detailResp.setCheckRoleUserNameList(userRespSet.stream().map(UserResp::getName).collect(Collectors.toList()));
+                }
+            }
         }
         return detailResp;
     }

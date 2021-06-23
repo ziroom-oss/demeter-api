@@ -92,6 +92,7 @@ public class SkillPointServiceImpl implements SkillPointService {
         SkillDetailResp resp = new SkillDetailResp();
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
         BeanUtils.copyProperties(demeterSkillTask, resp);
+        resp.setCheckRoles(demeterSkillTask.getCheckRole());
         resp.setSkillTreeId(demeterSkillTask.getSkillId());
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -115,6 +116,7 @@ public class SkillPointServiceImpl implements SkillPointService {
         DemeterSkillTask entity = new DemeterSkillTask();
         BeanUtils.copyProperties(skillTaskReq, entity);
         entity.setSkillId(skillTaskReq.getSkillTreeId());
+        entity.setCheckRole(skillTaskReq.getCheckRoles().stream().map(String::valueOf).collect(Collectors.joining(",")));
 
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(skillTaskReq.getId());
 

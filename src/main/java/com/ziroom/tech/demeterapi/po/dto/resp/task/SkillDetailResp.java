@@ -40,6 +40,8 @@ public class SkillDetailResp {
 
     private String publisherName;
 
+    private String checkRoles;
+
     private List<DemeterRole> checkRole;
 
     private List<String> checkRoleUserList;

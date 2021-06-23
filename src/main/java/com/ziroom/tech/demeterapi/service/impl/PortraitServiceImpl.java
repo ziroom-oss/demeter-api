@@ -81,6 +81,7 @@ public class PortraitServiceImpl implements PortraitService {
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         DemeterTaskUserExample.Criteria demeterTaskUserExampleCriteria = demeterTaskUserExample.createCriteria();
         demeterTaskUserExampleCriteria.andReceiverUidEqualTo(dailyTaskReq.getUid());
+        demeterTaskUserExampleCriteria.andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
         Date startTime = dailyTaskReq.getStartTime();
         Date endTime = dailyTaskReq.getEndTime();
         if (Objects.nonNull(startTime) && Objects.nonNull(endTime)) {

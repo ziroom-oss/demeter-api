@@ -1,8 +1,8 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
-import com.magicframework.core.cache.CacheType;
-import com.magicframework.core.cache.Cached;
+//import com.magicframework.core.cacheommi.CacheType;
+//import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;

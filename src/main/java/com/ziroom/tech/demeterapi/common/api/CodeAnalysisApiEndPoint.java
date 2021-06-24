@@ -18,6 +18,9 @@ public interface CodeAnalysisApiEndPoint {
     @GET("/report/getDE")
     Call<JSONObject> getDevelopmentEquivalent(@Query("account") String email, @Query("fromDate") String fromDate, @Query("toDate") String toDate);
 
+    @POST("/report/getDE")
+    Call<JSONObject> getSingleDE(@Query("account") String email, @Query("fromDate") String fromDate, @Query("toDate") String toDate);
+
     @POST("/report/getDEByDepartment")
     Call<JSONObject> getDEByDepartment(@Query("departmentCode") String departmentCode, @Query("account") String account, @Query("fromDate") String fromDate, @Query("toDate") String toDate);
 

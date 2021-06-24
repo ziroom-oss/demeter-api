@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoOmegaResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
@@ -45,4 +46,8 @@ public interface PortraitService {
     CtoResp getCtoData(CTOReq ctoReq);
 
     CtoDevResp getCtoDevData(CTOReq ctoReq);
+
+    Object getCtoProjectData(CTOReq ctoReq);
+
+    CtoOmegaResp getCtoOmegaData(CTOReq ctoReq) throws Exception;
 }

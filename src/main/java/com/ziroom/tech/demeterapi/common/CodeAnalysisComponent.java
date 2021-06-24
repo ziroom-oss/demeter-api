@@ -47,7 +47,7 @@ public class CodeAnalysisComponent {
         String fromDateString = formatter.format(fromDate);
         String toDateString = formatter.format(toDate);
 
-        Call<JSONObject> call = codeAnalysisApiEndPoint.getDevelopmentEquivalent(userDetail.getEmail(), fromDateString, toDateString);
+        Call<JSONObject> call = codeAnalysisApiEndPoint.getSingleDE(userDetail.getEmail(), fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
 
         String success = "200";
@@ -62,11 +62,11 @@ public class CodeAnalysisComponent {
             if (deletions != null) {
                 resp.setDeletions(deletions);
             }
-            Integer devEquivalent = jsonObject.getInteger("dev_equivalent");
+            Integer devEquivalent = jsonObject.getInteger("devEquivalent");
             if (devEquivalent != null) {
                 resp.setDevEquivalent(devEquivalent);
             }
-            Integer commitCount = jsonObject.getInteger("commit_count");
+            Integer commitCount = jsonObject.getInteger("commitCount");
             if (commitCount != null) {
                 resp.setCommitCount(commitCount);
             }

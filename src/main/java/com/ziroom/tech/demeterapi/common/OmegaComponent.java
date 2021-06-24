@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
+import springfox.documentation.spring.web.json.Json;
 
 /**
  * @author daijiankun
@@ -39,37 +40,19 @@ public class OmegaComponent {
     @Resource
     private EhrComponent ehrComponent;
 
-    public void getDeployNorm(String uid, Date fromDate, Date toDate) {
+    public JSONArray getDeployNorm(String deptId, Date fromDate, Date toDate) {
 
-        // TODO: 2021/6/18 terrible code structure!
-        UserDetailResp userDetail = ehrComponent.getUserDetail(uid);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
         String toDateString = formatter.format(toDate);
 
-        Call<JSONObject> call = omegaApiEndPoint.getDeployNorm(userDetail.getEmail(), fromDateString, toDateString);
+        Call<JSONObject> call = omegaApiEndPoint.getDeployNorm(deptId, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
 
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
-            JSONObject jsonObject = response.getJSONObject(DATA_ATTRIBUTE);
-            EngineeringMetricResp resp = new EngineeringMetricResp();
-            Integer insertions = jsonObject.getInteger("insertions");
-            if (insertions != null) {
-                resp.setInsertions(insertions);
-            }
-            Integer deletions = jsonObject.getInteger("deletions");
-            if (deletions != null) {
-                resp.setDeletions(deletions);
-            }
-            Integer devEquivalent = jsonObject.getInteger("dev_equivalent");
-            if (devEquivalent != null) {
-                resp.setDevEquivalent(devEquivalent);
-            }
-            Integer commitCount = jsonObject.getInteger("commit_count");
-            if (commitCount != null) {
-                resp.setCommitCount(commitCount);
-            }
+            return response.getJSONArray(DATA_ATTRIBUTE);
         }
+        return new JSONArray();
     }
 }

@@ -51,7 +51,7 @@ server:
 retrofit:
   endpoints:
     - identity: ehr
-      baseUrl: http://ehrnew.kt.ziroom.com/
+      baseUrl: http://ehrnew.kp.ziroom.com/
     - identity: ehrapi
       baseUrl: http://ehr-api.kt.ziroom.com/
     - identity: storage
@@ -59,7 +59,7 @@ retrofit:
     - identity: ca
       baseUrl: http://ca.kt.ziroom.com/
     - identity: omega
-      baseUrl: http://omega-api.kt.ziroom.com/
+      baseUrl: http://omega-api.uat.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

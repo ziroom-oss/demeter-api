@@ -1,10 +1,13 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 //import com.magicframework.core.cacheommi.CacheType;
 //import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
+import com.ziroom.tech.demeterapi.common.OmegaComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
@@ -22,15 +25,15 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrJoinTimeResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import com.ziroom.tech.demeterapi.service.TreeService;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.temporal.ChronoUnit;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -61,8 +64,9 @@ public class PortraitServiceImpl implements PortraitService {
     @Resource
     private CodeAnalysisComponent codeAnalysisComponent;
     @Resource
+    private OmegaComponent omegaComponent;
+    @Resource
     private TreeService treeService;
-
     @Resource
     private HaloService haloService;
 
@@ -458,6 +462,49 @@ public class PortraitServiceImpl implements PortraitService {
     @Override
     public CtoDevResp getCtoDevData(CTOReq ctoReq) {
         return codeAnalysisComponent.getDepartmentDe(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+    }
+
+    @Override
+    public Object getCtoProjectData(CTOReq ctoReq) {
+        return null;
+    }
+
+    @Override
+    public CtoOmegaResp getCtoOmegaData(CTOReq ctoReq) throws Exception {
+        CtoOmegaResp resp = new CtoOmegaResp();
+        JSONArray deployNorm =
+                omegaComponent.getDeployNorm(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+        List<CtoOmegaResp> response = new ArrayList<>(16);
+        for (Object o : deployNorm) {
+            if (o instanceof LinkedHashMap) {
+                response.add(mapToObject((LinkedHashMap)o, CtoOmegaResp.class));
+            }
+        }
+        resp.setCiNum(response.stream().mapToInt(CtoOmegaResp::getCiNum).sum());
+        resp.setDeploymentNum(response.stream().mapToInt(CtoOmegaResp::getCiNum).sum());
+        resp.setRestartNum(response.stream().mapToInt(CtoOmegaResp::getRestartNum).sum());
+        resp.setOnlineNum(response.stream().mapToInt(CtoOmegaResp::getOnlineNum).sum());
+        resp.setRollbackNum(response.stream().mapToInt(CtoOmegaResp::getRollbackNum).sum());
+        return resp;
+    }
+
+    public static <T> T mapToObject(Map<Object, Object> map, Class<T> beanClass) throws Exception {
+        if (map == null) {
+            return null;
+        }
+        T obj = beanClass.newInstance();
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            int mod = field.getModifiers();
+            if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                continue;
+            }
+            field.setAccessible(true);
+            if (map.containsKey(field.getName())) {
+                field.set(obj, map.get(field.getName()));
+            }
+        }
+        return obj;
     }
 }
 

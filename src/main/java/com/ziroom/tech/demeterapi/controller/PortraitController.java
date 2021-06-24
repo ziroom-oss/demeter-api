@@ -7,6 +7,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoOmegaResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
@@ -83,9 +84,34 @@ public class PortraitController {
         return Resp.success(portraitService.getCtoData(ctoReq));
     }
 
+    /**
+     * CTO视角-开发类
+     * @param ctoReq
+     * @return
+     */
     @PostMapping("/cto/dev")
     public Resp<CtoDevResp> getCtoDevData(@RequestBody CTOReq ctoReq) {
         return Resp.success(portraitService.getCtoDevData(ctoReq));
+    }
+
+    /**
+     * CTO视角-项目类
+     * @param ctoReq
+     * @return
+     */
+    @PostMapping("/cto/project")
+    public Resp getCtoProjectData(@RequestBody CTOReq ctoReq) {
+        return Resp.success(portraitService.getCtoProjectData(ctoReq));
+    }
+
+    /**
+     * CTO视角-发布类
+     * @param ctoReq
+     * @return
+     */
+    @PostMapping("/cto/omega")
+    public Resp<CtoOmegaResp> getCtoOmegaData(@RequestBody CTOReq ctoReq) throws Exception {
+        return Resp.success(portraitService.getCtoOmegaData(ctoReq));
     }
 
 }

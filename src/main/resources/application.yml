@@ -60,6 +60,8 @@ retrofit:
       baseUrl: http://ca.kt.ziroom.com/
     - identity: omega
       baseUrl: http://omega-api.kp.ziroom.com/
+    - identity: worktop
+      baseUrl: http://management-api.kt.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

@@ -13,6 +13,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PortrayalInfoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopOverview;
 import java.util.Date;
 import java.util.List;
 
@@ -50,4 +51,6 @@ public interface PortraitService {
     Object getCtoProjectData(CTOReq ctoReq);
 
     CtoOmegaResp getCtoOmegaData(CTOReq ctoReq) throws Exception;
+
+    WorktopOverview getWorktopOverview(CTOReq ctoReq) throws Exception;
 }

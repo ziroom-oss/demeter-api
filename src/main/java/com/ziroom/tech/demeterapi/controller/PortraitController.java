@@ -114,4 +114,9 @@ public class PortraitController {
         return Resp.success(portraitService.getCtoOmegaData(ctoReq));
     }
 
+    @PostMapping("/cto/worktop")
+    public Resp getWorktopOverview(@RequestBody CTOReq ctoReq) throws Exception {
+        return Resp.success(portraitService.getWorktopOverview(ctoReq));
+    }
+
 }

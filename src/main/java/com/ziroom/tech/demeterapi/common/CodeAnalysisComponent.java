@@ -50,10 +50,10 @@ public class CodeAnalysisComponent {
         Call<JSONObject> call = codeAnalysisApiEndPoint.getSingleDE(userDetail.getEmail(), fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
 
+        EngineeringMetricResp resp = new EngineeringMetricResp();
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONObject jsonObject = response.getJSONObject(DATA_ATTRIBUTE);
-            EngineeringMetricResp resp = new EngineeringMetricResp();
             Integer insertions = jsonObject.getInteger("insertions");
             if (insertions != null) {
                 resp.setInsertions(insertions);
@@ -70,9 +70,8 @@ public class CodeAnalysisComponent {
             if (commitCount != null) {
                 resp.setCommitCount(commitCount);
             }
-            return resp;
         }
-        return null;
+        return resp;
     }
 
     public CtoDevResp getDepartmentDe(String departmentCode, Date from, Date to) {

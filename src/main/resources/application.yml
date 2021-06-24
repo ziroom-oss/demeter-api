@@ -51,7 +51,7 @@ server:
 retrofit:
   endpoints:
     - identity: ehr
-      baseUrl: http://ehrnew.kp.ziroom.com/
+      baseUrl: http://ehrnew.kt.ziroom.com/
     - identity: ehrapi
       baseUrl: http://ehr-api.kt.ziroom.com/
     - identity: storage

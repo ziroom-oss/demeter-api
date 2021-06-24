@@ -58,6 +58,8 @@ retrofit:
       baseUrl: http://storage.t.ziroom.com/
     - identity: ca
       baseUrl: http://ca.kt.ziroom.com/
+    - identity: omega
+      baseUrl: http://omega-api.kt.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

@@ -11,7 +11,11 @@ import com.ziroom.tech.demeterapi.po.dto.req.role.RoleQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.role.RoleUserReq;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.management.relation.Role;
 import lombok.extern.slf4j.Slf4j;
@@ -91,5 +95,21 @@ public class RoleServiceImpl implements RoleService {
         roleUserExample.createCriteria()
                 .andRoleIdIn(roleIds);
         return roleUserDao.selectByExample(roleUserExample);
+    }
+
+    @Override
+    public Map<String, List<DemeterRole>> queryRoleByUid(List<String> uidList) {
+        RoleUserExample roleUserExample = new RoleUserExample();
+        roleUserExample.createCriteria()
+                .andSystemCodeIn(uidList);
+        List<RoleUser> roleUsers = roleUserDao.selectByExample(roleUserExample);
+        Map<String, List<RoleUser>> roleMap = roleUsers.stream().collect(Collectors.groupingBy(RoleUser::getSystemCode));
+        Map<String, List<DemeterRole>> resp = new HashMap<>(16);
+        roleMap.forEach((key, value) -> {
+            List<Long> roleIdList = value.stream().map(RoleUser::getRoleId).collect(Collectors.toList());
+            List<DemeterRole> demeterRoles = batchQueryByIds(roleIdList);
+            resp.put(key, demeterRoles);
+        });
+        return resp;
     }
 }

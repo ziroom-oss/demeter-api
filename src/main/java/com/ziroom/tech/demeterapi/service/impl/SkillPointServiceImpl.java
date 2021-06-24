@@ -2,22 +2,35 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.StorageComponent;
+import com.ziroom.tech.demeterapi.common.enums.AssignTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.TaskIdPrefix;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.dao.entity.*;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterRoleDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
+import com.ziroom.tech.demeterapi.dao.mapper.RoleUserDao;
 import com.ziroom.tech.demeterapi.dao.mapper.TaskFinishConditionDao;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
+import com.ziroom.tech.demeterapi.po.dto.req.skill.CheckSkillReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
+import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiveQueryResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
+import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.SkillPointService;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -41,9 +54,17 @@ public class SkillPointServiceImpl implements SkillPointService {
     private TaskFinishConditionDao taskFinishConditionDao;
     @Resource
     private DemeterTaskUserDao demeterTaskUserDao;
-
     @Resource
     private StorageComponent storageComponent;
+    @Resource
+    private RoleUserDao roleUserDao;
+    @Resource
+    private DemeterRoleDao demeterRoleDao;
+    @Resource
+    private RoleService roleService;
+    @Resource
+    private EhrComponent ehrComponent;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -193,5 +214,105 @@ public class SkillPointServiceImpl implements SkillPointService {
                 .andReceiverUidEqualTo(batchQueryReq.getUid())
                 .andTaskTypeEqualTo(TaskType.SKILL.getCode());
         return demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+    }
+
+    @Override
+    public PageListResp<ReceiveQueryResp> getSkillPointsCheckList(CheckSkillReq checkSkillReq) {
+
+        PageListResp<ReceiveQueryResp> pageListResp = new PageListResp<>();
+        List<ReceiveQueryResp> respList = new ArrayList<>(16);
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        DemeterTaskUserExample.Criteria demeterTaskUserExampleCriteria = demeterTaskUserExample.createCriteria();
+
+        String systemCode = checkSkillReq.getSystemCode();
+        if (StringUtils.isNotEmpty(systemCode)) {
+            demeterTaskUserExampleCriteria.andReceiverUidEqualTo(systemCode);
+        }
+
+        ArrayList<Integer> showStatus =
+                Lists.newArrayList(SkillTaskFlowStatus.TO_AUTHENTICATE.getCode(), SkillTaskFlowStatus.PASS.getCode(),
+                        SkillTaskFlowStatus.FAILED.getCode());
+        demeterTaskUserExampleCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                .andTaskStatusIn(showStatus);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        List<Long> taskIds = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = demeterSkillTaskExample.createCriteria();
+
+        String nameOrNo = checkSkillReq.getNameOrNo();
+        if (StringUtils.isNotEmpty(nameOrNo)) {
+            if (nameOrNo.startsWith(TaskIdPrefix.SKILL_PREFIX.getDesc())) {
+                skillTaskExampleCriteria.andIdEqualTo(Long.parseLong(nameOrNo.split("-")[1]));
+            } else {
+                skillTaskExampleCriteria.andTaskNameLike(nameOrNo);
+            }
+        }
+        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>(16);
+        if (CollectionUtils.isNotEmpty(taskIds)) {
+            skillTaskExampleCriteria.andIdIn(taskIds);
+            demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+        }
+
+        Map<Long, DemeterSkillTask> skillTaskMap = demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function
+                .identity()));
+        Set<String> userId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
+        Set<String> skillPublisher = demeterSkillTasks.stream().map(DemeterSkillTask::getPublisher).collect(Collectors.toSet());
+        userId.addAll(skillPublisher);
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(userId);
+        Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+
+        /**
+         * 查询当前登录人的角色
+         */
+        Map<String, List<DemeterRole>> roleMap =
+                roleService.queryRoleByUid(Lists.newArrayList(OperatorContext.getOperator()));
+
+        demeterTaskUsers.forEach(taskUser -> {
+            ReceiveQueryResp resp = new ReceiveQueryResp();
+            DemeterSkillTask skill = skillTaskMap.get(taskUser.getTaskId());
+            List<Long> roles = Arrays.stream(skill.getCheckRole().split(",")).map(Long::parseLong).collect(Collectors.toList());
+            List<Long> demeterRoles = roleMap.get(OperatorContext.getOperator()).stream().map(DemeterRole::getId).collect(Collectors.toList());
+            if (!hasIntersection(roles, demeterRoles).isEmpty()) {
+                BeanUtils.copyProperties(skill, resp);
+                resp.setTaskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + skill.getId());
+                resp.setTaskType(TaskType.SKILL.getCode());
+                resp.setTaskTypeName(TaskType.SKILL.getDesc());
+                resp.setTaskReward(skill.getSkillReward());
+                resp.setReceiver(taskUser.getReceiverUid());
+                resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
+                resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                respList.add(resp);
+            }
+        });
+
+        respList.sort(Comparator.comparing(ReceiveQueryResp::getTaskFlowStatus));
+        pageListResp.setTotal(respList.size());
+        List<ReceiveQueryResp> rtv = respList.stream().skip(checkSkillReq.getStart()).limit(checkSkillReq.getPageSize()).collect(Collectors.toList());
+        pageListResp.setData(rtv);
+        return pageListResp;
+    }
+
+    /**
+     * 交集
+     * @param lists lists
+     * @param <T> T
+     * @return List<T>
+     */
+    @SafeVarargs
+    private final <T> List<T> hasIntersection(List<T>... lists) {
+        if (lists.length <= 0) {
+            return Lists.newArrayList();
+        }
+        if (lists.length == 1) {
+            return lists[0];
+        }
+        List<T> res = lists[0];
+        for (List<T> list: lists) {
+            res.retainAll(list);
+        }
+        return res;
     }
 }

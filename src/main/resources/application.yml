@@ -59,7 +59,7 @@ retrofit:
     - identity: ca
       baseUrl: http://ca.kt.ziroom.com/
     - identity: omega
-      baseUrl: http://omega-api.uat.ziroom.com/
+      baseUrl: http://omega-api.kp.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

@@ -135,6 +135,8 @@ public class TaskServiceImpl implements TaskService {
                     DemeterTaskUser update = DemeterTaskUser.builder()
                             .id(demeterTaskUser.getId())
                             .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
+                            .modifyId(OperatorContext.getOperator())
+                            .modifyTime(new Date())
                             .build();
                     demeterTaskUserDao.updateByPrimaryKeySelective(update);
                 } else {
@@ -206,6 +208,7 @@ public class TaskServiceImpl implements TaskService {
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
         entity.setUpdateTime(new Date());
+        entity.setModifyId(OperatorContext.getOperator());
 
         MultipartFile attachment = assignTaskReq.getAttachment();
         if (Objects.nonNull(attachment)) {
@@ -246,6 +249,8 @@ public class TaskServiceImpl implements TaskService {
                     DemeterSkillTask update = new DemeterSkillTask();
                     update.setId(taskId);
                     update.setTaskStatus(SkillTaskStatus.UNFORBIDDEN.getCode());
+                    update.setUpdateTime(new Date());
+                    update.setModifyId(OperatorContext.getOperator());
                     demeterSkillTaskDao.updateByPrimaryKeySelective(update);
                     break;
                 case FORBIDDEN:
@@ -256,6 +261,8 @@ public class TaskServiceImpl implements TaskService {
                     DemeterSkillTask updateForbidden = new DemeterSkillTask();
                     updateForbidden.setId(taskId);
                     updateForbidden.setTaskStatus(SkillTaskStatus.FORBIDDEN.getCode());
+                    updateForbidden.setModifyId(OperatorContext.getOperator());
+                    updateForbidden.setUpdateTime(new Date());
                     demeterSkillTaskDao.updateByPrimaryKeySelective(updateForbidden);
                     break;
                 default:
@@ -273,6 +280,8 @@ public class TaskServiceImpl implements TaskService {
                 DemeterAssignTask update = new DemeterAssignTask();
                 update.setId(taskId);
                 update.setTaskStatus(AssignTaskStatus.ONGOING.getCode());
+                update.setUpdateTime(new Date());
+                update.setModifyId(OperatorContext.getOperator());
                 demeterAssignTaskDao.updateByPrimaryKeySelective(update);
             } else if (taskStatus.equals(AssignTaskStatus.CLOSED.getCode())) {
                 if (demeterAssignTask.getTaskStatus().equals(AssignTaskStatus.CLOSED.getCode())) {
@@ -296,6 +305,8 @@ public class TaskServiceImpl implements TaskService {
                 DemeterAssignTask update = new DemeterAssignTask();
                 update.setId(taskId);
                 update.setTaskStatus(AssignTaskStatus.CLOSED.getCode());
+                update.setUpdateTime(new Date());
+                update.setModifyId(OperatorContext.getOperator());
                 demeterAssignTaskDao.updateByPrimaryKeySelective(update);
             }
             return Resp.success();
@@ -1089,6 +1100,8 @@ public class TaskServiceImpl implements TaskService {
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
             DemeterTaskUser updateEntity = demeterTaskUsers.get(0);
+            updateEntity.setModifyTime(new Date());
+            updateEntity.setModifyId(OperatorContext.getOperator());
             if (TaskType.getByCode(taskType).equals(TaskType.SKILL)) {
                 updateEntity.setTaskStatus(SkillTaskFlowStatus.TO_AUTHENTICATE.getCode());
             } else if (TaskType.getByCode(taskType).equals(TaskType.ASSIGN)) {
@@ -1112,7 +1125,11 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(TaskType.ASSIGN.getCode())
                 .andReceiverUidEqualTo(OperatorContext.getOperator());
-        DemeterTaskUser update = DemeterTaskUser.builder().taskStatus(AssignTaskFlowStatus.FINISHED.getCode()).build();
+        DemeterTaskUser update = DemeterTaskUser.builder()
+                .taskStatus(AssignTaskFlowStatus.FINISHED.getCode())
+                .modifyId(OperatorContext.getOperator())
+                .modifyTime(new Date())
+                .build();
         demeterTaskUserDao.updateByExampleSelective(update, updateExample);
         return Resp.success();
     }
@@ -1485,6 +1502,8 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskEndTimeLessThan(new Date());
         DemeterTaskUser updated = DemeterTaskUser.builder()
                 .taskStatus(AssignTaskFlowStatus.UNFINISHED.getCode())
+                .modifyTime(new Date())
+                .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByExampleSelective(updated, demeterTaskUserExample);
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
@@ -1529,6 +1548,7 @@ public class TaskServiceImpl implements TaskService {
         DemeterSkillTask update = new DemeterSkillTask();
         update.setId(id);
 //        update.setSkillId(skillTreeId);
+        update.setModifyId(OperatorContext.getOperator());
         demeterSkillTaskDao.updateByPrimaryKeySelective(update);
         return true;
     }

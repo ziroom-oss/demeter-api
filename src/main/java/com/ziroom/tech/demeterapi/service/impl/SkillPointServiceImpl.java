@@ -284,11 +284,13 @@ public class SkillPointServiceImpl implements SkillPointService {
                 resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
                 resp.setTaskFlowStatus(taskUser.getTaskStatus());
                 resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                resp.setSubmitCheckTime(taskUser.getModifyTime());
                 respList.add(resp);
             }
         });
 
         respList.sort(Comparator.comparing(ReceiveQueryResp::getTaskFlowStatus));
+        respList.sort(Comparator.comparing(ReceiveQueryResp::getSubmitCheckTime).reversed());
         pageListResp.setTotal(respList.size());
         List<ReceiveQueryResp> rtv = respList.stream().skip(checkSkillReq.getStart()).limit(checkSkillReq.getPageSize()).collect(Collectors.toList());
         pageListResp.setData(rtv);

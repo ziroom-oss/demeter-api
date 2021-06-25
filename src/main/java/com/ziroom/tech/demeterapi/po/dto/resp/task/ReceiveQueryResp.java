@@ -56,4 +56,6 @@ public class ReceiveQueryResp {
     private String createId;
 
     private String modifyId;
+
+    private Date submitCheckTime;
 }

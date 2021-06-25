@@ -1,7 +1,5 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.worktop;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 

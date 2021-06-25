@@ -26,6 +26,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.KVResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopOverview;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
@@ -494,9 +495,21 @@ public class PortraitServiceImpl implements PortraitService {
         WorktopOverview worktopOverview = WorktopOverview.builder().build();
         JSONArray worktopResp =
                 worktopComponent.getWorktopOverview(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
-        // TODO: 2021/6/25
-
-        return worktopOverview;
+        List<KVResp> respList = new ArrayList<>(16);
+        for (Object o : worktopResp) {
+            if (o instanceof LinkedHashMap) {
+                KVResp resp = mapToObject((LinkedHashMap) o, KVResp.class);
+                respList.add(resp);
+            }
+        }
+        Map<String, KVResp> kvRespMap = respList.stream().collect(Collectors.toMap(KVResp::getKey, Function.identity()));
+        return WorktopOverview.builder()
+                .projectAvg(Optional.ofNullable(kvRespMap.get("projectAvg")).map(KVResp::getValue).orElse(""))
+                .projectCount(Optional.ofNullable(kvRespMap.get("projectCount")).map(KVResp::getValue).orElse(""))
+                .taskAvg(Optional.ofNullable(kvRespMap.get("taskAvg")).map(KVResp::getValue).orElse(""))
+                .taskCount(Optional.ofNullable(kvRespMap.get("taskCount")).map(KVResp::getValue).orElse(""))
+                .workTimeCount(Optional.ofNullable(kvRespMap.get("workTimeCount")).map(KVResp::getValue).orElse(""))
+                .build();
     }
 
     public static <T> T mapToObject(Map<Object, Object> map, Class<T> beanClass) throws Exception {

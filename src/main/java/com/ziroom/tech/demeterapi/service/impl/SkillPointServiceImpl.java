@@ -289,8 +289,7 @@ public class SkillPointServiceImpl implements SkillPointService {
             }
         });
 
-        respList.sort(Comparator.comparing(ReceiveQueryResp::getTaskFlowStatus));
-        respList.sort(Comparator.comparing(ReceiveQueryResp::getSubmitCheckTime).reversed());
+        respList.sort(Comparator.comparing(ReceiveQueryResp::getTaskFlowStatus).thenComparing(ReceiveQueryResp::getSubmitCheckTime, Comparator.reverseOrder()));
         pageListResp.setTotal(respList.size());
         List<ReceiveQueryResp> rtv = respList.stream().skip(checkSkillReq.getStart()).limit(checkSkillReq.getPageSize()).collect(Collectors.toList());
         pageListResp.setData(rtv);

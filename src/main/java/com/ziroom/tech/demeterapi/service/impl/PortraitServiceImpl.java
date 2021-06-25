@@ -1,13 +1,7 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.parser.Feature;
 import com.google.common.collect.Lists;
-//import com.magicframework.core.cacheommi.CacheType;
-//import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.OmegaComponent;
@@ -32,7 +26,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.worktop.KVResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopOverview;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
@@ -42,7 +35,6 @@ import java.lang.reflect.Modifier;
 import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.checkerframework.checker.units.qual.K;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -197,7 +189,7 @@ public class PortraitServiceImpl implements PortraitService {
             List<RadarGraph> radarGraphList = new ArrayList<>(6);
             List<RadarGraph> skills = new ArrayList<>(6);
             for (int i = 0; i < 6; i++) {
-                if (radarGraphs.size() - 1 > i) {
+                if (radarGraphs.size() - 1 >= i) {
                     Map.Entry<Integer, Long> entry = radarGraphs.get(i);
                     SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
                     RadarGraph graph = new RadarGraph();
@@ -390,7 +382,7 @@ public class PortraitServiceImpl implements PortraitService {
 
         List<List<String>> partition = Lists.partition(userCodes, 10);
         partition.forEach(codeGroup -> {
-            String codeString = codeGroup.stream().collect(Collectors.joining(","));
+            String codeString = String.join(",", codeGroup);
             List<EhrUserDetailResp> ehrUserDetail = ehrComponent.getEhrUserDetail(codeString);
             if (CollectionUtils.isNotEmpty(ehrUserDetail)) {
                 userRespSet.addAll(ehrUserDetail);
@@ -499,23 +491,12 @@ public class PortraitServiceImpl implements PortraitService {
 
     @Override
     public WorktopOverview getWorktopOverview(CTOReq ctoReq) throws Exception {
+        WorktopOverview worktopOverview = WorktopOverview.builder().build();
         JSONArray worktopResp =
                 worktopComponent.getWorktopOverview(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
-        List<KVResp> respList = new ArrayList<>(16);
-        for (Object o : worktopResp) {
-            if (o instanceof LinkedHashMap) {
-                KVResp resp = mapToObject((LinkedHashMap) o, KVResp.class);
-                respList.add(resp);
-            }
-        }
-        Map<String, KVResp> kvRespMap = respList.stream().collect(Collectors.toMap(KVResp::getKey, Function.identity()));
-        return WorktopOverview.builder()
-                .projectAvg(Optional.ofNullable(kvRespMap.get("projectAvg")).map(KVResp::getValue).orElse(""))
-                .projectCount(Optional.ofNullable(kvRespMap.get("projectCount")).map(KVResp::getValue).orElse(""))
-                .taskAvg(Optional.ofNullable(kvRespMap.get("taskAvg")).map(KVResp::getValue).orElse(""))
-                .taskCount(Optional.ofNullable(kvRespMap.get("taskCount")).map(KVResp::getValue).orElse(""))
-                .workTimeCount(Optional.ofNullable(kvRespMap.get("workTimeCount")).map(KVResp::getValue).orElse(""))
-                .build();
+        // TODO: 2021/6/25
+
+        return worktopOverview;
     }
 
     public static <T> T mapToObject(Map<Object, Object> map, Class<T> beanClass) throws Exception {

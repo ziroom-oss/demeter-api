@@ -22,7 +22,7 @@ public class CaffeineCacheConfig {
         Caffeine caffeine = Caffeine.newBuilder()
                 .initialCapacity(10000)
                 .maximumSize(1000)
-                .expireAfterWrite(30,TimeUnit.SECONDS);
+                .expireAfterWrite(6,TimeUnit.HOURS);
 
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setAllowNullValues(true);

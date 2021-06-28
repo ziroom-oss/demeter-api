@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 //import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
+import com.ziroom.tech.demeterapi.config.RecordLogger;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrOrgListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.*;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 
@@ -68,6 +70,7 @@ public class EhrComponent {
      * @param deptId 部门编码
      * @return Set<EhrUserResp>
      */
+    @RecordLogger
     public Set<EhrUserResp> getUsers(String deptId, Integer setId) {
         log.info("EhrComponent.getUsers params:{} {}", deptId, setId);
         if (Objects.isNull(setId)) {
@@ -100,6 +103,8 @@ public class EhrComponent {
      * @param uidString 用户系统号列表
      * @return List<User>
      */
+    @RecordLogger
+    @Cacheable(value = "guava")
     public List<EhrUserDetailResp> getEhrUserDetail(String uidString) {
         log.info("EhrService.getEhrUserDetail params:{}", uidString);
         List<String> strings = Arrays.asList(uidString.split(","));
@@ -382,6 +387,7 @@ public class EhrComponent {
      * @return Set<EhrDeptResp>
      */
 //    @Cached(expire = 36000, cacheType = CacheType.BOTH)
+    @RecordLogger
     public Set<EhrDeptResp> getChildOrgs(String parentId, String setId) {
         log.info("EhrService.getChildOrgs params:{} {}", parentId, setId);
         Call<JSONObject> call = ehrApiEndPoint.getChildOrgs(parentId, setId);
@@ -439,6 +445,8 @@ public class EhrComponent {
         return ehrDeptRespMap;
     }
 
+    @RecordLogger
+    @Cacheable("guava")
     public List<EhrJoinTimeResp> getJointime(String empCode) {
         Call<JSONObject> call = ehrApiEndPoint.getJointime(empCode, 1, 10);
         JSONObject response = RetrofitCallAdaptor.execute(call);

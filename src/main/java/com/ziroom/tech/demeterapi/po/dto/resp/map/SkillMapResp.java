@@ -16,6 +16,8 @@ public class SkillMapResp {
     private String name;
     @ApiModelProperty("适用职务")
     private String jobName;
+    @ApiModelProperty("适用职务 id")
+    private Integer jobId;
     @ApiModelProperty("创建时间")
     private Date createTime;
     @ApiModelProperty("最后更新时间")

@@ -76,10 +76,10 @@
 <!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--        </table>-->
 
-<!--        <table tableName="skill_map_skill" enableCountByExample="true" enableUpdateByExample="true"-->
-<!--               enableSelectByExample="true">-->
-<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
-<!--        </table>-->
+        <table tableName="skill_map_skill_bk" enableCountByExample="true" enableUpdateByExample="true"
+               enableSelectByExample="true">
+            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
+        </table>
 
 <!--        <table tableName="demeter_role" enableCountByExample="true" enableUpdateByExample="true"-->
 <!--               enableSelectByExample="true">-->

@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.service;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMap;
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
 
+import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryData;
 import java.util.List;
 
 public interface MapService {
@@ -36,4 +37,9 @@ public interface MapService {
      * 返回指定 id 的技术图谱
      */
     SkillMap selectByPrimaryKey(Long id);
+
+    /**
+     * 技能图谱汇总数据-个人
+     */
+    SummaryData getSkillGraphData();
 }

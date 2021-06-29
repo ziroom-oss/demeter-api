@@ -21,6 +21,9 @@ public class UserDetailResp {
     @ApiModelProperty("职务 P:主职")
     private String job;
 
+    @ApiModelProperty("职务 ID")
+    private String jobId;
+
     @ApiModelProperty("部门")
     private String dept;
 

@@ -530,5 +530,11 @@ public class PortraitServiceImpl implements PortraitService {
         }
         return obj;
     }
+
+    @Override
+    public UserDetailResp getEmployeeDetail(String uid) {
+        UserDetailResp userDetailResp = ehrComponent.getUserDetail(uid);
+        return userDetailResp;
+    }
 }
 

@@ -216,6 +216,7 @@ public class EhrComponent {
                 JSONArray data = respData.getJSONArray(DATA_ATTRIBUTE);
                 data.stream().map(o -> JSONObject.parseObject(JSON.toJSONString(o))).filter(jsonObject -> Objects.equals(jsonObject.getString(
                         "jobIndicator"), "P")).forEach(jsonObject -> {
+                    userDetailResp.setJobId(jsonObject.getString("jobCode"));
                     userDetailResp.setJob(jsonObject.getString("descr"));
                     userDetailResp.setDept(jsonObject.getString("dept"));
                     userDetailResp.setDeptCode(jsonObject.getString("deptCode"));

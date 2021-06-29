@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoOmegaResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoResp;
@@ -16,10 +17,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -46,6 +44,15 @@ public class PortraitController {
     public Resp<List<EmployeeListResp>> getEmployeeList(@RequestBody EmployeeListReq employeeListReq) {
         List<EmployeeListResp> employeeList = portraitService.getEmployeeList(employeeListReq);
         return Resp.success(employeeList);
+    }
+
+    /**
+     * 员工详情
+     */
+    @GetMapping("/user/{uid}")
+    public Resp<UserDetailResp> getUserDetail(@PathVariable String uid) {
+        UserDetailResp userDetailResp = portraitService.getEmployeeDetail(uid);
+        return Resp.success(userDetailResp);
     }
 
     /**

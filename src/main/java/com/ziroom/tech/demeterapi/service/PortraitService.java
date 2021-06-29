@@ -5,6 +5,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PortrayalInfoReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoOmegaResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoResp;
@@ -28,6 +29,13 @@ public interface PortraitService {
      * @return EmployeeListResp
      */
     List<EmployeeListResp> getEmployeeList(EmployeeListReq employeeListReq);
+
+    /**
+     * 员工详情（当前登陆用户）
+     * @param uid
+     * @return
+     */
+    UserDetailResp getEmployeeDetail(String uid);
 
     /**
      * 查询当前登录人的指派类任务指标

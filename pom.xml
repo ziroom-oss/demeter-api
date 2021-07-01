@@ -185,6 +185,38 @@
 			<version>1.9.4</version>
 		</dependency>
 
+		<dependency>
+			<artifactId>gear-boot</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>druid</artifactId>
+					<groupId>com.alibaba</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>fastjson</artifactId>
+					<groupId>com.alibaba</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>apollo-client</artifactId>
+					<groupId>com.ziroom.framework.apollo</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-collections4</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>org.javassist</groupId>
+				</exclusion>
+			</exclusions>
+			<groupId>com.ziroom.gaea</groupId>
+			<version>3.0.2-SNAPSHOT</version>
+		</dependency>
+
 
 		<!--		<dependency>-->
 <!--			<groupId>com.ziroom.tech</groupId>-->

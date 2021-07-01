@@ -7,10 +7,10 @@ import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.StorageComponent;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
+import com.ziroom.tech.demeterapi.core.SkillNode;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
-
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
@@ -49,6 +49,16 @@ public class TaskServiceImpl implements TaskService {
     private DemeterSkillTaskDao demeterSkillTaskDao;
     @Resource
     private DemeterTaskUserDao demeterTaskUserDao;
+
+    @Resource
+    private DemeterTaskUserExtendDao demeterTaskUserExtendDao;
+
+    @Resource
+    private DemeterUserLearnManifestDao demeterUserLearnManifestDao;
+
+    @Resource
+    private DemeterSkillLearnPathDao demeterSkillLearnPathDao;
+
     @Resource
     private DemeterAuthHistoryDao demeterAuthHistoryDao;
     @Resource
@@ -696,6 +706,266 @@ public class TaskServiceImpl implements TaskService {
         pageListResp.setData(rtv);
         return pageListResp;
     }
+
+    /**
+     * @param req
+     * @return {@link Resp}
+     * @throws
+     * @author lipp3
+     * @date 2021/6/30 11:06
+     * @Description 分配技能学习任务 TODO
+     */
+    @Transactional
+    @Override
+    public Resp createSkillLearnManifest(createSkillLearnManifestReq req) {
+
+        //1.【demeter_user_learn_manifest】创建学习清单
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .assignerUid(OperatorContext.getOperator())
+                .learnerUid(req.getLearner())
+                .name(req.getName())
+                .learnPeriod(req.getLearnPeriod())
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+
+        demeterUserLearnManifestDao.insertSelective(manifest);
+        long manifestId = manifest.getId();
+
+                //2.创建技能点学习任务
+        String learnerUid = req.getLearner();
+        req.getSkillPathes().entrySet().stream().forEach(entry -> {
+            Long skillId = Long.valueOf(entry.getKey());
+            List<String> learnPathes = entry.getValue();
+
+            //2.1如果技能点编号不存在，则抛出异常
+            DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
+            if (Objects.isNull(skillTask)){
+                throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
+            }
+
+            //2.2如果是员工已经学习过的技能点，则抛出异常
+            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+            demeterTaskUserExample.createCriteria()
+                    .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                    .andReceiverUidEqualTo(learnerUid)
+                    .andTaskIdEqualTo(skillId);
+            List<DemeterTaskUser> taskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+            if (taskUsers.size() > 0){
+                throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, skillId));
+            }
+            //2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
+            DemeterTaskUser entity = DemeterTaskUser.builder()
+                    .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
+                    .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
+                    .taskType(TaskType.SKILL.getCode())
+                    .receiverUid(OperatorContext.getOperator())
+                    .taskId(skillId)
+                    .createTime(new Date())
+                    .modifyTime(new Date())
+                    .createId(OperatorContext.getOperator())
+                    .modifyId(OperatorContext.getOperator())
+                    .build();
+            demeterTaskUserDao.insertSelective(entity);
+            long taskUserId = entity.getId();
+
+            //2.4【demeter_task_user_extend】表demeter_task_user_extend关联task_user_id到demeter_task_user主键，关联manifest_id到demeter_user_learn_manifest主键
+            DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
+                    .taskUserId(taskUserId)
+                    .taskId(skillId)
+                    .manifestId(manifestId)
+                    .createTime(new Date())
+                    .modifyTime(new Date())
+                    .createId(OperatorContext.getOperator())
+                    .modifyId(OperatorContext.getOperator())
+                    .build();
+            demeterTaskUserExtendDao.insertSelective(userExtend);
+
+            //2.5【demeter_skill_learn_path】添加学习路径
+            learnPathes.stream().forEach(path -> {
+                DemeterSkillLearnPath demeterSkillLearnPath = DemeterSkillLearnPath.builder()
+                        .taskUserId(taskUserId)
+                        .taskId(skillId)
+                        .path(path)
+                        .createTime(new Date())
+                        .modifyTime(new Date())
+                        .createId(OperatorContext.getOperator())
+                        .modifyId(OperatorContext.getOperator())
+                        .build();
+                demeterSkillLearnPathDao.insertSelective(demeterSkillLearnPath);
+            });
+        });
+
+        return Resp.success();
+    }
+
+    /**
+     * 查询分配技能学习清单
+     *
+     * @param req 任务列表查询请求体
+     * @return Resp
+     */
+    @Override
+    public PageListResp<SkillLearnManifestResp> getSkillLearnManifest(GetSkillLearnManifestReq req) {
+        PageListResp<SkillLearnManifestResp> pageListResp = new PageListResp<>();
+        //1.【demeter_user_learn_manifest】根据清单名称或清单编号查询demeter_user_learn_manifest表
+        DemeterUserLearnManifestExample example = new DemeterUserLearnManifestExample();
+        DemeterUserLearnManifestExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotEmpty(req.getManifestName())){
+            criteria.andNameLike(req.getManifestName());
+        }
+        if (Objects.nonNull(req.getManifestId())){
+            criteria.andIdEqualTo(req.getManifestId());
+        }
+        List<DemeterUserLearnManifest> manifests = demeterUserLearnManifestDao.selectByExample(example);
+
+        //2.【demeter_task_user_extend】根据demeter_user_learn_manifest主键id关联demeter_task_user_extend的manifest_id查询清单下面的所有task_Id
+        List<SkillLearnManifestResp> manifestResps = new ArrayList<>();
+        manifests.stream().forEach(manifest -> {
+            SkillLearnManifestResp skillLearnManifestResp = new SkillLearnManifestResp();
+            BeanUtils.copyProperties(manifest, skillLearnManifestResp);
+            DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
+            extendExample.createCriteria()
+                    .andManifestIdEqualTo(manifest.getId());
+            List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+            boolean passed = true;
+            for(DemeterTaskUserExtend extend : taskUserExtends){
+                DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
+                if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
+                    passed = false;
+                    break;
+                }
+            }
+            if (passed){
+                skillLearnManifestResp.setStatus(SkillManifestFlowStatus.PASS.getCode());
+            }else{
+                skillLearnManifestResp.setStatus(SkillManifestFlowStatus.ONGOING.getCode());
+            }
+            manifestResps.add(skillLearnManifestResp);
+        });
+
+        List<SkillLearnManifestResp> resps = manifestResps.stream().skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
+
+        pageListResp.setTotal(manifestResps.size());
+        pageListResp.setData(resps);
+
+        return pageListResp;
+    }
+
+    /**
+     * @param manifestId 清单id
+     * @return {@link Resp}
+     * @throws
+     * @author
+     * @date 2021/7/1 9:24
+     * @Description TODO
+     */
+    @Override
+    public SkillLearnManifestDetailResp getSkillLearnManifestDetail(Long manifestId) {
+        DemeterUserLearnManifest manifest = demeterUserLearnManifestDao.selectByPrimaryKey(manifestId);
+        if (Objects.isNull(manifest)){
+            return null;
+        }
+        SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
+        BeanUtils.copyProperties(manifest, detailResp);
+        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+        return detailResp;
+    }
+
+    /**
+     * @param manifestId
+     * @return {@link Resp<ManifestSkillLearnGrapeResp>}
+     * @throws
+     * @author
+     * @date 2021/7/1 11:10
+     * @Description 根据清单id获取技能学习图谱  TODO
+     */
+    @Override
+    public ManifestSkillLearnGrapeResp getManifestSkillGrape(Long manifestId) {
+        ManifestSkillLearnGrapeResp learnGrapeResp = new ManifestSkillLearnGrapeResp();
+
+        //1.根据manifestId获取所有demeter_task_user_extend
+        DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
+        extendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId);
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+
+        taskUserExtends.stream().forEach(extend -> {
+            Long taskId = extend.getTaskUserId();
+            Long skillId = extend.getTaskId();
+            //2.获取技能层次结构
+            SkillHierarchyResp skillHierarchy = getSkillHierarchy(skillId);
+            SkillHierarchyResp skillParent = skillHierarchy;
+            SkillNode rootNode = null;
+            SkillNode childNode = null;
+            while (Objects.nonNull(skillParent)){
+                Long id = skillParent.getId();
+                Long parentId = skillParent.getParentId();
+                String name = skillParent.getName();
+                if (Objects.isNull(rootNode)) {
+                    rootNode = new SkillNode(id, parentId, name);
+                    childNode = rootNode;
+                }else{
+                    childNode = childNode.getOrAddChild(new SkillNode(parentId, id, name));
+                }
+
+                skillParent = skillParent.getChild();
+            }
+            if (Objects.isNull(childNode)){
+                return;
+            }
+
+            DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
+            learnPathExample.createCriteria()
+                    .andTaskUserIdEqualTo(taskId);
+            //3.获取技能点学习路径
+            List<DemeterSkillLearnPath> skillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
+            for (DemeterSkillLearnPath tmp : skillLearnPaths){
+                childNode.addChild(new SkillNode(childNode.getId(), null, tmp.getPath()));
+            }
+            learnGrapeResp.getSkillTree().addBranch(rootNode);
+        });
+
+        return learnGrapeResp;
+    }
+
+    /**
+     * @param skillId
+     * @return {@link SkillHierarchyResp}
+     * @throws
+     * @author
+     * @date 2021/7/1 10:49
+     * @Description 获取技能点的层级结构
+     */
+    @Override
+    public SkillHierarchyResp getSkillHierarchy(Long skillId) {
+        //1.获取技能点信息
+        DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
+        Integer parentId = skillTask.getSkillId();
+        SkillHierarchyResp child = new SkillHierarchyResp();
+        SkillHierarchyResp parent = null;
+        child.setId(skillId);
+        child.setName(skillTask.getTaskName());
+        child.setParentId(Long.valueOf(parentId));
+
+        //2.获取技能树信息
+        while (parentId != 0) {
+            SkillTree skillTree = skillTreeDao.selectByPrimaryKey(parentId);
+            parentId = skillTree.getParentId();
+            parent = new SkillHierarchyResp();
+            parent.setId(Long.valueOf(skillTree.getId()));
+            parent.setName(skillTree.getName());
+            parent.setParentId(Long.valueOf(parentId));
+            child.setParent(parent);
+            parent.setChild(child);
+            child = parent;
+        }
+
+        return parent;
+    }
+
 
     private CurrentRole getCurrentRole() {
         AuthResp permission = haloService.getAuth();

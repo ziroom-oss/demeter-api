@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.DemeterUserLearnManifestDao">
+    <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="assigner_uid" property="assignerUid" jdbcType="VARCHAR"/>
+        <result column="learner_uid" property="learnerUid" jdbcType="VARCHAR"/>
+        <result column="learn_period" property="learnPeriod" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_id" property="createId" jdbcType="VARCHAR"/>
+        <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, name, assigner_uid, learner_uid, learn_period, create_time, modify_time, create_id, modify_id
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifestExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        FROM demeter_user_learn_manifest
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM demeter_user_learn_manifest
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM demeter_user_learn_manifest
+        WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO demeter_user_learn_manifest (name, assigner_uid, learner_uid, learn_period, create_time, modify_time, create_id, 
+            modify_id)
+        VALUES (#{name,jdbcType=VARCHAR}, #{assignerUid,jdbcType=VARCHAR}, #{learnerUid,jdbcType=VARCHAR}, #{learnPeriod,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, 
+            #{modifyId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO demeter_user_learn_manifest
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="assignerUid != null">
+                assigner_uid,
+            </if>
+            <if test="learnerUid != null">
+                learner_uid,
+            </if>
+            <if test="learnPeriod != null">
+                learn_period,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="modifyId != null">
+                modify_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="assignerUid != null">
+                #{assignerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="learnerUid != null">
+                #{learnerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="learnPeriod != null">
+                #{learnPeriod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifestExample" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM demeter_user_learn_manifest
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        UPDATE demeter_user_learn_manifest
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.assignerUid != null">
+                assigner_uid = #{record.assignerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.learnerUid != null">
+                learner_uid = #{record.learnerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.learnPeriod != null">
+                learn_period = #{record.learnPeriod,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.modifyTime != null">
+                modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.createId != null">
+                create_id = #{record.createId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.modifyId != null">
+                modify_id = #{record.modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        UPDATE demeter_user_learn_manifest
+        SET id = #{record.id,jdbcType=BIGINT},
+            name = #{record.name,jdbcType=VARCHAR},
+            assigner_uid = #{record.assignerUid,jdbcType=VARCHAR},
+            learner_uid = #{record.learnerUid,jdbcType=VARCHAR},
+            learn_period = #{record.learnPeriod,jdbcType=VARCHAR},
+            create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{record.createId,jdbcType=VARCHAR},
+            modify_id = #{record.modifyId,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
+        UPDATE demeter_user_learn_manifest
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="assignerUid != null">
+                assigner_uid = #{assignerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="learnerUid != null">
+                learner_uid = #{learnerUid,jdbcType=VARCHAR},
+            </if>
+            <if test="learnPeriod != null">
+                learn_period = #{learnPeriod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyId != null">
+                modify_id = #{modifyId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
+        UPDATE demeter_user_learn_manifest
+        SET name = #{name,jdbcType=VARCHAR},
+            assigner_uid = #{assignerUid,jdbcType=VARCHAR},
+            learner_uid = #{learnerUid,jdbcType=VARCHAR},
+            learn_period = #{learnPeriod,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            create_id = #{createId,jdbcType=VARCHAR},
+            modify_id = #{modifyId,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

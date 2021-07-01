@@ -53,6 +53,67 @@ public interface TaskService {
     PageListResp<ReceiveQueryResp> getExecuteList(TaskListQueryReq taskListQueryReq);
 
     /**
+     *
+     * @param req
+     * @return {@link Resp}
+     * @throws
+     *
+     * @author lipp3
+     * @date 2021/6/30 11:06
+     *
+     * @Description  分配技能学习任务
+     */
+    Resp createSkillLearnManifest(createSkillLearnManifestReq req);
+
+    /**
+     * 获取学习清单详情
+     * @param req
+     * @return Resp
+     */
+    PageListResp<SkillLearnManifestResp> getSkillLearnManifest(GetSkillLearnManifestReq req);
+
+    /**
+     *
+     * @param manifestId 清单id
+     * @return {@link Resp}
+     * @throws
+     *
+     * @author
+     * @date 2021/7/1 9:24
+     *
+     * @Description  
+     */
+    SkillLearnManifestDetailResp getSkillLearnManifestDetail(Long manifestId);
+
+
+    /**
+     *
+     * @param manifestId
+     * @return {@link Resp<ManifestSkillLearnGrapeResp>}
+     * @throws
+     *
+     * @author
+     * @date 2021/7/1 11:10
+     *
+     * @Description  根据清单id获取技能学习图谱
+     */
+    ManifestSkillLearnGrapeResp getManifestSkillGrape(Long manifestId);
+
+
+    /**
+     *
+     * @param skillId
+     * @return {@link SkillHierarchyResp}
+     * @throws
+     *
+     * @author
+     * @date 2021/7/1 10:49
+     *
+     * @Description  获取技能点的层级结构
+     */
+    SkillHierarchyResp getSkillHierarchy(Long skillId);
+
+    /**
      * 任务详情-指派类任务
      * @param id 任务id
      * @return Resp<AssignDetailResp>

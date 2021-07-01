@@ -36,7 +36,62 @@ public class WorktopComponent {
         requestBody.setEnd(toDate);
         Call<JSONObject> call = worktopApiEndPoint.getWorktopOverview(requestBody, OperatorContext.getOperator());
         JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return response.getJSONArray(DATA_ATTRIBUTE);
+        }
+        return new JSONArray();
+    }
 
+    public JSONArray getDepartmentData(String deptId, Date fromDate, Date toDate) {
+        CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
+        requestBody.setDeptId(deptId);
+        requestBody.setBegin(fromDate);
+        requestBody.setEnd(toDate);
+        Call<JSONObject> call = worktopApiEndPoint.getProjectData(requestBody, OperatorContext.getOperator());
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return response.getJSONArray(DATA_ATTRIBUTE);
+        }
+        return new JSONArray();
+    }
+
+    public JSONArray getProjectData(String deptId, Date fromDate, Date toDate) {
+        CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
+        requestBody.setDeptId(deptId);
+        requestBody.setBegin(fromDate);
+        requestBody.setEnd(toDate);
+        Call<JSONObject> call = worktopApiEndPoint.getProjectData(requestBody, OperatorContext.getOperator());
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return response.getJSONArray(DATA_ATTRIBUTE);
+        }
+        return new JSONArray();
+    }
+
+    public JSONArray getMonthData(String deptId, Date fromDate, Date toDate) {
+        CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
+        requestBody.setDeptId(deptId);
+        requestBody.setBegin(fromDate);
+        requestBody.setEnd(toDate);
+        Call<JSONObject> call = worktopApiEndPoint.getMonthData(requestBody, OperatorContext.getOperator());
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return response.getJSONArray(DATA_ATTRIBUTE);
+        }
+        return new JSONArray();
+    }
+
+    public JSONArray getLevelData(String deptId, Date fromDate, Date toDate) {
+        CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
+        requestBody.setDeptId(deptId);
+        requestBody.setBegin(fromDate);
+        requestBody.setEnd(toDate);
+        Call<JSONObject> call = worktopApiEndPoint.getLevelData(requestBody, OperatorContext.getOperator());
+        JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             return response.getJSONArray(DATA_ATTRIBUTE);

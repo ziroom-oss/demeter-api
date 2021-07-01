@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.common.api;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.boot.annotation.RetrofitService;
 import com.ziroom.tech.demeterapi.po.dto.req.worktop.CtoPerspectiveReq;
@@ -23,4 +24,16 @@ public interface WorktopApiEndPoint {
      */
     @POST("/api/view/cto/overview")
     Call<JSONObject> getWorktopOverview(@Body CtoPerspectiveReq request, @Header("uid") String uid);
+
+    @POST("/api/view/cto/group/team")
+    Call<JSONObject> getDepartmentData(@Body CtoPerspectiveReq request, @Header("uid") String uid);
+
+    @POST("/api/view/cto/group/project")
+    Call<JSONObject> getProjectData(@Body CtoPerspectiveReq request, @Header("uid") String uid);
+
+    @POST("/api/view/cto/group/month")
+    Call<JSONObject> getMonthData(@Body CtoPerspectiveReq request, @Header("uid") String uid);
+
+    @POST("/api/view/cto/group/level")
+    Call<JSONObject> getLevelData(@Body CtoPerspectiveReq request, @Header("uid") String uid);
 }

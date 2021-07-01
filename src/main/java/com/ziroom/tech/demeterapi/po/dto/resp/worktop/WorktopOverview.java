@@ -19,4 +19,6 @@ public class WorktopOverview {
     private String projectAvg;
 
     private String taskAvg;
+
+    private DepartmentData departmentData;
 }

@@ -104,7 +104,7 @@ public class EhrComponent {
      * @return List<User>
      */
     @RecordLogger
-    @Cacheable(value = "guava")
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public List<EhrUserDetailResp> getEhrUserDetail(String uidString) {
         log.info("EhrService.getEhrUserDetail params:{}", uidString);
         List<String> strings = Arrays.asList(uidString.split(","));
@@ -447,7 +447,7 @@ public class EhrComponent {
     }
 
     @RecordLogger
-    @Cacheable("guava")
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public List<EhrJoinTimeResp> getJointime(String empCode) {
         Call<JSONObject> call = ehrApiEndPoint.getJointime(empCode, 1, 10);
         JSONObject response = RetrofitCallAdaptor.execute(call);

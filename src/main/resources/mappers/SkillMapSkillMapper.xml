@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillDao">
+    <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="skill_map_id" property="skillMapId" jdbcType="INTEGER"/>
+        <result column="skill_task_id" property="skillTaskId" jdbcType="BIGINT"/>
+        <result column="is_del" property="isDel" jdbcType="TINYINT"/>
+        <result column="job_level" property="jobLevel" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, skill_map_id, skill_task_id, job_level , create_time, modify_time
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM skill_map_skill
+        WHERE id = #{id,jdbcType=BIGINT} and is_del = 0
+    </select>
+    <select id="selectByMapId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from skill_map_skill
+        where skill_map_id = #{skillMapId,jdbcType=INTEGER} and is_del = 0
+    </select>
+    <select id="selectByConditionSelective" resultMap="BaseResultMap">
+        select distinct
+        <include refid="Base_Column_List"/>
+        from skill_map_skill
+        <where>
+            <if test="mapSkillListReq.skillMapId != null">
+                and skill_map_id = #{mapSkillListReq.skillMapId}
+            </if>
+            <if test="mapSkillListReq.skillTaskId != null">
+                and skill_task_id = #{mapSkillListReq.skillTaskId}
+            </if>
+            and is_del = 0
+        </where>
+    </select>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        update skill_map_skill set is_del = 1
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+    <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO skill_map_skill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="skillMapId != null">
+                skill_map_id,
+            </if>
+            <if test="skillTaskId != null">
+                skill_task_id,
+            </if>
+            <if test="isDel != null">
+                is_del,
+            </if>
+            <if test="jobLevel != null">
+                job_level,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="skillMapId != null">
+                #{skillMapId,jdbcType=INTEGER},
+            </if>
+            <if test="skillTaskId != null">
+                #{skillTaskId,jdbcType=BIGINT},
+            </if>
+            <if test="isDel != null">
+                #{isDel,jdbcType=TINYINT},
+            </if>
+            <if test="jobLevel != null">
+                #{jobLevel,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill">
+        UPDATE skill_map_skill
+        <set>
+            <if test="skillMapId != null">
+                skill_map_id = #{skillMapId,jdbcType=INTEGER},
+            </if>
+            <if test="skillTaskId != null">
+                skill_task_id = #{skillTaskId,jdbcType=BIGINT},
+            </if>
+            <if test="jobLevel != null">
+                job_level = #{jobLevel}
+            </if>
+            <if test="isDel != null">
+                is_del = #{isDel,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

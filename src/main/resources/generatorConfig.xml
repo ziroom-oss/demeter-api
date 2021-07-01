@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <context id="message-common" targetRuntime="MyBatis3">
+
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://10.30.7.107:3306/demeter"
+                        userId="dev_jcpt"
+                        password="ziroomdb">
+        </jdbcConnection>
+
+
+        <javaModelGenerator targetPackage="com.ziroom.tech.demeterapi.dao.entity" targetProject="src/main/java">
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="mappers" targetProject="src/main/resources">
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.ziroom.tech.demeterapi.dao.mapper"
+                             targetProject="src/main/java">
+        </javaClientGenerator>
+
+<!--        <table tableName="demeter_assign_task" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="demeter_skill_task" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="demeter_task_user" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="task_finish_condition" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="task_finish_condition_info" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="task_finish_outcome" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--   技能领域     -->
+<!--        <table tableName="graph_area_skill" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+<!--        <table tableName="jobs" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+<!--        <table tableName="skill_map" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+<!--        <table tableName="skill_tree" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+<!--        <table tableName="skill_map_skill_bk" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+        <!--<table tableName="demeter_skill_learn_path" enableCountByExample="true" enableUpdateByExample="true"-->
+               <!--enableSelectByExample="true">-->
+            <!--<generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+        <!--</table>-->
+
+        <!--<table tableName="demeter_user_learn_manifest" enableCountByExample="true" enableUpdateByExample="true"-->
+               <!--enableSelectByExample="true">-->
+            <!--<generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+        <!--</table>-->
+
+
+<!--        <table tableName="demeter_auth_history" enableCountByExample="true" enableUpdateByExample="true"-->
+<!--               enableSelectByExample="true">-->
+<!--            <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
+<!--        </table>-->
+
+    </context>
+</generatorConfiguration>

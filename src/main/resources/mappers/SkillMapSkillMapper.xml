@@ -15,7 +15,7 @@
         id, skill_map_id, skill_task_id, job_level , create_time, modify_time
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        SELECT 
+        SELECT
         <include refid="Base_Column_List"/>
         FROM skill_map_skill
         WHERE id = #{id,jdbcType=BIGINT} and is_del = 0

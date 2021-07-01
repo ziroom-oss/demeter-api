@@ -1,9 +1,30 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
+import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.TaskType;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMap;
+import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkillBk;
+import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkillBkExample;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
 import com.ziroom.tech.demeterapi.dao.mapper.SkillMapDao;
+import com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillBkDao;
+import com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillDao;
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryData;
+import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryMapResp;
 import com.ziroom.tech.demeterapi.service.MapService;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +36,17 @@ import java.util.List;
 public class MapServiceImpl implements MapService {
     @Resource
     private SkillMapDao skillMapDao;
+    @Resource
+    private DemeterTaskUserDao demeterTaskUserDao;
+    @Resource
+    private DemeterSkillTaskDao demeterSkillTaskDao;
+    @Resource
+    private SkillMapSkillDao skillMapSkillDao;
+
+    @Resource
+    private SkillMapSkillBkDao skillMapSkillBkDao;
+
+
     @Override
     public Integer countBySkillMap(SkillMapListReq skillMapListReq) {
         return skillMapDao.countBySkillMap(skillMapListReq);
@@ -39,5 +71,57 @@ public class MapServiceImpl implements MapService {
     @Override
     public SkillMap selectByPrimaryKey(Long id) {
         return skillMapDao.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public SummaryData getSkillGraphData() {
+        String operator = OperatorContext.getOperator();
+        SummaryData summaryData = new SummaryData();
+
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                .andReceiverUidEqualTo(operator)
+                .andTaskStatusEqualTo(SkillTaskFlowStatus.PASS.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        summaryData.setAuthedSkillPointCount(demeterTaskUsers.size());
+
+        List<Long> taskIds = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+
+        List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(new DemeterSkillTaskExample());
+
+        LinkedHashMap<Integer, List<DemeterSkillTask>> skillIdMap = demeterSkillTasks.stream()
+                .collect(Collectors.groupingBy(DemeterSkillTask::getSkillId, LinkedHashMap::new, Collectors.toList()));
+
+        Map<Long, DemeterSkillTask> skillTaskMap =
+                demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function.identity()));
+
+        AtomicInteger skillCount = new AtomicInteger();
+        skillIdMap.forEach((k, v) -> {
+            List<Long> allIds = v.stream().map(DemeterSkillTask::getId).collect(Collectors.toList());
+            if (taskIds.containsAll(allIds)) {
+                skillCount.getAndIncrement();
+            }
+        });
+        summaryData.setAuthedSkillCount(skillCount.get());
+
+        List<SkillMapSkillBk> skillMapSkillBks = skillMapSkillBkDao.selectByExample(new SkillMapSkillBkExample());
+        Map<Integer, List<SkillMapSkillBk>> skillMapSkills =
+                skillMapSkillBks.stream().collect(Collectors.groupingBy(SkillMapSkillBk::getSkillMapId));
+        List<SummaryMapResp> summaryMapResps = new ArrayList<>(16);
+        skillMapSkills.forEach((k, v) -> {
+            List<Long> skillTaskIds = v.stream().map(SkillMapSkillBk::getSkillTaskId).collect(Collectors.toList());
+            skillTaskIds.retainAll(taskIds);
+            if (skillTaskIds.size() < v.size()) {
+                double progress = skillTaskIds.size() * 1.0 / v.size();
+                SkillMap skillMap = skillMapDao.selectByPrimaryKey(k.longValue());
+                SummaryMapResp summaryMapResp = new SummaryMapResp();
+                summaryMapResp.setProgress(progress);
+                summaryMapResp.setSkillMap(skillMap);
+                summaryMapResps.add(summaryMapResp);
+            }
+        });
+        summaryData.setSkillGraph(summaryMapResps);
+       return summaryData;
     }
 }

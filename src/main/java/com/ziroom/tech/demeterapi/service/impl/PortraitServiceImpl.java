@@ -45,12 +45,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author daijiankun
  */
 @Service
 @Slf4j
+@Transactional
 public class PortraitServiceImpl implements PortraitService {
 
     @Resource
@@ -189,9 +191,9 @@ public class PortraitServiceImpl implements PortraitService {
             List<Map.Entry<Integer, Long>> radarGraphs = skillList.stream().limit(6).collect(Collectors.toList());
             List<RadarGraph> radarGraphList = new ArrayList<>(6);
             List<RadarGraph> skills = new ArrayList<>(6);
-            for (int i = 0; i < 6; i++) {
-                if (radarGraphs.size() - 1 >= i) {
-                    Map.Entry<Integer, Long> entry = radarGraphs.get(i);
+            for (int i = 1; i <= 6; i++) {
+                if (radarGraphs.size() >= i) {
+                    Map.Entry<Integer, Long> entry = radarGraphs.get(i - 1);
                     SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
                     RadarGraph graph = new RadarGraph();
                     graph.setText(skillTree.getName());
@@ -492,7 +494,6 @@ public class PortraitServiceImpl implements PortraitService {
 
     @Override
     public WorktopOverview getWorktopOverview(CTOReq ctoReq) throws Exception {
-        WorktopOverview worktopOverview = WorktopOverview.builder().build();
         JSONArray worktopResp =
                 worktopComponent.getWorktopOverview(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
         List<KVResp> respList = new ArrayList<>(16);

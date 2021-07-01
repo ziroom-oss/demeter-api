@@ -9,6 +9,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapCreateReq;
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapModReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.map.SkillMapResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryData;
 import com.ziroom.tech.demeterapi.service.JobsService;
 import com.ziroom.tech.demeterapi.service.MapService;
 import io.swagger.annotations.Api;
@@ -86,5 +87,11 @@ public class MapController {
         skillMapModReq.setId(id);
         SkillMap skillMap = skillMapModReq.getEntity(skillMapModReq);
         return Resp.success(mapService.updateByPrimaryKeySelective(skillMap));
+    }
+
+    @PostMapping("/data")
+    @ApiOperation("技能图谱汇总数据")
+    public Resp<SummaryData> getSkillGraphData () {
+        return Resp.success(mapService.getSkillGraphData());
     }
 }

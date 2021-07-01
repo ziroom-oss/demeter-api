@@ -102,12 +102,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid-spring-boot-starter</artifactId>
-			<version>1.2.4</version>
-		</dependency>
-
 		<!-- 任务调度平台 -->
 		<dependency>
 			<groupId>com.ziroom.tech.sia</groupId>
@@ -199,10 +193,6 @@
 				<exclusion>
 					<artifactId>guava</artifactId>
 					<groupId>com.google.guava</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>apollo-client</artifactId>
-					<groupId>com.ziroom.framework.apollo</groupId>
 				</exclusion>
 				<exclusion>
 					<artifactId>commons-collections4</artifactId>

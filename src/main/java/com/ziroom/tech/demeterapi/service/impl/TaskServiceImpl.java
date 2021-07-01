@@ -50,6 +50,8 @@ public class TaskServiceImpl implements TaskService {
     @Resource
     private DemeterTaskUserDao demeterTaskUserDao;
     @Resource
+    private DemeterAuthHistoryDao demeterAuthHistoryDao;
+    @Resource
     private TaskFinishConditionDao taskFinishConditionDao;
     @Resource
     private TaskFinishConditionInfoDao taskFinishConditionInfoDao;
@@ -1046,6 +1048,18 @@ public class TaskServiceImpl implements TaskService {
                 .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
+
+//        DemeterAuthHistory demeterAuthHistory = DemeterAuthHistory.builder()
+//                .userTaskId(checkTaskReq.getId())
+//                .authOpinion(checkTaskReq.getAcceptanceOpinion())
+//                .authResult(checkTaskReq.getResult())
+//                .authUser(OperatorContext.getOperator())
+//                .createId(OperatorContext.getOperator())
+//                .modifyId(OperatorContext.getOperator())
+//                .createTime(new Date())
+//                .modifyTime(new Date())
+//                .build();
+//        demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
 
         messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();

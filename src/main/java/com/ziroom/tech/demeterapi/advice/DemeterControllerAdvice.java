@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.advice;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.jdbc.SQL;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -66,5 +67,4 @@ public class DemeterControllerAdvice {
         log.error(exception.getMessage(), exception);
         return Resp.error(exception.getMessage());
     }
-
 }

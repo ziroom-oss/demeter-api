@@ -3,6 +3,9 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 import com.ziroom.tech.demeterapi.dao.entity.Jobs;
 import com.ziroom.tech.demeterapi.dao.entity.JobsExample;
 import java.util.List;
+
+import com.ziroom.tech.demeterapi.po.dto.req.jobs.JobsCreateReq;
+import com.ziroom.tech.demeterapi.po.dto.req.jobs.JobsModReq;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
@@ -19,7 +22,7 @@ public interface JobsDao {
     /**
      * 新建职务
      */
-    public int insertSelective(Jobs record);
+    public int insertSelective(JobsCreateReq jobsCreateReq);
 
     /**
      * 查询所有职务
@@ -39,5 +42,5 @@ public interface JobsDao {
     /**
      * 更新指定 id 的职务
      */
-    public int updateByPrimaryKeySelective(Jobs record);
+    public Integer updateByPrimaryKeySelective(@Param("JobsModReq") JobsModReq jobsModReq);
 }

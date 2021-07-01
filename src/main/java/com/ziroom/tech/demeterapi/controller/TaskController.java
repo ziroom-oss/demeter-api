@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/task")
-public class TaskController {
+    public class TaskController {
 
     @Resource
     private TaskService taskService;
@@ -99,6 +99,57 @@ public class TaskController {
         return Resp.success(taskService.getReleaseList(taskListQueryReq));
     }
 
+    /**
+     *
+     * @param req
+     * @return {@link Resp}
+     * @throws
+     *
+     * @author lipp3
+     * @date 2021/6/30 18:56
+     *
+     * @Description  
+     */
+    @PostMapping("/create/skill/manifest")
+    @ApiOperation(value = "创建员工学习清单", httpMethod = "POST")
+    public Resp createSkillLearnManifest(@RequestBody createSkillLearnManifestReq req) {
+        return taskService.createSkillLearnManifest(req);
+    }
+
+    /**
+     *
+     * @param req
+     * @return {@link Resp}
+     * @throws
+     *
+     * @author lipp3
+     * @date 2021/7/1 9:06
+     *
+     * @Description  
+     */
+    @PostMapping("/list/skill/manifest")
+    @ApiOperation(value = "分页查询员工学习清单", httpMethod = "POST")
+    public Resp getSkillLearnManifest(@RequestBody GetSkillLearnManifestReq req) {
+        return Resp.success(taskService.getSkillLearnManifest(req));
+    }
+
+    /**
+     *
+     * @param manifestId
+     * @return {@link Resp}
+     * @throws
+     *
+     * @author lipp3
+     * @date 2021/7/1 9:06
+     *
+     * @Description
+     */
+    @GetMapping("/get/skill/manifest/detail")
+    @ApiOperation(value = "获取学习清单详情", httpMethod = "GET")
+    public Resp getSkillLearnManifestDetail(@RequestParam("manifestId") Long manifestId) {
+        return Resp.success(taskService.getSkillLearnManifestDetail(manifestId));
+    }
+
     @PostMapping("/list/receive")
     @ApiOperation(value = "接收任务列表", httpMethod = "POST")
     public Resp<PageListResp<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
@@ -110,12 +161,6 @@ public class TaskController {
     @ApiOperation(value = "任务详情", httpMethod = "POST")
     public Resp<TaskDetailResp> getAllDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
         return taskService.getAllDetails(taskId, taskType);
-    }
-
-    @PostMapping("/task/delete")
-    @ApiOperation(value = "任务删除", httpMethod = "POST")
-    public Resp<Object> deleteTask(@RequestParam Long id, @RequestParam Integer type) {
-        return taskService.delete(id, type);
     }
 
     @PostMapping("/assign/re-designate")

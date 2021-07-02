@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.SkillMapDao">
+    <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.SkillMap">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="is_enable" property="isEnable" jdbcType="TINYINT"/>
+        <result column="job_id" property="jobId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="is_del" property="isDel" jdbcType="TINYINT"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, name, is_enable, job_id, create_time, modify_time
+    </sql>
+    <select id="selectByConditionSelective" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM skill_map
+        <where>
+            <if test="skillMapListReq.id != null">
+                and id = #{skillMapListReq.id}
+            </if>
+            <if test="skillMapListReq.name != null">
+                and name like concat('%', #{skillMapListReq.name}, '%')
+            </if>
+            <if test="skillMapListReq.isEnable != null">
+                and is_enable = #{skillMapListReq.isEnable}
+            </if>
+            <if test="skillMapListReq.jobId != null">
+                and job_id = #{skillMapListReq.jobId}
+            </if>
+            <if test="skillMapListReq.createStartTime != null and skillMapListReq.createEndTime != null">
+                and create_time >= #{skillMapListReq.createStartTime}
+                and create_time &lt;= #{skillMapListReq.createEndTime}
+            </if>
+            and is_del = 0
+        </where>
+        order by create_time desc
+        limit #{skillMapListReq.start}, #{skillMapListReq.pageSize}
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM skill_map
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+    <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        update skill_map set is_del = 1
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+    <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.SkillMap">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO skill_map
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="isEnable != null">
+                is_enable,
+            </if>
+            <if test="jobId != null">
+                job_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="isEnable != null">
+                #{isEnable,jdbcType=TINYINT},
+            </if>
+            <if test="jobId != null">
+                #{jobId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countBySkillMap" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM skill_map
+        <where>
+            <if test="skillMapListReq.id != null">
+                and id = #{skillMapListReq.id}
+            </if>
+            <if test="skillMapListReq.name != null">
+                and name like concat('%', #{skillMapListReq.name}, '%')
+            </if>
+            <if test="skillMapListReq.isEnable != null">
+                and is_enable = #{skillMapListReq.isEnable}
+            </if>
+            <if test="skillMapListReq.jobId != null">
+                and job_id = #{skillMapListReq.jobId}
+            </if>
+            <if test="skillMapListReq.createStartTime != null and skillMapListReq.createEndTime != null">
+                and create_time >= #{skillMapListReq.createStartTime}
+                and create_time &lt;= #{skillMapListReq.createEndTime}
+            </if>
+            and is_del = 0
+        </where>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.SkillMap">
+        UPDATE skill_map
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="isEnable != null">
+                is_enable = #{isEnable,jdbcType=TINYINT},
+            </if>
+            <if test="jobId != null">
+                job_id = #{jobId,jdbcType=INTEGER},
+            </if>
+            <if test="isDel != null">
+                is_del = #{isDel,jdbcType=TINYINT},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

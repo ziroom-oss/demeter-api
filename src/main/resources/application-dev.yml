@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: demeter-api
+  servlet:
+    multipart:
+      max-request-size: 40MB
+      max-file-size: 40MB
+  datasource:
+    name: mysql_test
+    #基本属性
+    url: jdbc:mysql://10.30.7.107:3306/demeter?useSSL=false&useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: dev_jcpt
+    password: ziroomdb
+    #druid相关配置
+    druid:
+      #监控统计拦截的filters
+      filters: stat
+      #配置初始化大小/最小/最大
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      #获取连接等待超时时间
+      max-wait: 60000
+      #间隔多久进行一次检测，检测需要关闭的空闲连接
+      time-between-eviction-runs-millis: 60000
+      #一个连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+server:
+  port: 8081
+  tomcat:
+    accesslog:
+      enabled: true
+      buffered: true
+      directory: /app/logs
+      file-date-format: .yyyy-MM-dd
+      pattern: '%t %a %A %m %U%q %s %I %B %D'
+      prefix: access_log
+      suffix: .log
+      rename-on-rotate: false
+      request-attributes-enabled: false
+      rotate: true
+
+retrofit:
+  endpoints:
+    - identity: ehr
+      baseUrl: http://ehrnew.kt.ziroom.com/
+    - identity: ehrapi
+      baseUrl: http://ehr-api.kt.ziroom.com/
+    - identity: storage
+      baseUrl: http://storage.t.ziroom.com/
+    - identity: ca
+      baseUrl: http://ca.kt.ziroom.com/
+    - identity: omega
+      baseUrl: http://omega-api.kp.ziroom.com/
+    - identity: worktop
+      baseUrl: http://management-api.kt.ziroom.com/
+  connection:
+    connect-timeout: 5000
+    read-timeout: 20000
+    write-timeout: 20000
+    max-idle-connections: 5
+    keep-alive-duration: 5
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#logging:
+#  root:
+#    level: debug
+
+message:
+  baseUrl: http://message.t.ziroom.com
+  token:
+    workWechat: 6099ed8a28a4fb4763b10ada
+  model:
+    workWechat: WW-1620700709
+
+halo:
+  user-perm:
+    app-code: demeter-api
+    url: http://tech.halo.t.ziroom.com/api/v2/user-perm

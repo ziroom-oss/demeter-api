@@ -52,9 +52,9 @@ mybatis:
 message:
   baseUrl: http://message.ziroom.com
   token:
-    workWechat: 6099ed8a28a4fb4763b10ada
+    workWechat: 60de7d18bd5d033440f35eff
   model:
-    workWechat: WW-1620700709
+    workWechat: WW-1625193835
 
 halo:
   user-perm:

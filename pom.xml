@@ -157,15 +157,15 @@
 			</exclusions>
 		</dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
+		<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
+		<dependency>
+				<groupId>com.github.ben-manes.caffeine</groupId>
+				<artifactId>caffeine</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -181,34 +181,10 @@
 
 		<dependency>
 			<artifactId>gear-boot</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>fastjson</artifactId>
-					<groupId>com.alibaba</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guava</artifactId>
-					<groupId>com.google.guava</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-collections4</artifactId>
-					<groupId>org.apache.commons</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>org.javassist</groupId>
-				</exclusion>
-			</exclusions>
 			<groupId>com.ziroom.gaea</groupId>
 			<version>3.0.2-SNAPSHOT</version>
 		</dependency>
 
-
-		<!--		<dependency>-->
-<!--			<groupId>com.ziroom.tech</groupId>-->
-<!--			<artifactId>magic-starter-cache-springdata</artifactId>-->
-<!--			<version>2.0.0-SNAPSHOT</version>-->
-<!--		</dependency>-->
 	</dependencies>
 	<build>
 		<finalName>demeter-api</finalName>

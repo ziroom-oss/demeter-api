@@ -177,6 +177,8 @@ public class PortraitServiceImpl implements PortraitService {
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(taskUserExample);
         List<Long> skillPoints = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
+
+        List<Map.Entry<Integer, Long>> skillList = new ArrayList<>(16);
         if (CollectionUtils.isNotEmpty(skillPoints)) {
             DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
             demeterSkillTaskExample.createCriteria()
@@ -188,30 +190,31 @@ public class PortraitServiceImpl implements PortraitService {
                 long count = skillMap.get(skillId).stream().mapToInt(DemeterSkillTask::getSkillReward).sum();
                 res.put(skillId, count);
             });
-            List<Map.Entry<Integer, Long>> skillList = res.entrySet().stream()
+            skillList = res.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toList());
-            List<Map.Entry<Integer, Long>> radarGraphs = skillList.stream().limit(6).collect(Collectors.toList());
-            List<RadarGraph> radarGraphList = new ArrayList<>(6);
-            List<RadarGraph> skills = new ArrayList<>(6);
-            for (int i = 1; i <= 6; i++) {
-                if (radarGraphs.size() >= i) {
-                    Map.Entry<Integer, Long> entry = radarGraphs.get(i - 1);
-                    SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
-                    RadarGraph graph = new RadarGraph();
-                    graph.setText(skillTree.getName());
-                    graph.setMax(entry.getValue());
-                    radarGraphList.add(graph);
-                    skills.add(graph);
-                } else {
-                    RadarGraph graph = new RadarGraph();
-                    graph.setText("待认证技能");
-                    graph.setMax(0L);
-                    radarGraphList.add(graph);
-                }
-            }
-            resp.setRadarGraphs(radarGraphList);
-            userInfo.setSkills(skills.stream().map(RadarGraph::getText).collect(Collectors.joining("|")));
         }
+        List<Map.Entry<Integer, Long>> radarGraphs = skillList.stream().limit(6).collect(Collectors.toList());
+        List<RadarGraph> radarGraphList = new ArrayList<>(6);
+        List<RadarGraph> skills = new ArrayList<>(6);
+
+        for (int i = 1; i <= 6; i++) {
+            if (radarGraphs.size() >= i) {
+                Map.Entry<Integer, Long> entry = radarGraphs.get(i - 1);
+                SkillTree skillTree = treeService.selectByPrimaryKey(entry.getKey());
+                RadarGraph graph = new RadarGraph();
+                graph.setText(skillTree.getName());
+                graph.setMax(entry.getValue());
+                radarGraphList.add(graph);
+                skills.add(graph);
+            } else {
+                RadarGraph graph = new RadarGraph();
+                graph.setText("待认证技能");
+                graph.setMax(0L);
+                radarGraphList.add(graph);
+            }
+        }
+        resp.setRadarGraphs(radarGraphList);
+        userInfo.setSkills(skills.stream().map(RadarGraph::getText).collect(Collectors.joining("|")));
 
         resp.setUserInfo(userInfo);
         List<EmployeeListResp> respList = this.queryEmployeeInfo(Lists.newArrayList(portrayalInfoReq.getUid()), startTime, endTime);

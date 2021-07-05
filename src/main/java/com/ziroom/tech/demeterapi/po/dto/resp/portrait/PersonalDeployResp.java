@@ -8,13 +8,13 @@ import lombok.Data;
 @Data
 public class PersonalDeployResp {
 
-    private Integer deploymentNum;
+    private Integer deploymentNum = 0;
 
-    private Integer restartNum;
+    private Integer restartNum = 0;
 
-    private Integer rollbackNum;
+    private Integer rollbackNum = 0;
 
-    private Integer onlineNum;
+    private Integer onlineNum = 0;
 
-    private Integer ciNum;
+    private Integer ciNum = 0;
 }

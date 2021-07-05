@@ -355,16 +355,18 @@ public class PortraitServiceImpl implements PortraitService {
         UserDetailResp userDetail = ehrComponent.getUserDetail(req.getUid());
         JSONArray personalNorm = omegaComponent
                 .getPersonalNorm(userDetail.getEmail().split("@")[0], req.getStartTime(), req.getEndTime());
+        PersonalDeployResp personalDeployResp = new PersonalDeployResp();
         if (personalNorm.size() > 0) {
-            PersonalDeployResp personalDeployResp = new PersonalDeployResp();
             Map<String, Integer> map = (LinkedHashMap<String, Integer>) personalNorm.get(0);
-            personalDeployResp.setDeploymentNum(map.get("deploymentNum"));
-            personalDeployResp.setRestartNum(map.get("restartNum"));
-            personalDeployResp.setRollbackNum(map.get("rollbackNum"));
-            personalDeployResp.setOnlineNum(map.get("onlineNum"));
-            personalDeployResp.setCiNum(map.get("ciNum"));
-            engineeringMetricResp.setPersonalDeployResp(personalDeployResp);
+            if (map != null) {
+                personalDeployResp.setDeploymentNum(map.get("deploymentNum"));
+                personalDeployResp.setRestartNum(map.get("restartNum"));
+                personalDeployResp.setRollbackNum(map.get("rollbackNum"));
+                personalDeployResp.setOnlineNum(map.get("onlineNum"));
+                personalDeployResp.setCiNum(map.get("ciNum"));
+            }
         }
+        engineeringMetricResp.setPersonalDeployResp(personalDeployResp);
         PersonalDevResp devResp = codeAnalysisComponent
                 .getDevelopmentEquivalent(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
         engineeringMetricResp.setPersonalDevResp(devResp);

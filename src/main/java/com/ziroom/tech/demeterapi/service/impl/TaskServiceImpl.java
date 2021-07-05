@@ -1287,6 +1287,30 @@ public class TaskServiceImpl implements TaskService {
                 .andReceiverUidEqualTo(taskUser.getReceiverUid());
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
         taskProgressResp.setTaskFinishOutcomeList(taskFinishOutcomes);
+
+        DemeterAuthHistoryExample demeterAuthHistoryExample = new DemeterAuthHistoryExample();
+        demeterAuthHistoryExample.createCriteria()
+                .andUserTaskIdEqualTo(id);
+        List<DemeterAuthHistory> demeterAuthHistories =
+                demeterAuthHistoryDao.selectByExample(demeterAuthHistoryExample);
+        Set<String> uidSet =
+                demeterAuthHistories.stream().map(DemeterAuthHistory::getAuthUser).collect(Collectors.toSet());
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
+        Map<String, UserResp> userMap =
+                userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+        if (CollectionUtils.isNotEmpty(demeterAuthHistories)) {
+            List<AuthHistoryResp> authHistories = new ArrayList<>(16);
+            demeterAuthHistories.forEach(history -> {
+                AuthHistoryResp resp = new AuthHistoryResp();
+                BeanUtils.copyProperties(history, resp);
+                resp.setAuthResultName(CheckoutResult.getByCode(history.getAuthResult()).getDesc());
+                Optional<UserResp> userResp = Optional.ofNullable(userMap.get(history.getAuthUser()));
+                resp.setAuthUserName(userResp.map(UserResp::getName).orElse("Unknown"));
+                authHistories.add(resp);
+            });
+            taskProgressResp.setTaskAuthHistoryList(authHistories);
+        }
+
         return Resp.success(taskProgressResp);
     }
 
@@ -1319,17 +1343,17 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
 
-//        DemeterAuthHistory demeterAuthHistory = DemeterAuthHistory.builder()
-//                .userTaskId(checkTaskReq.getId())
-//                .authOpinion(checkTaskReq.getAcceptanceOpinion())
-//                .authResult(checkTaskReq.getResult())
-//                .authUser(OperatorContext.getOperator())
-//                .createId(OperatorContext.getOperator())
-//                .modifyId(OperatorContext.getOperator())
-//                .createTime(new Date())
-//                .modifyTime(new Date())
-//                .build();
-//        demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
+        DemeterAuthHistory demeterAuthHistory = DemeterAuthHistory.builder()
+                .userTaskId(checkTaskReq.getId())
+                .authOpinion(checkTaskReq.getAcceptanceOpinion())
+                .authResult(checkTaskReq.getResult())
+                .authUser(OperatorContext.getOperator())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .build();
+        demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
 
         messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();

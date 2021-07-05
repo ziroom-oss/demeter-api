@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 
@@ -39,6 +40,7 @@ public class CodeAnalysisComponent {
     @Resource
     private EhrComponent ehrComponent;
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public EngineeringMetricResp getDevelopmentEquivalent(String uid, Date fromDate, Date toDate) {
 
         // TODO: 2021/6/18 terrible code structure!
@@ -74,6 +76,7 @@ public class CodeAnalysisComponent {
         return resp;
     }
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public CtoDevResp getDepartmentDe(String departmentCode, Date from, Date to) {
         CtoDevResp ctoDevResp = new CtoDevResp();
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");

@@ -26,9 +26,8 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.worktop.DepartmentData;
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopData;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.KVResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.worktop.ProjectData;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopOverview;
 import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
@@ -509,12 +508,17 @@ public class PortraitServiceImpl implements PortraitService {
             }
         }
 
-        DepartmentData worktopData = getWorktopDepartmentData(ctoReq);
-        ProjectData ProjectData = getWorktopProjectData(ctoReq);
+        WorktopData departmentData = getWorktopDepartmentData(ctoReq);
+        WorktopData projectData = getWorktopProjectData(ctoReq);
+        WorktopData monthData = getWorktopMonthData(ctoReq);
+        WorktopData levelData = getWorktopLevelData(ctoReq);
 
         Map<String, KVResp> kvRespMap = respList.stream().collect(Collectors.toMap(KVResp::getKey, Function.identity()));
         return WorktopOverview.builder()
-                .departmentData(worktopData)
+                .departmentData(departmentData)
+                .projectData(projectData)
+                .monthData(monthData)
+                .levelData(levelData)
                 .projectAvg(Optional.ofNullable(kvRespMap.get("projectAvg")).map(KVResp::getValue).orElse(""))
                 .projectCount(Optional.ofNullable(kvRespMap.get("projectCount")).map(KVResp::getValue).orElse(""))
                 .taskAvg(Optional.ofNullable(kvRespMap.get("taskAvg")).map(KVResp::getValue).orElse(""))
@@ -523,8 +527,8 @@ public class PortraitServiceImpl implements PortraitService {
                 .build();
     }
 
-    public DepartmentData getWorktopDepartmentData(CTOReq ctoReq) throws Exception {
-        DepartmentData resp = new DepartmentData();
+    public WorktopData getWorktopDepartmentData(CTOReq ctoReq) throws Exception {
+        WorktopData resp = new WorktopData();
         JSONArray departmentData =
                 worktopComponent.getDepartmentData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
         log.info("{}", departmentData);
@@ -545,10 +549,10 @@ public class PortraitServiceImpl implements PortraitService {
         return resp;
     }
 
-    public ProjectData getWorktopProjectData(CTOReq ctoReq) throws Exception {
-        ProjectData resp = new ProjectData();
+    public WorktopData getWorktopProjectData(CTOReq ctoReq) throws Exception {
+        WorktopData resp = new WorktopData();
         JSONArray projectData =
-                worktopComponent.getDepartmentData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+                worktopComponent.getProjectData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
 
         List<KVResp> respList = new ArrayList<>(16);
         for (Object o : projectData) {
@@ -566,49 +570,48 @@ public class PortraitServiceImpl implements PortraitService {
         return resp;
     }
 
-//    public ProjectData getWorktopData(CTOReq ctoReq) throws Exception {
-//        ProjectData resp = new ProjectData();
-//        JSONArray projectData =
-//                worktopComponent.getProjectData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
-//
-//        List<KVResp> respList = new ArrayList<>(16);
-//        for (Object o : projectData) {
-//            if (o instanceof LinkedHashMap) {
-//                KVResp res = mapToObject((LinkedHashMap) o, KVResp.class);
-//                respList.add(res);
-//            }
-//        }
-//        Map<String, List<KVResp>> categoryMap = respList.stream().collect(Collectors.groupingBy(KVResp::getCategory));
-//        List<KVResp> countList = categoryMap.get("count");
-//        List<KVResp> workTimeList = categoryMap.get("workTime");
-//
-//        resp.setProblems(countList);
-//        resp.setWorkTime(workTimeList);
-//        return resp;
-//    }
-//
-//
-//    public DepartmentData getWorktopData(CTOReq ctoReq) throws Exception {
-//        DepartmentData resp = new DepartmentData();
-//        JSONArray departmentData =
-//                worktopComponent.getDepartmentData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
-//        log.info("{}", departmentData);
-//
-//        List<KVResp> respList = new ArrayList<>(16);
-//        for (Object o : departmentData) {
-//            if (o instanceof LinkedHashMap) {
-//                KVResp res = mapToObject((LinkedHashMap) o, KVResp.class);
-//                respList.add(res);
-//            }
-//        }
-//        Map<String, List<KVResp>> categoryMap = respList.stream().collect(Collectors.groupingBy(KVResp::getCategory));
-//        List<KVResp> countList = categoryMap.get("count");
-//        List<KVResp> workTimeList = categoryMap.get("workTime");
-//
-//        resp.setProblems(countList);
-//        resp.setWorkTime(workTimeList);
-//        return resp;
-//    }
+    public WorktopData getWorktopMonthData(CTOReq ctoReq) throws Exception {
+        WorktopData resp = new WorktopData();
+        JSONArray monthData =
+                worktopComponent.getMonthData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+
+        List<KVResp> respList = new ArrayList<>(16);
+        for (Object o : monthData) {
+            if (o instanceof LinkedHashMap) {
+                KVResp res = mapToObject((LinkedHashMap) o, KVResp.class);
+                respList.add(res);
+            }
+        }
+        Map<String, List<KVResp>> categoryMap = respList.stream().collect(Collectors.groupingBy(KVResp::getCategory));
+        List<KVResp> countList = categoryMap.get("count");
+        List<KVResp> workTimeList = categoryMap.get("workTime");
+
+        resp.setProblems(countList);
+        resp.setWorkTime(workTimeList);
+        return resp;
+    }
+
+    public WorktopData getWorktopLevelData(CTOReq ctoReq) throws Exception {
+        WorktopData resp = new WorktopData();
+        JSONArray departmentData =
+                worktopComponent.getLevelData(ctoReq.getDeptId(), ctoReq.getStartDate(), ctoReq.getEndDate());
+        log.info("{}", departmentData);
+
+        List<KVResp> respList = new ArrayList<>(16);
+        for (Object o : departmentData) {
+            if (o instanceof LinkedHashMap) {
+                KVResp res = mapToObject((LinkedHashMap) o, KVResp.class);
+                respList.add(res);
+            }
+        }
+        Map<String, List<KVResp>> categoryMap = respList.stream().collect(Collectors.groupingBy(KVResp::getCategory));
+        List<KVResp> countList = categoryMap.get("count");
+        List<KVResp> workTimeList = categoryMap.get("workTime");
+
+        resp.setProblems(countList);
+        resp.setWorkTime(workTimeList);
+        return resp;
+    }
 
     public static <T> T mapToObject(Map<Object, Object> map, Class<T> beanClass) throws Exception {
         if (map == null) {

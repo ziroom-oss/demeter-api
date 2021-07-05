@@ -218,7 +218,6 @@ import java.util.List;
         return taskService.checkTask(checkTaskReq);
     }
 
-    // todo test
     @PostMapping("/detail/progress")
     @ApiOperation(value = "任务查看进度/验收任务预览", httpMethod = "POST")
     public Resp<TaskProgressResp> getAssignTaskProgress(@RequestParam(value = "id") Long id) {

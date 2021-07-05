@@ -8,6 +8,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.worktop.CtoPerspectiveReq;
 import java.util.Date;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 
@@ -28,6 +29,7 @@ public class WorktopComponent {
     @Resource
     private EhrComponent ehrComponent;
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public JSONArray getWorktopOverview(String deptId, Date fromDate, Date toDate) {
 
         CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
@@ -43,12 +45,13 @@ public class WorktopComponent {
         return new JSONArray();
     }
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public JSONArray getDepartmentData(String deptId, Date fromDate, Date toDate) {
         CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
         requestBody.setDeptId(deptId);
         requestBody.setBegin(fromDate);
         requestBody.setEnd(toDate);
-        Call<JSONObject> call = worktopApiEndPoint.getProjectData(requestBody, OperatorContext.getOperator());
+        Call<JSONObject> call = worktopApiEndPoint.getDepartmentData(requestBody, OperatorContext.getOperator());
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
@@ -57,6 +60,7 @@ public class WorktopComponent {
         return new JSONArray();
     }
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public JSONArray getProjectData(String deptId, Date fromDate, Date toDate) {
         CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
         requestBody.setDeptId(deptId);
@@ -71,6 +75,7 @@ public class WorktopComponent {
         return new JSONArray();
     }
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public JSONArray getMonthData(String deptId, Date fromDate, Date toDate) {
         CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
         requestBody.setDeptId(deptId);
@@ -85,6 +90,7 @@ public class WorktopComponent {
         return new JSONArray();
     }
 
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public JSONArray getLevelData(String deptId, Date fromDate, Date toDate) {
         CtoPerspectiveReq requestBody = new CtoPerspectiveReq();
         requestBody.setDeptId(deptId);

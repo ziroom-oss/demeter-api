@@ -1,10 +1,13 @@
 package com.ziroom.tech.demeterapi.common;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.demeterapi.common.api.WorktopApiEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.req.worktop.CtoPerspectiveReq;
+import com.ziroom.tech.demeterapi.po.dto.req.worktop.PersonalReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.PersonalResp;
 import java.util.Date;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -103,5 +106,20 @@ public class WorktopComponent {
             return response.getJSONArray(DATA_ATTRIBUTE);
         }
         return new JSONArray();
+    }
+
+    public PersonalResp getPersonalMetrics(String adCode, Date from, Date end) {
+        PersonalReq req = PersonalReq.builder()
+                .adCode(adCode)
+                .begin(from)
+                .end(end)
+                .build();
+        Call<JSONObject> call = worktopApiEndPoint.getPersonalMetrics(req, OperatorContext.getOperator());
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return JSON.parseObject(response.getJSONObject(DATA_ATTRIBUTE).toJSONString(), PersonalResp.class);
+        }
+        return new PersonalResp();
     }
 }

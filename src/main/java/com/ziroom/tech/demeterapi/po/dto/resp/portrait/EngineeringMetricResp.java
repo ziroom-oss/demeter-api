@@ -1,5 +1,7 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.portrait;
 
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.PersonalResp;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -8,11 +10,15 @@ import lombok.Data;
 @Data
 public class EngineeringMetricResp {
 
-    private Integer insertions = 0;
+    private PersonalDevResp personalDevResp;
 
-    private Integer deletions = 0;
+    private PersonalProjectResp personalProjectResp;
 
-    private Integer devEquivalent = 0;
+    private PersonalDeployResp personalDeployResp;
 
-    private Integer commitCount = 0;
+    private List<PersonalByProject> personalByProject;
+
+    private List<PersonalByDay> personalByDays;
+
+    private PersonalResp personalResp;
 }

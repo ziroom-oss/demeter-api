@@ -16,4 +16,7 @@ public interface OmegaApiEndPoint {
 
     @GET("/api/out/getDeployNorm")
     Call<JSONObject> getDeployNorm(@Query("deptId") String deptId, @Query("start") String start, @Query("end") String end);
+
+    @GET("/api/out/getPersonaltNorm")
+    Call<JSONObject> getPersonalNorm(@Query("userEmail") String userEmail, @Query("start") String start, @Query("end") String end);
 }

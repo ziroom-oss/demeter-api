@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.CodeAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
@@ -26,6 +27,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.EmployeeListResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.worktop.PersonalResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopData;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.KVResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.worktop.WorktopOverview;
@@ -349,7 +351,37 @@ public class PortraitServiceImpl implements PortraitService {
 
     @Override
     public EngineeringMetricResp getEngineeringMetrics(EngineeringMetricReq req) {
-        return codeAnalysisComponent.getDevelopmentEquivalent(req.getUid(), req.getStartTime(), req.getEndTime());
+        EngineeringMetricResp engineeringMetricResp = new EngineeringMetricResp();
+        UserDetailResp userDetail = ehrComponent.getUserDetail(req.getUid());
+        JSONArray personalNorm = omegaComponent
+                .getPersonalNorm(userDetail.getEmail().split("@")[0], req.getStartTime(), req.getEndTime());
+        if (personalNorm.size() > 0) {
+            PersonalDeployResp personalDeployResp = new PersonalDeployResp();
+            Map<String, Integer> map = (LinkedHashMap<String, Integer>) personalNorm.get(0);
+            personalDeployResp.setDeploymentNum(map.get("deploymentNum"));
+            personalDeployResp.setRestartNum(map.get("restartNum"));
+            personalDeployResp.setRollbackNum(map.get("rollbackNum"));
+            personalDeployResp.setOnlineNum(map.get("onlineNum"));
+            personalDeployResp.setCiNum(map.get("ciNum"));
+            engineeringMetricResp.setPersonalDeployResp(personalDeployResp);
+        }
+        PersonalDevResp devResp = codeAnalysisComponent
+                .getDevelopmentEquivalent(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        engineeringMetricResp.setPersonalDevResp(devResp);
+
+        List<PersonalByProject> personalDEByProject = codeAnalysisComponent
+                .getPersonalDEByProject(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        engineeringMetricResp.setPersonalByProject(personalDEByProject);
+
+        List<PersonalByDay> personalDEByDay =
+                codeAnalysisComponent.getPersonalDEByDay(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        engineeringMetricResp.setPersonalByDays(personalDEByDay);
+
+        PersonalResp personalMetrics = worktopComponent
+                .getPersonalMetrics(userDetail.getEmail().split("@")[0], req.getStartTime(), req.getEndTime());
+        engineeringMetricResp.setPersonalResp(personalMetrics);
+
+        return engineeringMetricResp;
     }
 
     private CurrentRole getCurrentRole() {

@@ -25,5 +25,5 @@ public enum  SkillManifestFlowStatus {
     /**
      * 类型描述
      */
-    private String desc;
+    private String name;
 }

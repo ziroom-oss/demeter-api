@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
+import retrofit2.http.Query;
 import springfox.documentation.spring.web.json.Json;
 
 /**
@@ -49,6 +50,20 @@ public class OmegaComponent {
         Call<JSONObject> call = omegaApiEndPoint.getDeployNorm(deptId, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
 
+        String success = "200";
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            return response.getJSONArray(DATA_ATTRIBUTE);
+        }
+        return new JSONArray();
+    }
+
+    public JSONArray getPersonalNorm(String userEmail, Date fromDate, Date toDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String fromDateString = formatter.format(fromDate);
+        String toDateString = formatter.format(toDate);
+
+        Call<JSONObject> call = omegaApiEndPoint.getPersonalNorm(userEmail, fromDateString, toDateString);
+        JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             return response.getJSONArray(DATA_ATTRIBUTE);

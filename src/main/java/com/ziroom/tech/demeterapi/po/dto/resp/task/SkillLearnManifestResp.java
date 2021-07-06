@@ -18,11 +18,17 @@ public class SkillLearnManifestResp {
 
     private String assignerUid;
 
+    private String assignerName;
+
     private String learnerUid;
+
+    private String learnerName;
 
     private String learnPeriod;
 
     private Integer status;
+
+    private String  statusName;
 
     //学习清单技能奖励值
     private Integer reward;

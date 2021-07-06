@@ -1,12 +1,11 @@
 package com.ziroom.tech.demeterapi.common.api;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.boot.annotation.RetrofitService;
 import com.ziroom.tech.demeterapi.po.dto.req.worktop.CtoPerspectiveReq;
+import com.ziroom.tech.demeterapi.po.dto.req.worktop.PersonalReq;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 
@@ -36,4 +35,7 @@ public interface WorktopApiEndPoint {
 
     @POST("/api/view/cto/group/level")
     Call<JSONObject> getLevelData(@Body CtoPerspectiveReq request, @Header("uid") String uid);
+
+    @POST("/api/view/personal/metrics")
+    Call<JSONObject> getPersonalMetrics(@Body PersonalReq personalReq, @Header("uid") String uid);
 }

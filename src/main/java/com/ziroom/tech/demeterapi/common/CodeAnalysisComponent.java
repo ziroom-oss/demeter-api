@@ -9,12 +9,16 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.CtoDevResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DevOverviewStruct;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DevStruct;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PersonalByDay;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PersonalByProject;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PersonalDevResp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 
@@ -35,22 +39,19 @@ public class CodeAnalysisComponent {
 
     @Resource
     private CodeAnalysisApiEndPoint codeAnalysisApiEndPoint;
-
     @Resource
     private EhrComponent ehrComponent;
 
-    public EngineeringMetricResp getDevelopmentEquivalent(String uid, Date fromDate, Date toDate) {
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
+    public PersonalDevResp getDevelopmentEquivalent(String userEmail, Date fromDate, Date toDate) {
 
-        // TODO: 2021/6/18 terrible code structure!
-        UserDetailResp userDetail = ehrComponent.getUserDetail(uid);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
         String toDateString = formatter.format(toDate);
 
-        Call<JSONObject> call = codeAnalysisApiEndPoint.getSingleDE(userDetail.getEmail(), fromDateString, toDateString);
+        Call<JSONObject> call = codeAnalysisApiEndPoint.getSingleDE(userEmail, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
-
-        EngineeringMetricResp resp = new EngineeringMetricResp();
+        PersonalDevResp resp = new PersonalDevResp();
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONObject jsonObject = response.getJSONObject(DATA_ATTRIBUTE);
@@ -74,6 +75,53 @@ public class CodeAnalysisComponent {
         return resp;
     }
 
+//    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
+    public List<PersonalByProject> getPersonalDEByProject(String userEmail, Date fromDate, Date toDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String fromDateString = formatter.format(fromDate);
+        String toDateString = formatter.format(toDate);
+        Call<JSONObject> call = codeAnalysisApiEndPoint.getDEByProject(userEmail, fromDateString, toDateString);
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        List<PersonalByProject> personalByProjects = new ArrayList<>(16);
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            JSONArray jsonArray = response.getJSONArray(DATA_ATTRIBUTE);
+            for (Object o : jsonArray) {
+                Map<String, Object> map = (LinkedHashMap<String, Object>) o;
+                PersonalByProject resp = new PersonalByProject();
+                resp.setValue((Integer) map.get("devEquivalent"));
+                resp.setName((String) map.get("projectName"));
+                personalByProjects.add(resp);
+            }
+        }
+        return personalByProjects;
+    }
+
+    public List<PersonalByDay> getPersonalDEByDay(String userEmail, Date fromDate, Date toDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String fromDateString = formatter.format(fromDate);
+        String toDateString = formatter.format(toDate);
+        Call<JSONObject> call = codeAnalysisApiEndPoint.getDEByDay(userEmail, fromDateString, toDateString);
+        JSONObject response = RetrofitCallAdaptor.execute(call);
+        String success = "200";
+        List<PersonalByDay> personalByDays = new ArrayList<>(16);
+        if (response.getString(CODE_ATTRIBUTE).equals(success)) {
+            JSONArray jsonArray = response.getJSONArray(DATA_ATTRIBUTE);
+            for (Object o : jsonArray) {
+                Map<String, Object> map = (LinkedHashMap<String, Object>) o;
+                PersonalByDay resp = new PersonalByDay();
+                resp.setDay((String) map.get("day"));
+                resp.setDevEquivalent((Integer) map.get("devEquivalent"));
+                resp.setInsertions((Integer) map.get("insertions"));
+                personalByDays.add(resp);
+            }
+        }
+        return personalByDays;
+    }
+
+
+
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public CtoDevResp getDepartmentDe(String departmentCode, Date from, Date to) {
         CtoDevResp ctoDevResp = new CtoDevResp();
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
@@ -83,12 +131,12 @@ public class CodeAnalysisComponent {
         JSONObject response2 = RetrofitCallAdaptor.execute(call2);
         if (Objects.nonNull(response2)) {
             if (response2.getInteger("code").equals(200)) {
-                Map map = (LinkedHashMap) response2.get("data");
+                Map<String, Integer> map = (LinkedHashMap<String, Integer>) response2.get("data");
                 DevOverviewStruct devOverviewStruct = DevOverviewStruct.builder()
-                        .insertions((Integer) map.get("insertions"))
-                        .deletions((Integer) map.get("deletions"))
-                        .devEquivalent((Integer) map.get("devEquivalent"))
-                        .commitCounts((Integer) map.get("commitCount"))
+                        .insertions(map.get("insertions"))
+                        .deletions(map.get("deletions"))
+                        .devEquivalent(map.get("devEquivalent"))
+                        .commitCounts(map.get("commitCount"))
                         .build();
                 ctoDevResp.setDevOverviewStruct(devOverviewStruct);
             }
@@ -101,8 +149,8 @@ public class CodeAnalysisComponent {
             if (response.getInteger("code").equals(200)) {
                 JSONArray data = response.getJSONArray("data");
                 List<DevStruct> devStructList = new ArrayList<>(16);
-                for (int i = 0; i < data.size(); i++) {
-                    Map map = (LinkedHashMap) data.get(i);
+                for (Object datum : data) {
+                    Map<String, Object> map = (LinkedHashMap<String, Object>) datum;
                     DevStruct struct = DevStruct.builder()
                             .name((String) map.get("departmentName"))
                             .devEquivalent((Integer) map.get("devEquivalent"))
@@ -122,7 +170,7 @@ public class CodeAnalysisComponent {
                 JSONArray data = response1.getJSONArray("data");
                 List<DevStruct> devStructList = new ArrayList<>(16);
                 for (Object datum : data) {
-                    Map<String, Object> map = (LinkedHashMap) datum;
+                    Map<String, Object> map = (LinkedHashMap<String, Object>) datum;
                     DevStruct struct = DevStruct.builder()
                             .name((String) map.get("projectName"))
                             .devEquivalent((Integer) map.get("devEquivalent"))
@@ -139,7 +187,7 @@ public class CodeAnalysisComponent {
         JSONObject response3 = RetrofitCallAdaptor.execute(call3);
         if (Objects.nonNull(response3)) {
             if (response1.getInteger("code").equals(200)) {
-                List<LinkedHashMap> list = (ArrayList) response3.get("data");
+                List<LinkedHashMap<String, Object>> list = (ArrayList<LinkedHashMap<String, Object>>) response3.get("data");
                 List<DevStruct> periodList = new ArrayList<>(16);
                 list.forEach(item -> {
                     DevStruct devStruct = DevStruct.builder()

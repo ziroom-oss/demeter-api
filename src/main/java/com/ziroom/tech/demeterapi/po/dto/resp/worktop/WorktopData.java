@@ -7,7 +7,7 @@ import lombok.Data;
  * @author daijiankun
  */
 @Data
-public class ProjectData {
+public class WorktopData {
 
     private List<KVResp> problems;
 

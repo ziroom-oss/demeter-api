@@ -20,5 +20,13 @@ public class WorktopOverview {
 
     private String taskAvg;
 
-    private DepartmentData departmentData;
+    private WorktopData departmentData;
+
+    private WorktopData projectData;
+
+    private WorktopData monthData;
+
+    private WorktopData levelData;
+
+
 }

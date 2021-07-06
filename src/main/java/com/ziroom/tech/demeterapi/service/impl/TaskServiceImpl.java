@@ -23,6 +23,7 @@ import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
+import com.ziroom.tech.demeterapi.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -813,19 +814,39 @@ public class TaskServiceImpl implements TaskService {
         //1.【demeter_user_learn_manifest】根据清单名称或清单编号查询demeter_user_learn_manifest表
         DemeterUserLearnManifestExample example = new DemeterUserLearnManifestExample();
         DemeterUserLearnManifestExample.Criteria criteria = example.createCriteria();
-        if (StringUtils.isNotEmpty(req.getManifestName())){
-            criteria.andNameLike(req.getManifestName());
-        }
-        if (Objects.nonNull(req.getManifestId())){
-            criteria.andIdEqualTo(req.getManifestId());
+        if (StringUtils.isNotEmpty(req.getManifestIdOrName())){
+            criteria.andNameLike("%" + req.getManifestIdOrName() + "%");
         }
         List<DemeterUserLearnManifest> manifests = demeterUserLearnManifestDao.selectByExample(example);
+        if (manifests.size() == 0 && StringUtil.isLong(req.getManifestIdOrName())){
+            example.clear();
+            example.createCriteria().andIdEqualTo(Long.valueOf(req.getManifestIdOrName()));
+            manifests = demeterUserLearnManifestDao.selectByExample(example);
+        }
+        if (manifests.size() == 0){
+            return pageListResp;
+        }
 
         //2.【demeter_task_user_extend】根据demeter_user_learn_manifest主键id关联demeter_task_user_extend的manifest_id查询清单下面的所有task_Id
         List<SkillLearnManifestResp> manifestResps = new ArrayList<>();
         manifests.stream().forEach(manifest -> {
             SkillLearnManifestResp skillLearnManifestResp = new SkillLearnManifestResp();
             BeanUtils.copyProperties(manifest, skillLearnManifestResp);
+            if (StringUtils.isNotEmpty(manifest.getAssignerUid())) {
+                UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getAssignerUid());
+                if (Objects.nonNull(userDetail)) {
+                    skillLearnManifestResp.setAssignerName(userDetail.getUserName());
+                }
+            }else{
+                skillLearnManifestResp.setAssignerName("-");
+            }
+
+            if(StringUtils.isNotEmpty(manifest.getLearnerUid())){
+                UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getLearnerUid());
+                if (Objects.nonNull(userDetail)) {
+                    skillLearnManifestResp.setLearnerName(userDetail.getUserName());
+                }
+            }
             DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
             extendExample.createCriteria()
                     .andManifestIdEqualTo(manifest.getId());
@@ -838,11 +859,12 @@ public class TaskServiceImpl implements TaskService {
                     break;
                 }
             }
+            SkillManifestFlowStatus status = SkillManifestFlowStatus.ONGOING;
             if (passed){
-                skillLearnManifestResp.setStatus(SkillManifestFlowStatus.PASS.getCode());
-            }else{
-                skillLearnManifestResp.setStatus(SkillManifestFlowStatus.ONGOING.getCode());
+                status = SkillManifestFlowStatus.PASS;
             }
+            skillLearnManifestResp.setStatus(status.getCode());
+            skillLearnManifestResp.setStatusName(status.getName());
             manifestResps.add(skillLearnManifestResp);
         });
 
@@ -1287,6 +1309,30 @@ public class TaskServiceImpl implements TaskService {
                 .andReceiverUidEqualTo(taskUser.getReceiverUid());
         List<TaskFinishOutcome> taskFinishOutcomes = taskFinishOutcomeDao.selectByExample(taskFinishOutcomeExample);
         taskProgressResp.setTaskFinishOutcomeList(taskFinishOutcomes);
+
+        DemeterAuthHistoryExample demeterAuthHistoryExample = new DemeterAuthHistoryExample();
+        demeterAuthHistoryExample.createCriteria()
+                .andUserTaskIdEqualTo(id);
+        List<DemeterAuthHistory> demeterAuthHistories =
+                demeterAuthHistoryDao.selectByExample(demeterAuthHistoryExample);
+        Set<String> uidSet =
+                demeterAuthHistories.stream().map(DemeterAuthHistory::getAuthUser).collect(Collectors.toSet());
+        Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
+        Map<String, UserResp> userMap =
+                userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+        if (CollectionUtils.isNotEmpty(demeterAuthHistories)) {
+            List<AuthHistoryResp> authHistories = new ArrayList<>(16);
+            demeterAuthHistories.forEach(history -> {
+                AuthHistoryResp resp = new AuthHistoryResp();
+                BeanUtils.copyProperties(history, resp);
+                resp.setAuthResultName(CheckoutResult.getByCode(history.getAuthResult()).getDesc());
+                Optional<UserResp> userResp = Optional.ofNullable(userMap.get(history.getAuthUser()));
+                resp.setAuthUserName(userResp.map(UserResp::getName).orElse("Unknown"));
+                authHistories.add(resp);
+            });
+            taskProgressResp.setTaskAuthHistoryList(authHistories);
+        }
+
         return Resp.success(taskProgressResp);
     }
 
@@ -1319,17 +1365,17 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
 
-//        DemeterAuthHistory demeterAuthHistory = DemeterAuthHistory.builder()
-//                .userTaskId(checkTaskReq.getId())
-//                .authOpinion(checkTaskReq.getAcceptanceOpinion())
-//                .authResult(checkTaskReq.getResult())
-//                .authUser(OperatorContext.getOperator())
-//                .createId(OperatorContext.getOperator())
-//                .modifyId(OperatorContext.getOperator())
-//                .createTime(new Date())
-//                .modifyTime(new Date())
-//                .build();
-//        demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
+        DemeterAuthHistory demeterAuthHistory = DemeterAuthHistory.builder()
+                .userTaskId(checkTaskReq.getId())
+                .authOpinion(checkTaskReq.getAcceptanceOpinion())
+                .authResult(checkTaskReq.getResult())
+                .authUser(OperatorContext.getOperator())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .build();
+        demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
 
         messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();

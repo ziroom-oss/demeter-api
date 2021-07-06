@@ -58,7 +58,7 @@ retrofit:
     - identity: ca
       baseUrl: http://ca.kt.ziroom.com/
     - identity: omega
-      baseUrl: http://omega-api.kp.ziroom.com/
+      baseUrl: http://omega-api.kt.ziroom.com/
     - identity: worktop
       baseUrl: http://management-api.kt.ziroom.com/
   connection:

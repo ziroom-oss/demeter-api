@@ -574,25 +574,32 @@ public class TaskServiceImpl implements TaskService {
     public PageListResp<ReceiveQueryResp> getExecuteList(TaskListQueryReq taskListQueryReq) {
         PageListResp<ReceiveQueryResp> pageListResp = new PageListResp<>();
         // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
-        List<ReceiveQueryResp> respList = new ArrayList<>(16);
+        List<ReceiveQueryResp> respList = new ArrayList<>(16);//任务列表表头、、、
 
-        DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
+        DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();//DemeterSkillTask技能表
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
-        DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();
+        DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();//DemeterAssignTask任务指派表
         DemeterAssignTaskExample.Criteria assignTaskExampleCriteria = assignTaskExample.createCriteria();
-
-        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample(); //员工任务表
         DemeterTaskUserExample.Criteria demeterTaskUserCriteria = demeterTaskUserExample.createCriteria();
 
-        CurrentRole currentRole = this.getCurrentRole();
-        String receiverCode = taskListQueryReq.getSystemCode();
+        DemeterTaskUserExtendExample taskUserExtendExample = new DemeterTaskUserExtendExample();//员工任务扩展
+        DemeterTaskUserExtendExample.Criteria taskUserExtendCriteria = taskUserExtendExample.createCriteria();
+        DemeterUserLearnManifestExample userLearnManifestExample = new DemeterUserLearnManifestExample();//员工学习清单
+        DemeterUserLearnManifestExample.Criteria userLearnManifestCriteria = userLearnManifestExample.createCriteria();
+
+
+        CurrentRole currentRole = this.getCurrentRole();//当前登录人角色
+        String receiverCode = taskListQueryReq.getSystemCode();//获取发布人或接收人系统号
         switch (currentRole) {
+            //超级管理员
             case SUPER:
                 // 全部
                 if (StringUtils.isNotEmpty(receiverCode)) {
                     demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
                 }
                 break;
+                //部门管理员
             case DEPT:
                 if (StringUtils.isNotEmpty(receiverCode)) {
                     demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
@@ -601,6 +608,7 @@ public class TaskServiceImpl implements TaskService {
                     demeterTaskUserCriteria.andReceiverUidIn(currentDeptUsers);
                 }
                 break;
+                //普通用户
             case PLAIN:
                 demeterTaskUserCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
             default:
@@ -636,14 +644,15 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);//员工任务表
 
         List<Long> skillIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.SKILL.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
         List<Long> assignIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.ASSIGN.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
         Set<String> receiverId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
-
+        //技能表
         List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        //任务指派
         List<DemeterAssignTask> demeterAssignTasks = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(skillIds)) {
@@ -660,6 +669,7 @@ public class TaskServiceImpl implements TaskService {
         receiverId.addAll(skillPublisher);
         receiverId.addAll(assignPublisher);
 
+        //ehr系统获取用户信息UserResp:code、name、email
         Set<UserResp> userDetail = ehrComponent.getUserDetail(receiverId);
         Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
 
@@ -667,6 +677,7 @@ public class TaskServiceImpl implements TaskService {
         Map<Long, DemeterAssignTask> assignTaskMap = demeterAssignTasks.stream().collect(Collectors.toMap(DemeterAssignTask::getId, Function.identity()));
 
         demeterTaskUsers.forEach(taskUser -> {
+
             ReceiveQueryResp resp = new ReceiveQueryResp();
             Long taskId = taskUser.getTaskId();
 
@@ -678,6 +689,8 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.SKILL.getCode());
                     resp.setTaskTypeName(TaskType.SKILL.getDesc());
                     resp.setTaskReward(skill.getSkillReward());
+                    resp.setAssigner(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid());
+                    resp.setAssignerName(ehrComponent.getUserDetail(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid()).getUserName());
                     resp.setReceiver(taskUser.getReceiverUid());
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
@@ -693,6 +706,10 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskTypeName(TaskType.ASSIGN.getDesc());
                     resp.setReceiver(taskUser.getReceiverUid());
                     resp.setNeedAcceptance(assign.getNeedAcceptance());
+
+                    resp.setAssigner(taskUser.getReceiverUid());
+                    resp.setAssignerName(userMap.get(taskUser.getReceiverUid()).getName());
+
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(assign.getPublisher()).getName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
@@ -718,7 +735,7 @@ public class TaskServiceImpl implements TaskService {
      */
     @Transactional
     @Override
-    public Resp createSkillLearnManifest(createSkillLearnManifestReq req) {
+    public Resp createSkillLearnManifest(CreateSkillLearnManifestReq req) {
 
         //1.【demeter_user_learn_manifest】创建学习清单
         DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
@@ -733,7 +750,7 @@ public class TaskServiceImpl implements TaskService {
                 .build();
 
         demeterUserLearnManifestDao.insertSelective(manifest);
-        long manifestId = manifest.getId();
+        long manifestId = manifest.getId();//获取当前学习清单id
 
                 //2.创建技能点学习任务
         String learnerUid = req.getLearner();
@@ -747,7 +764,7 @@ public class TaskServiceImpl implements TaskService {
                 throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
             }
 
-            //2.2如果是员工已经学习过的技能点，则抛出异常
+            //2.2 如果是员工已经学习过的技能点，则抛出异常
             DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
             demeterTaskUserExample.createCriteria()
                     .andTaskTypeEqualTo(TaskType.SKILL.getCode())
@@ -798,7 +815,6 @@ public class TaskServiceImpl implements TaskService {
                 demeterSkillLearnPathDao.insertSelective(demeterSkillLearnPath);
             });
         });
-
         return Resp.success();
     }
 
@@ -832,7 +848,7 @@ public class TaskServiceImpl implements TaskService {
         manifests.stream().forEach(manifest -> {
             SkillLearnManifestResp skillLearnManifestResp = new SkillLearnManifestResp();
             BeanUtils.copyProperties(manifest, skillLearnManifestResp);
-            if (StringUtils.isNotEmpty(manifest.getAssignerUid())) {
+            if (StringUtils.isNotEmpty(manifest.getAssignerUid())) { //分配者不为空
                 UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getAssignerUid());
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setAssignerName(userDetail.getUserName());
@@ -854,6 +870,7 @@ public class TaskServiceImpl implements TaskService {
             boolean passed = true;
             for(DemeterTaskUserExtend extend : taskUserExtends){
                 DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
+                skillLearnManifestResp.setTaskType(demeterTaskUser.getTaskType());
                 if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
                     passed = false;
                     break;
@@ -865,7 +882,15 @@ public class TaskServiceImpl implements TaskService {
             }
             skillLearnManifestResp.setStatus(status.getCode());
             skillLearnManifestResp.setStatusName(status.getName());
-            manifestResps.add(skillLearnManifestResp);
+          if(req.getStatus() == SkillManifestFlowStatus.PASS.getCode()){
+                if (passed){
+                    manifestResps.add(skillLearnManifestResp);
+                }
+            }else{
+                if (!passed) {
+                    manifestResps.add(skillLearnManifestResp);
+                }
+            }
         });
 
         List<SkillLearnManifestResp> resps = manifestResps.stream().skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
@@ -892,6 +917,9 @@ public class TaskServiceImpl implements TaskService {
         }
         SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
         BeanUtils.copyProperties(manifest, detailResp);
+        //根据人物uid查出姓名
+        detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
+        detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
         detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
         return detailResp;
     }
@@ -1263,7 +1291,7 @@ public class TaskServiceImpl implements TaskService {
             taskProgressResp.setId(taskUser.getId());
             taskProgressResp.setTaskId(taskUser.getTaskId());
             taskProgressResp.setTaskType(taskUser.getTaskType());
-            taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime());
+            taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime()); //检查时间
             taskProgressResp.setCheckoutOpinion(taskUser.getCheckOpinion());
             taskProgressResp.setCheckoutResult(CheckoutResult.getByCode(taskUser.getCheckResult()).getDesc());
             taskProgressResp.setReceiverUid(taskUser.getReceiverUid());

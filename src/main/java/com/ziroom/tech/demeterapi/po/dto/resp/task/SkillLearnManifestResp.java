@@ -12,28 +12,30 @@ import java.util.Date;
 @Data
 public class SkillLearnManifestResp {
 
-    private Long id;
+    private Long id;//1、学习清单编号
 
-    private String name;
+    private String name;//2、学习清单名称
+
+    private String  statusName; //3、状态
+
+    private Date createTime;//4、创建时间
+
+    //学习清单技能奖励值
+    private Integer reward;//5、技能点奖励
+
+    private String assignerName;//6、分配人
+
+    private String learnerName;//7、认领人
+
+    private Integer taskType;
 
     private String assignerUid;
 
-    private String assignerName;
-
     private String learnerUid;
-
-    private String learnerName;
 
     private String learnPeriod;
 
     private Integer status;
-
-    private String  statusName;
-
-    //学习清单技能奖励值
-    private Integer reward;
-
-    private Date createTime;
 
     private Date modifyTime;
 

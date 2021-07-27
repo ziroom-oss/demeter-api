@@ -30,13 +30,6 @@ import java.util.List;
     @Resource
     private TaskService taskService;
 
-    @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
-    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
-        assignTaskReq.validateAdd();
-        return taskService.createAssignTask(assignTaskReq);
-    }
-
     @PostMapping("get/assign")
     @ApiOperation(value = "查看指派类任务", httpMethod = "POST")
     public Resp<AssignDetailResp> getAssignTask(@RequestParam Long id) {
@@ -110,10 +103,17 @@ import java.util.List;
      *
      * @Description  
      */
-    @PostMapping("/create/skill/manifest")
+    @PostMapping(value = "/create/skill/manifest")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     @ApiOperation(value = "创建员工学习清单", httpMethod = "POST")
-    public Resp createSkillLearnManifest(@RequestBody createSkillLearnManifestReq req) {
+    public Resp createSkillLearnManifest(@RequestBody CreateSkillLearnManifestReq req) {
         return taskService.createSkillLearnManifest(req);
+    }
+
+    @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
+    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
+        assignTaskReq.validateAdd();
+        return taskService.createAssignTask(assignTaskReq);
     }
 
     /**
@@ -125,11 +125,12 @@ import java.util.List;
      * @author lipp3
      * @date 2021/7/1 9:06
      *
-     * @Description  
+     * @Description
      */
     @PostMapping("/list/skill/manifest")
     @ApiOperation(value = "分页查询员工学习清单", httpMethod = "POST")
     public Resp getSkillLearnManifest(@RequestBody GetSkillLearnManifestReq req) {
+        req.validate();
         return Resp.success(taskService.getSkillLearnManifest(req));
     }
 
@@ -144,16 +145,16 @@ import java.util.List;
      *
      * @Description
      */
-    @GetMapping("/get/skill/manifest/detail")
-    @ApiOperation(value = "获取学习清单详情", httpMethod = "GET")
-    public Resp getSkillLearnManifestDetail(@RequestParam("manifestId") Long manifestId) {
+    @PostMapping("/get/skill/manifest/detail")
+    @ApiOperation(value = "获取学习清单详情", httpMethod = "POST")
+    public Resp getSkillLearnManifestDetail(@RequestParam Long manifestId) {
         return Resp.success(taskService.getSkillLearnManifestDetail(manifestId));
     }
 
     @PostMapping("/list/receive")
     @ApiOperation(value = "接收任务列表", httpMethod = "POST")
     public Resp<PageListResp<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
-        taskListQueryReq.validate();
+       taskListQueryReq.validate();
         return Resp.success(taskService.getExecuteList(taskListQueryReq));
     }
 

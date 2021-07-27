@@ -46,6 +46,8 @@ public interface DemeterTaskUserExtendDao {
 
     public DemeterTaskUserExtend selectByPrimaryKey(Long id);
 
+    public DemeterTaskUserExtend selectByTaskUserId(Long taskId);
+
     public int updateByExampleSelective(@Param("record") DemeterTaskUserExtend record, @Param("example") DemeterTaskUserExtendExample example);
 
     public int updateByExample(@Param("record") DemeterTaskUserExtend record, @Param("example") DemeterTaskUserExtendExample example);

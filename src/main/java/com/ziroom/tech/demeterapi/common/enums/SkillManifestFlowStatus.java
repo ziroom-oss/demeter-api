@@ -14,9 +14,9 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum  SkillManifestFlowStatus {
 
-    ONGOING(1, "进行中"),
+    ONGOING(2 ,"进行中"),
 
-    PASS(2, "认证通过");
+    PASS(4 , "认证通过");
 
     /**
      * 类型码

@@ -63,7 +63,7 @@ public interface TaskService {
      *
      * @Description  分配技能学习任务
      */
-    Resp createSkillLearnManifest(createSkillLearnManifestReq req);
+    Resp createSkillLearnManifest(CreateSkillLearnManifestReq req);
 
     /**
      * 获取学习清单详情

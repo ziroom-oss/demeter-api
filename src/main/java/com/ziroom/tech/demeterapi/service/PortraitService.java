@@ -61,4 +61,6 @@ public interface PortraitService {
     CtoOmegaResp getCtoOmegaData(CTOReq ctoReq) throws Exception;
 
     WorktopOverview getWorktopOverview(CTOReq ctoReq) throws Exception;
+
+
 }

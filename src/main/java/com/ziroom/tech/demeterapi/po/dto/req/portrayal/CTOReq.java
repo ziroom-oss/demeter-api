@@ -16,4 +16,9 @@ public class CTOReq {
     private Date startDate;
 
     private Date endDate;
+
+    /**
+     * 环比 false，同比 true
+     */
+    private Boolean basePeriod;
 }

@@ -671,5 +671,7 @@ public class PortraitServiceImpl implements PortraitService {
         UserDetailResp userDetailResp = ehrComponent.getUserDetail(uid);
         return userDetailResp;
     }
+
+
 }
 

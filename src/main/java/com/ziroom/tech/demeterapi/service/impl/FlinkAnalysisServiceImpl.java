@@ -168,6 +168,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .tendency(commitS - yoyCommitS > 0 ? 1 : 2).build());
 //        productionMetric.add(Metric.builder().name("项目数").value("-").oldValue("-").rate("23").tendency(0).build());
         qoqProductionMetric.add(Metric.builder().name("修复bug数").value(Long.toString(fixBugS)).oldValue("-").rate("0").tendency(0).build());
+        yoyProductionMetric.add(Metric.builder().name("修复bug数").value(Long.toString(fixBugS)).oldValue("-").rate("0").tendency(0).build());
 //        productionMetric.add(Metric.builder().name("开发价值").value("-").oldValue("-").rate("1.4").tendency(0).build());
 //        productionMetric.add(Metric.builder().name("价值密度").value("2333").oldValue("23333").rate("110").tendency(1).build());
         TeamOverviewResp production = TeamOverviewResp.builder()
@@ -178,16 +179,23 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .style("margin-top: 15px")
                 .build();
 
-        List<Metric> efficiencyMetric = new ArrayList<>();
-        efficiencyMetric.add(Metric.builder().name("项目平均开发周期").value("189h").oldValue("214h").rate("8").tendency(2).build());
-        efficiencyMetric.add(Metric.builder().name("功能平均开发周期").value("-").oldValue("-").rate("0").tendency(0).build());
-        efficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("1.5h").oldValue("0.8h").rate("43").tendency(2).build());
-        efficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("1.5h").oldValue("0.8h").rate("43").tendency(2).build());
+        List<Metric> qoqEfficiencyMetric = new ArrayList<>();
+        List<Metric> yoyEfficiencyMetric = new ArrayList<>();
+        qoqEfficiencyMetric.add(Metric.builder().name("项目平均开发周期").value("189h").oldValue("214h").rate("8").tendency(2).build());
+        yoyEfficiencyMetric.add(Metric.builder().name("项目平均开发周期").value("189h").oldValue("214h").rate("8").tendency(2).build());
+        qoqEfficiencyMetric.add(Metric.builder().name("功能平均开发周期").value("-").oldValue("-").rate("0").tendency(0).build());
+        yoyEfficiencyMetric.add(Metric.builder().name("功能平均开发周期").value("-").oldValue("-").rate("0").tendency(0).build());
+        qoqEfficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("3.5h").oldValue("0.8h").rate("43").tendency(2).build());
+        yoyEfficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("1h").oldValue("0.8h").rate("67").tendency(2).build());
+        qoqEfficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("1.9h").oldValue("0.8h").rate("34").tendency(2).build());
+        yoyEfficiencyMetric.add(Metric.builder().name("bug平均修复时间").value("0.2h").oldValue("0.8h").rate("1").tendency(2).build());
+
         TeamOverviewResp efficiency = TeamOverviewResp.builder()
                 .id(2)
                 .name("效率类")
                 .style("border-right: dashed #A9A9A9; border-left: dashed #A9A9A9; margin-top: 15px")
-                .qoqMetricList(efficiencyMetric)
+                .qoqMetricList(qoqEfficiencyMetric)
+                .yoyMetricList(yoyEfficiencyMetric)
                 .build();
 
         long publishS = analysisData.stream().mapToLong(AnalysisResp::getPublishNum).sum();
@@ -195,28 +203,44 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         long onlineS = analysisData.stream().mapToLong(AnalysisResp::getOnlineNum).sum();
         long rollbackS = analysisData.stream().mapToLong(AnalysisResp::getRollbackNum).sum();
         long restartS = analysisData.stream().mapToLong(AnalysisResp::getRestartNum).sum();
-        List<Metric> publicationMetric = new ArrayList<>();
-        publicationMetric.add(Metric.builder().name("发布次数").value(String.valueOf(publishS)).oldValue("233").rate("0").tendency(1).build());
-        publicationMetric.add(Metric.builder().name("编译次数").value(String.valueOf(compileS)).oldValue("233").rate("0").tendency(1).build());
-        publicationMetric.add(Metric.builder().name("上线次数").value(String.valueOf(onlineS)).oldValue("233").rate("0").tendency(2).build());
-        publicationMetric.add(Metric.builder().name("重启次数").value(String.valueOf(rollbackS)).oldValue("233").rate("0").tendency(1).build());
-        publicationMetric.add(Metric.builder().name("回滚次数").value(String.valueOf(restartS)).oldValue("233").rate("0").tendency(2).build());
+        List<Metric> qoqPublicationMetric = new ArrayList<>();
+        List<Metric> yoyPublicationMetric = new ArrayList<>();
+        qoqPublicationMetric.add(Metric.builder().name("发布次数").value(String.valueOf(publishS)).oldValue("233").rate("0").tendency(1).build());
+        qoqPublicationMetric.add(Metric.builder().name("编译次数").value(String.valueOf(compileS)).oldValue("233").rate("0").tendency(1).build());
+        qoqPublicationMetric.add(Metric.builder().name("上线次数").value(String.valueOf(onlineS)).oldValue("233").rate("0").tendency(2).build());
+        qoqPublicationMetric.add(Metric.builder().name("重启次数").value(String.valueOf(rollbackS)).oldValue("233").rate("0").tendency(1).build());
+        qoqPublicationMetric.add(Metric.builder().name("回滚次数").value(String.valueOf(restartS)).oldValue("233").rate("0").tendency(2).build());
+
+        yoyPublicationMetric.add(Metric.builder().name("发布次数").value(String.valueOf(publishS)).oldValue("233").rate("0").tendency(1).build());
+        yoyPublicationMetric.add(Metric.builder().name("编译次数").value(String.valueOf(compileS)).oldValue("233").rate("0").tendency(1).build());
+        yoyPublicationMetric.add(Metric.builder().name("上线次数").value(String.valueOf(onlineS)).oldValue("233").rate("0").tendency(2).build());
+        yoyPublicationMetric.add(Metric.builder().name("重启次数").value(String.valueOf(rollbackS)).oldValue("233").rate("0").tendency(1).build());
+        yoyPublicationMetric.add(Metric.builder().name("回滚次数").value(String.valueOf(restartS)).oldValue("233").rate("0").tendency(2).build());
         TeamOverviewResp publication = TeamOverviewResp.builder()
                 .id(3)
                 .name("发布类")
-                .qoqMetricList(publicationMetric)
+                .qoqMetricList(qoqPublicationMetric)
+                .yoyMetricList(yoyPublicationMetric)
                 .style("margin-top: 15px")
                 .build();
 
-        List<Metric> qualityMetric = new ArrayList<>();
-        qualityMetric.add(Metric.builder().name("注释覆盖度").value("100%").oldValue("90%").rate("10").tendency(1).build());
-        qualityMetric.add(Metric.builder().name("测试覆盖度").value("0.01%").oldValue("0.01%").rate("10").tendency(2).build());
-        qualityMetric.add(Metric.builder().name("代码模块性").value("0.01%").oldValue("0.01%").rate("10").tendency(1).build());
-        qualityMetric.add(Metric.builder().name("千行bug率").value("0.01%").oldValue("0.017%").rate("4").tendency(2).build());
+        List<Metric> qoqQualityMetric = new ArrayList<>();
+        List<Metric> yoyQualityMetric = new ArrayList<>();
+        qoqQualityMetric.add(Metric.builder().name("注释覆盖度").value("100%").oldValue("90%").rate("10").tendency(1).build());
+        qoqQualityMetric.add(Metric.builder().name("测试覆盖度").value("0.01%").oldValue("0.01%").rate("10").tendency(2).build());
+        qoqQualityMetric.add(Metric.builder().name("代码模块性").value("0.01%").oldValue("0.01%").rate("10").tendency(1).build());
+        qoqQualityMetric.add(Metric.builder().name("千行bug率").value("0.01%").oldValue("0.017%").rate("4").tendency(2).build());
+
+        yoyQualityMetric.add(Metric.builder().name("注释覆盖度").value("100%").oldValue("90%").rate("10").tendency(1).build());
+        yoyQualityMetric.add(Metric.builder().name("测试覆盖度").value("0.01%").oldValue("0.01%").rate("10").tendency(2).build());
+        yoyQualityMetric.add(Metric.builder().name("代码模块性").value("0.01%").oldValue("0.01%").rate("10").tendency(1).build());
+        yoyQualityMetric.add(Metric.builder().name("千行bug率").value("0.01%").oldValue("0.017%").rate("4").tendency(2).build());
+
         TeamOverviewResp quality = TeamOverviewResp.builder()
                 .id(4)
                 .name("质量类")
-                .qoqMetricList(qualityMetric)
+                .qoqMetricList(qoqQualityMetric)
+                .yoyMetricList(yoyQualityMetric)
                 .style("margin-top: 15px")
                 .build();
 

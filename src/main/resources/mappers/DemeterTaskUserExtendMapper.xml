@@ -93,6 +93,14 @@
         FROM demeter_task_user_extend
         WHERE id = #{id,jdbcType=BIGINT}
     </select>
+
+    <select id="selectByTaskUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demeter_task_user_extend
+        WHERE task_user_id = #{taskUserId,jdbcType=BIGINT}
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM demeter_task_user_extend
         WHERE id = #{id,jdbcType=BIGINT}

@@ -14,7 +14,10 @@ import lombok.Data;
 @ApiModel("分配技能任务-查询请求体")
 public class GetSkillLearnManifestReq extends PageListReq {
 
-    @ApiModelProperty("清单编号")
+    @ApiModelProperty("任务类型")
+    private Integer taskType;
+
+    @ApiModelProperty("清单编号/名称")
     private String manifestIdOrName;
 
     @ApiModelProperty("清单状态")

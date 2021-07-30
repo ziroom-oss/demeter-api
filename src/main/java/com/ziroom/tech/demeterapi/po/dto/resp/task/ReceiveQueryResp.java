@@ -36,6 +36,10 @@ public class ReceiveQueryResp {
 
     private String taskDescription;
 
+    private String assigner;
+
+    private String assignerName;
+
     private String publisher;
 
     private String publisherName;

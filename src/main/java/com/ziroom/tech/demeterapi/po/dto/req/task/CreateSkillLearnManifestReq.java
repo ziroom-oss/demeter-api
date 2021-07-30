@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Data
 @ApiModel("创建学习清单请求体")
-public class createSkillLearnManifestReq{
+public class CreateSkillLearnManifestReq {
 
     @ApiModelProperty("学习清单名称")
     private String name;

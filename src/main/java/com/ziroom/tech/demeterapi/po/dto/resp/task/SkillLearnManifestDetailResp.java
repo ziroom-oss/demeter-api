@@ -10,5 +10,6 @@ import lombok.Data;
  */
 @Data
 public class SkillLearnManifestDetailResp extends SkillLearnManifestResp {
+
     private SkillTree skillTree;
 }

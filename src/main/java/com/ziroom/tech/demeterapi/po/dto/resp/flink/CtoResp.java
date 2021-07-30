@@ -20,7 +20,7 @@ import lombok.Data;
 public class CtoResp {
 
     /**
-     * 核心数据指标-环比
+     * 核心数据指标
      */
     private List<TeamOverviewResp> teamOverviewResp;
 

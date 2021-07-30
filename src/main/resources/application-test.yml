@@ -61,6 +61,8 @@ retrofit:
       baseUrl: http://omega-api.kp.ziroom.com/
     - identity: worktop
       baseUrl: http://management-api.kp.ziroom.com/
+    - identity: flink-analysis
+      baseUrl: http://analysis.kt.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000

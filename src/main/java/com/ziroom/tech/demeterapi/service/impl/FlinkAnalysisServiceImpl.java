@@ -115,12 +115,16 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         double yoyDevEquivalentRate = Math.abs((devEquivalentS - yoyDevEquivalentS) * 1.0 / yoyDevEquivalentS) * 100;
 
         long insertionS = analysisData.stream().mapToLong(AnalysisResp::getInsertions).sum();
-        long oldInsertionsS = qoqAnalysisData.stream().mapToLong(AnalysisResp::getInsertions).sum();
-        double insertionsRate = Math.abs((insertionS - oldInsertionsS) * 1.0 / oldInsertionsS) * 100;
+        long qoqInsertionsS = qoqAnalysisData.stream().mapToLong(AnalysisResp::getInsertions).sum();
+        long yoyInsertionsS = yoyAnalysisData.stream().mapToLong(AnalysisResp::getInsertions).sum();
+        double qoqInsertionsRate = Math.abs((insertionS - qoqInsertionsS) * 1.0 / qoqInsertionsS) * 100;
+        double yoyInsertionsRate = Math.abs((insertionS - yoyInsertionsS) * 1.0 / yoyInsertionsS) * 100;
 
         long commitS = analysisData.stream().mapToLong(AnalysisResp::getCommitCount).sum();
-        long oldCommitS = qoqAnalysisData.stream().mapToLong(AnalysisResp::getCommitCount).sum();
-        double commitsRate = Math.abs((commitS - oldCommitS) * 1.0 / oldCommitS) * 100;
+        long qoqCommitS = qoqAnalysisData.stream().mapToLong(AnalysisResp::getCommitCount).sum();
+        long yoyCommitS = yoyAnalysisData.stream().mapToLong(AnalysisResp::getCommitCount).sum();
+        double qoqCommitsRate = Math.abs((commitS - qoqCommitS) * 1.0 / qoqCommitS) * 100;
+        double yoyCommitsRate = Math.abs((commitS - yoyCommitS) * 1.0 / yoyCommitS) * 100;
         long fixBugS = analysisData.stream().mapToLong(AnalysisResp::getFixBugCount).sum();
         List<Metric> qoqProductionMetric = new ArrayList<>(16);
         List<Metric> yoyProductionMetric = new ArrayList<>(16);
@@ -140,15 +144,28 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         qoqProductionMetric.add(Metric.builder()
                 .name("代码行数")
                 .value(Long.toString(insertionS))
-                .oldValue(Long.toString(oldInsertionsS))
-                .rate(String.format("%.2f", insertionsRate))
-                .tendency(insertionsRate - oldInsertionsS > 0 ? 1 : 2).build());
+                .oldValue(Long.toString(qoqInsertionsS))
+                .rate(String.format("%.2f", qoqInsertionsRate))
+                .tendency(insertionS - qoqInsertionsS > 0 ? 1 : 2).build());
+        yoyProductionMetric.add(Metric.builder()
+                .name("代码行数")
+                .value(Long.toString(insertionS))
+                .oldValue(Long.toString(yoyInsertionsS))
+                .rate(String.format("%.2f", yoyInsertionsRate))
+                .tendency(insertionS - yoyInsertionsS > 0 ? 1 : 2).build());
+
         qoqProductionMetric.add(Metric.builder()
                 .name("代码提交次数")
                 .value(Long.toString(commitS))
-                .oldValue(Long.toString(oldCommitS))
-                .rate(String.format("%.2f", commitsRate))
-                .tendency(commitS - oldCommitS > 0 ? 1 : 2).build());
+                .oldValue(Long.toString(qoqCommitS))
+                .rate(String.format("%.2f", qoqCommitsRate))
+                .tendency(commitS - qoqCommitS > 0 ? 1 : 2).build());
+        yoyProductionMetric.add(Metric.builder()
+                .name("代码提交次数")
+                .value(Long.toString(commitS))
+                .oldValue(Long.toString(yoyCommitS))
+                .rate(String.format("%.2f", yoyCommitsRate))
+                .tendency(commitS - yoyCommitS > 0 ? 1 : 2).build());
 //        productionMetric.add(Metric.builder().name("项目数").value("-").oldValue("-").rate("23").tendency(0).build());
         qoqProductionMetric.add(Metric.builder().name("修复bug数").value(Long.toString(fixBugS)).oldValue("-").rate("0").tendency(0).build());
 //        productionMetric.add(Metric.builder().name("开发价值").value("-").oldValue("-").rate("1.4").tendency(0).build());

@@ -94,7 +94,7 @@ public class RankingListController {
     @PostMapping("devEfficiency")
     @ApiOperation(value = "开发效率", httpMethod = "POST")
     public Resp<RankingResp> devEfficiency(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.devEfficiency(rankingReq));
+        return Resp.success(rankingListService.authSkillpointnum(rankingReq));
     }
 
 }

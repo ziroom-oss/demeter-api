@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CtoResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
+import java.util.concurrent.ExecutionException;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,7 @@ public class PortraitNewController {
     private FlinkAnalysisService flinkAnalysisService;
 
     @PostMapping("/cto/overview")
-    public Resp<CtoResp> getTeamData(@RequestBody CTOReq ctoReq) {
+    public Resp<CtoResp> getTeamData(@RequestBody CTOReq ctoReq) throws ExecutionException, InterruptedException {
 
         CtoResp ctoResp = flinkAnalysisService.getCtoResp(ctoReq);
         return Resp.success(ctoResp);

@@ -34,8 +34,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -59,7 +62,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     }
 
     @Override
-    public CtoResp getCtoResp(CTOReq ctoReq) {
+    public CtoResp getCtoResp(CTOReq ctoReq) throws ExecutionException, InterruptedException {
         Set<EhrUserResp> users = ehrComponent.getUsers(ctoReq.getDeptId(), 101);
         List<String> userCodes = users.stream().map(EhrUserResp::getUserCode).collect(Collectors.toList());
 
@@ -77,18 +80,11 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         List<String> adCodeList = userRespSet.stream().map(EhrUserDetailResp::getEmail).filter(StringUtils::isNotEmpty).map(this::convertEmail2Adcode)
                 .collect(Collectors.toList());
 
-
-        List<AnalysisResp> analysisData = flinkAnalysisComponent
-                .getAnalysisResp(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList);
-
         Calendar startCal = Calendar.getInstance();
         startCal.add(Calendar.MONTH, -1);
         startCal.set(Calendar.DAY_OF_MONTH, 1);
         Calendar endCal = Calendar.getInstance();
         endCal.set(Calendar.DAY_OF_MONTH, 0);
-
-        List<AnalysisResp> qoqAnalysisData =
-                flinkAnalysisComponent.getAnalysisResp(startCal.getTime(), endCal.getTime(), adCodeList);
 
         Calendar yoyStart = Calendar.getInstance();
         yoyStart.add(Calendar.YEAR, -1);
@@ -96,13 +92,28 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         Calendar yoyEnd = Calendar.getInstance();
         yoyEnd.add(Calendar.MONTH, 1);
         yoyEnd.set(Calendar.DAY_OF_MONTH, 0);
-        List<AnalysisResp> yoyAnalysisData =
-                flinkAnalysisComponent.getAnalysisResp(yoyStart.getTime(), yoyEnd.getTime(), adCodeList);
 
+        CompletableFuture<List<AnalysisResp>> currentFuture
+                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList));
+
+        CompletableFuture<List<AnalysisResp>> qoqFuture
+                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(startCal.getTime(), endCal.getTime(), adCodeList));
+
+        CompletableFuture<List<AnalysisResp>> yoyFuture
+                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(yoyStart.getTime(), yoyEnd.getTime(), adCodeList));
+
+        List<List<AnalysisResp>> collect = Stream.of(currentFuture, qoqFuture, yoyFuture).map(CompletableFuture::join)
+                .collect(Collectors.toList());
+
+
+        List<AnalysisResp> analysisData = collect.get(0);
+        List<AnalysisResp> qoqAnalysisData = collect.get(1);
+        List<AnalysisResp> yoyAnalysisData = collect.get(2);
         analysisData.forEach(o -> {
             EhrUserDetailResp ehrUserDetailResp = userMap.get(o.getUid() + "@ziroom.com");
             o.setLevel(ehrUserDetailResp.getLevelName());
         });
+
         /**
          * 核心数据指标
          */

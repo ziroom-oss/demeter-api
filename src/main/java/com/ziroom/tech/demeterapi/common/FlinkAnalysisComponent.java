@@ -1,6 +1,5 @@
 package com.ziroom.tech.demeterapi.common;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.demeterapi.common.api.FlinkAnalysisEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisReq;

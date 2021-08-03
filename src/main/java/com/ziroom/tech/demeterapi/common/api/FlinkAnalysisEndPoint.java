@@ -4,6 +4,8 @@ import com.ziroom.tech.boot.annotation.RetrofitService;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.Resp;
+import com.ziroom.tech.demeterapi.po.dto.resp.flink.StabilityReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.flink.StabilityResp;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -22,4 +24,11 @@ public interface FlinkAnalysisEndPoint {
      */
     @POST("/api/v1/data/search")
     Call<Resp<List<AnalysisResp>>> getAnalysisResp(@Body AnalysisReq analysisReq);
+
+    /**
+     * @param stabilityReq
+     * @return
+     */
+    @POST("/api/v1/data/getDeptEfficiencyData")
+    Call<Resp<List<StabilityResp>>> getStabilityData(@Body StabilityReq stabilityReq);
 }

@@ -31,7 +31,6 @@ public class PortraitNewController {
 
     @PostMapping("/cto/overview")
     public Resp<CtoResp> getTeamData(@RequestBody CTOReq ctoReq) throws ExecutionException, InterruptedException {
-
         CtoResp ctoResp = flinkAnalysisService.getCtoResp(ctoReq);
         return Resp.success(ctoResp);
     }

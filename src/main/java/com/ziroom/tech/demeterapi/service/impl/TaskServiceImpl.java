@@ -830,10 +830,12 @@ public class TaskServiceImpl implements TaskService {
         //1.【demeter_user_learn_manifest】根据清单名称或清单编号查询demeter_user_learn_manifest表
         DemeterUserLearnManifestExample example = new DemeterUserLearnManifestExample();
         DemeterUserLearnManifestExample.Criteria criteria = example.createCriteria();
+        // 模糊查询清单名称
         if (StringUtils.isNotEmpty(req.getManifestIdOrName())){
             criteria.andNameLike("%" + req.getManifestIdOrName() + "%");
         }
         List<DemeterUserLearnManifest> manifests = demeterUserLearnManifestDao.selectByExample(example);
+        // 如果清单名称是 long 类型则移除上述查询条件，并将其赋值到 id 重新查询
         if (manifests.size() == 0 && StringUtil.isLong(req.getManifestIdOrName())){
             example.clear();
             example.createCriteria().andIdEqualTo(Long.valueOf(req.getManifestIdOrName()));
@@ -848,6 +850,8 @@ public class TaskServiceImpl implements TaskService {
         manifests.stream().forEach(manifest -> {
             SkillLearnManifestResp skillLearnManifestResp = new SkillLearnManifestResp();
             BeanUtils.copyProperties(manifest, skillLearnManifestResp);
+
+            // uid 查询分配者的姓名
             if (StringUtils.isNotEmpty(manifest.getAssignerUid())) { //分配者不为空
                 UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getAssignerUid());
                 if (Objects.nonNull(userDetail)) {
@@ -857,44 +861,57 @@ public class TaskServiceImpl implements TaskService {
                 skillLearnManifestResp.setAssignerName("-");
             }
 
+            // 查询学习者的姓名
             if(StringUtils.isNotEmpty(manifest.getLearnerUid())){
                 UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getLearnerUid());
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setLearnerName(userDetail.getUserName());
                 }
             }
+
+            // 清单 id 关联到 taskUserExtend 表的查询
             DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
             extendExample.createCriteria()
                     .andManifestIdEqualTo(manifest.getId());
             List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+
+
             boolean passed = true;
+            // 从 extend 表拿到 taskUserId 到 taskUser 表批量查询任务状态和任务类型
             for(DemeterTaskUserExtend extend : taskUserExtends){
                 DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
                 skillLearnManifestResp.setTaskType(demeterTaskUser.getTaskType());
+                // 如果 taskUser 的任务状态不是 PASS
                 if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
                     passed = false;
                     break;
                 }
             }
+
+            // 初始化清单流程状态为进行中，如果清单内所有任务的状态都是 PASS 则该清单判断为通过
             SkillManifestFlowStatus status = SkillManifestFlowStatus.ONGOING;
             if (passed){
                 status = SkillManifestFlowStatus.PASS;
             }
             skillLearnManifestResp.setStatus(status.getCode());
             skillLearnManifestResp.setStatusName(status.getName());
-          if(req.getStatus() == SkillManifestFlowStatus.PASS.getCode()){
+
+            // 如果查询清单状态是通过的话
+            if (req.getStatus() == SkillManifestFlowStatus.PASS.getCode()){
+                // 并且清单状态（包含的任务也都是通过状态）
                 if (passed){
                     manifestResps.add(skillLearnManifestResp);
                 }
-            }else{
+             } else {
+                // 如果查询的是其它状态
                 if (!passed) {
                     manifestResps.add(skillLearnManifestResp);
                 }
             }
         });
 
+        // 因为 manifestResps 内综合除分页以外的结果
         List<SkillLearnManifestResp> resps = manifestResps.stream().skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
-
         pageListResp.setTotal(manifestResps.size());
         pageListResp.setData(resps);
 
@@ -905,7 +922,7 @@ public class TaskServiceImpl implements TaskService {
      * @param manifestId 清单id
      * @return {@link Resp}
      * @throws
-     * @author
+     * @author modified by zhangxt3
      * @date 2021/7/1 9:24
      * @Description TODO
      */
@@ -920,7 +937,17 @@ public class TaskServiceImpl implements TaskService {
         //根据人物uid查出姓名
         detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
         detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
-        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+//        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+        //1.根据manifestId获取所有demeter_task_user_extend
+        DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
+        extendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId);
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        taskUserExtends.stream().forEach(extend -> {
+            demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+        });
+        detailResp.setDemeterSkillTasks(demeterSkillTasks);
         return detailResp;
     }
 

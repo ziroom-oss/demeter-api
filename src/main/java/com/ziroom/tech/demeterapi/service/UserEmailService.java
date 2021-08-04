@@ -20,10 +20,10 @@ public interface UserEmailService {
 
     /**
      * 删除用户子邮箱
-     * @param qo
+     * @param id
      * @return
      */
-    Integer deleteEmail(String qo);
+    Integer deleteEmail(Long id);
 
     /**
      * 查询用户子邮箱

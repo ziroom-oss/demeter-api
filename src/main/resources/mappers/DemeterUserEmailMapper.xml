@@ -3,7 +3,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ziroom.tech.demeterapi.dao.mapper.DemeterUserEmailDao">
     <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmail">
-        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="sub_email" property="subEmail" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
@@ -84,25 +84,25 @@
             order by ${orderByClause}
         </if>
     </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT 
         <include refid="Base_Column_List"/>
         FROM demeter_user_email
-        WHERE id = #{id,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM demeter_user_email
-        WHERE id = #{id,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmail">
-        <selectKey resultType="java.lang.String" keyProperty="id" order="AFTER">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
         INSERT INTO demeter_user_email (email, sub_email, create_time, update_time)
         VALUES (#{email,jdbcType=VARCHAR}, #{subEmail,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmail">
-        <selectKey resultType="java.lang.String" keyProperty="id" order="AFTER">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
         INSERT INTO demeter_user_email
@@ -135,17 +135,17 @@
             </if>
         </trim>
     </insert>
-    <SELECT id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmailExample" resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmailExample" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM demeter_user_email
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
-    </SELECT>
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         UPDATE demeter_user_email
         <set>
             <if test="record.id != null">
-                id = #{record.id,jdbcType=VARCHAR},
+                id = #{record.id,jdbcType=BIGINT},
             </if>
             <if test="record.email != null">
                 email = #{record.email,jdbcType=VARCHAR},
@@ -166,7 +166,7 @@
     </update>
     <update id="updateByExample" parameterType="map">
         UPDATE demeter_user_email
-        SET id = #{record.id,jdbcType=VARCHAR},
+        SET id = #{record.id,jdbcType=BIGINT},
             email = #{record.email,jdbcType=VARCHAR},
             sub_email = #{record.subEmail,jdbcType=VARCHAR},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -191,7 +191,7 @@
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        WHERE id = #{id,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserEmail">
         UPDATE demeter_user_email
@@ -199,6 +199,6 @@
             sub_email = #{subEmail,jdbcType=VARCHAR},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             update_time = #{updateTime,jdbcType=TIMESTAMP}
-        WHERE id = #{id,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>

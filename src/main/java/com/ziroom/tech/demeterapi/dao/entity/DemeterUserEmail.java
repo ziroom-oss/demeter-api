@@ -27,7 +27,7 @@ import java.util.Date;
  */
 public class DemeterUserEmail {
 
-    private String id;
+    private Long id;
 
     private String email;
 
@@ -37,11 +37,11 @@ public class DemeterUserEmail {
 
     private Date updateTime;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -36,7 +36,7 @@ public interface DemeterUserEmailDao {
 
     public int countByExample(DemeterUserEmailExample example);
 
-    public int deleteByPrimaryKey(String id);
+    public int deleteByPrimaryKey(Long id);
 
     public int insert(DemeterUserEmail record);
 
@@ -44,7 +44,7 @@ public interface DemeterUserEmailDao {
 
     public List<DemeterUserEmail> selectByExample(DemeterUserEmailExample example);
 
-    public DemeterUserEmail selectByPrimaryKey(String id);
+    public DemeterUserEmail selectByPrimaryKey(Long id);
 
     public int updateByExampleSelective(@Param("record") DemeterUserEmail record, @Param("example") DemeterUserEmailExample example);
 

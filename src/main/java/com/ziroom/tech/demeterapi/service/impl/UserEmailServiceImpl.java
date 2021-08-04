@@ -34,7 +34,6 @@ public class UserEmailServiceImpl implements UserEmailService {
     @Transactional
     public Integer insertEmail(UserEmailQo qo) {
         DemeterUserEmail emailEntity = new DemeterUserEmail();
-        emailEntity.setId(UUIDUtil.getId());
         emailEntity.setEmail(qo.getEmail());
         emailEntity.setSubEmail(qo.getSubEmail());
         emailEntity.setCreateTime(new Date());
@@ -43,7 +42,7 @@ public class UserEmailServiceImpl implements UserEmailService {
     }
 
     @Override
-    public Integer deleteEmail(String id) {
+    public Integer deleteEmail(Long id) {
         return demeterUserEmailDao.deleteByPrimaryKey(id);
     }
 

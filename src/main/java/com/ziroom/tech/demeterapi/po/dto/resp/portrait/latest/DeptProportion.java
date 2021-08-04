@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest;
 
 import java.util.List;
+import javax.naming.Name;
 import lombok.Builder;
 import lombok.Data;
 
@@ -50,4 +51,14 @@ public class DeptProportion {
      * 行价值密度
      */
     private List<NameValue> lineDensityList;
+
+    private List<NameValue> publishList;
+
+    private List<NameValue> compileList;
+
+    private List<NameValue> onlineList;
+
+    private List<NameValue> rollbackList;
+
+    private List<NameValue> restartList;
 }

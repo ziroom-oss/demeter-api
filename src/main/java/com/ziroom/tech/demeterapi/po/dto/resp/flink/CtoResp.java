@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.flink;
 
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EmployeeListReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptEffAndStab;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptProportion;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptTendency;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.EmployeeProportion;
@@ -38,6 +39,9 @@ public class CtoResp {
     /**
      * 部门工程指标-部门效率与稳定性统计
      */
+//    private DeptEffAndStab deptEffAndStab;
+
+    private List<List<Object>> deptEffAndStab;
 
     /**
      * 员工工程指标-员工占比统计

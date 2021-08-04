@@ -121,7 +121,7 @@ public class CodeAnalysisComponent {
 
 
 
-    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
     public CtoDevResp getDepartmentDe(String departmentCode, Date from, Date to) {
         CtoDevResp ctoDevResp = new CtoDevResp();
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");

@@ -12,9 +12,9 @@ public class StabilityResp {
 
     private String departmentCode;
 
-    private Double robustness;
+    private Double robustness = 0.0;
 
-    private Double stability;
+    private Double stability = 0.0;
 
     private String updateTime;
 }

@@ -21,4 +21,6 @@ public class CTOReq {
      * 环比 false，同比 true
      */
     private Boolean basePeriod;
+
+    private String subDeptId;
 }

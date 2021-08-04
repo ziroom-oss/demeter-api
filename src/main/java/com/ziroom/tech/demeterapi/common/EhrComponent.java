@@ -329,7 +329,7 @@ public class EhrComponent {
     }
 
     public String getPrincipalDept() {
-        List<EhrUserDetailResp> ehrUserDetail = getEhrUserDetail("[" + OperatorContext.getOperator() + "]");
+        List<EhrUserDetailResp> ehrUserDetail = getEhrUserDetail(OperatorContext.getOperator());
         if (!CollectionUtils.isEmpty(ehrUserDetail)) {
             for (EhrUserDetailResp ehrUser : ehrUserDetail) {
                 if (ehrUser.getJobIndicator().equals("P")) {

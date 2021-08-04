@@ -56,7 +56,7 @@ public class LoggerInterceptor {
                     param[i] = null;
                 }
             }
-            log.info("【" + className + ":" + methodName + "】开始执行");
+//            log.info("【" + className + ":" + methodName + "】开始执行");
         } catch (Exception e) {
             log.warn("日志参数转换异常，不影响业务逻辑！信息：" + e.getMessage());
         }
@@ -83,7 +83,7 @@ public class LoggerInterceptor {
             //方法开始时间
             timeMap.put(Thread.currentThread().getId() + "" + methodName + "end", System.currentTimeMillis());
             Long cost = timeMap.get(Thread.currentThread().getId() + "" + methodName + "end") - timeMap.get(Thread.currentThread().getId() + "" + methodName + "start");
-            log.info("【" + className + ":" + methodName + "】执行完毕,"+ ";花费时间" + cost + "ms");
+//            log.info("【" + className + ":" + methodName + "】执行完毕,"+ ";花费时间" + cost + "ms");
         } catch (Exception e) {
             log.warn("日志参数转换异常，不影响业务逻辑！信息：" + e.getMessage());
         } finally {
@@ -113,11 +113,11 @@ public class LoggerInterceptor {
             //方法开始时间
             timeMap.put(Thread.currentThread().getId() + "" + methodName + "end", System.currentTimeMillis());
             Long cost = timeMap.get(Thread.currentThread().getId() + "" + methodName + "end") - timeMap.get(Thread.currentThread().getId() + "" + methodName + "start");
-            log.info("【ServiceInterceptor】doAfterThrowing:" + e.getClass().getName());
+//            log.info("【ServiceInterceptor】doAfterThrowing:" + e.getClass().getName());
             if(!(e instanceof BusinessException)){
                 log.error("【ServiceInterceptor】异常:", e);
             }
-            log.info("【" + className + ":" + methodName + "】执行完毕" + ";花费时间" + cost + "ms;" +  "异常信息:" + e.getMessage());
+//            log.info("【" + className + ":" + methodName + "】执行完毕" + ";花费时间" + cost + "ms;" +  "异常信息:" + e.getMessage());
         } catch (Exception e1) {
             log.warn("日志参数转换异常，不影响业务逻辑！信息：" + e.getMessage());
         } finally {

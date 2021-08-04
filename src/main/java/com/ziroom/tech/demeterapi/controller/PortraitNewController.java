@@ -3,10 +3,13 @@ package com.ziroom.tech.demeterapi.controller;
 import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.EngineeringMetricReq;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PersonReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CtoResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.flink.PersonResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.EngineeringMetricResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
-import java.util.concurrent.ExecutionException;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +33,14 @@ public class PortraitNewController {
     private FlinkAnalysisService flinkAnalysisService;
 
     @PostMapping("/cto/overview")
-    public Resp<CtoResp> getTeamData(@RequestBody CTOReq ctoReq) throws ExecutionException, InterruptedException {
+    public Resp<CtoResp> getTeamData(@RequestBody CTOReq ctoReq) {
         CtoResp ctoResp = flinkAnalysisService.getCtoResp(ctoReq);
         return Resp.success(ctoResp);
+    }
+
+    @PostMapping("/metric")
+    public Resp<PersonResp> getPersonData(@RequestBody PersonReq personReq) {
+        return Resp.success(flinkAnalysisService.getPersonData(personReq));
     }
 
 }

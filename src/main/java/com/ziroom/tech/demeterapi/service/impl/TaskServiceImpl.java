@@ -922,7 +922,7 @@ public class TaskServiceImpl implements TaskService {
      * @param manifestId 清单id
      * @return {@link Resp}
      * @throws
-     * @author
+     * @author modified by zhangxt3
      * @date 2021/7/1 9:24
      * @Description TODO
      */
@@ -937,7 +937,17 @@ public class TaskServiceImpl implements TaskService {
         //根据人物uid查出姓名
         detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
         detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
-        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+//        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+        //1.根据manifestId获取所有demeter_task_user_extend
+        DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
+        extendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId);
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        taskUserExtends.stream().forEach(extend -> {
+            demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+        });
+        detailResp.setDemeterSkillTasks(demeterSkillTasks);
         return detailResp;
     }
 

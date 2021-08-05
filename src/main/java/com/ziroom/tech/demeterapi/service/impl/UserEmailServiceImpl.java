@@ -54,4 +54,13 @@ public class UserEmailServiceImpl implements UserEmailService {
         List<UserEmailDto> dtos =beanMapper.mapList(demeterUserEmails,UserEmailDto.class);
         return dtos;
     }
+
+    @Override
+    public List<UserEmailDto> batchSelectEmail(List<String> emailList) {
+        DemeterUserEmailExample demeterUserEmailExample = new DemeterUserEmailExample();
+        demeterUserEmailExample.createCriteria()
+                .andEmailIn(emailList);
+        List<DemeterUserEmail> demeterUserEmails = demeterUserEmailDao.selectByExample(demeterUserEmailExample);
+        return beanMapper.mapList(demeterUserEmails,UserEmailDto.class);
+    }
 }

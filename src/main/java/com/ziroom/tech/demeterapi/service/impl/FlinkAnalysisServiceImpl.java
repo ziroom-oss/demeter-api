@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.common.FlinkAnalysisComponent;
+import com.ziroom.tech.demeterapi.po.dto.req.email.UserEmailDto;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PersonReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
@@ -30,6 +31,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.Metric;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
+import com.ziroom.tech.demeterapi.service.UserEmailService;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -69,6 +71,8 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     private FlinkAnalysisComponent flinkAnalysisComponent;
     @Resource
     private EhrComponent ehrComponent;
+    @Resource
+    private UserEmailService userEmailService;
 
     private String convertEmail2Adcode(String email) {
         return email.split("@")[0];
@@ -97,8 +101,15 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
 
         Map<String, EhrUserDetailResp> userMap =
                 userRespSet.stream().collect(Collectors.toMap(EhrUserDetailResp::getEmail, Function.identity(), (value1, value2) -> value2));
+        List<String> emailList = userRespSet.stream().map(EhrUserDetailResp::getEmail).filter(StringUtils::isNotEmpty)
+                .collect(Collectors.toList());
+        List<UserEmailDto> userEmailDtoList = userEmailService.batchSelectEmail(emailList);
+        List<String> subPrefixList = userEmailDtoList.stream().map(UserEmailDto::getSubEmail).map(this::convertEmail2Adcode)
+                .collect(Collectors.toList());
         List<String> adCodeList = userRespSet.stream().map(EhrUserDetailResp::getEmail).filter(StringUtils::isNotEmpty).map(this::convertEmail2Adcode)
                 .collect(Collectors.toList());
+//        adCodeList.addAll(subPrefixList);
+
 
         Calendar qoqStart = getQoQStart(ctoReq.getStartDate());
         Calendar qoqEnd = getQoQEnd(ctoReq.getStartDate());
@@ -294,7 +305,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .rate("")
                 .tendency(0)
                 .build());
-        getCalculateData("xxxx", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getFixBugCount, qoqEfficiencyMetric, yoyEfficiencyMetric);
+        getCalculateData("bug修复数", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getFixBugCount, qoqEfficiencyMetric, yoyEfficiencyMetric);
         TeamOverviewResp efficiency = TeamOverviewResp.builder()
                 .id(2)
                 .name("效率类")
@@ -540,7 +551,6 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
             empMap = analysisData.stream().filter(x -> StringUtils.isNotEmpty(x.getUid()))
                     .collect(Collectors.groupingBy(AnalysisResp::getUid));
         }
-
         EmployeeProportion employeeProportion = getEmployeeProportion(empMap, userMap);
         EmployeeTendency employeeTendency = getEmployeeTendency(empMap, employeeProportion, userMap);
         employeeTendency.setMonthList(monthList);
@@ -551,55 +561,52 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         Map<String, List<AnalysisResp>> levelMap =
                 analysisData.stream().filter(x -> StringUtils.isNotEmpty(x.getUid()))
                         .collect(Collectors.groupingBy(AnalysisResp::getLevel));
-        List<NameValue> levelDevEquivalentList = new ArrayList<>(16);
-        List<NameValue> levelCodeLineList = new ArrayList<>(16);
-        levelMap.forEach((levelName, list) -> {
-            long devS = list.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
-            long codeS = list.stream().mapToLong(AnalysisResp::getInsertions).sum();
-            NameValue devNV = NameValue.builder()
-                    .name(levelName)
-                    .value(String.valueOf(devS))
-                    .build();
-            levelDevEquivalentList.add(devNV);
-            NameValue codeNV = NameValue.builder()
-                    .name(levelName)
-                    .value(String.valueOf(codeS))
-                    .build();
-            levelCodeLineList.add(codeNV);
-        });
-        levelDevEquivalentList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
-        levelCodeLineList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
-        LevelProportion levelProportion = LevelProportion.builder()
-                .devEquivalentList(levelDevEquivalentList)
-                .codeLineList(levelCodeLineList)
-                .build();
+        LevelProportion levelProportion = getLevelProportion(levelMap);
+        LevelTendency levelTendency = getLevelTendency(levelMap);
+
+//        levelMap.forEach((levelName, list) -> {
+//            long devS = list.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
+//            long codeS = list.stream().mapToLong(AnalysisResp::getInsertions).sum();
+//            NameValue devNV = NameValue.builder()
+//                    .name(levelName)
+//                    .value(String.valueOf(devS))
+//                    .build();
+//            levelDevEquivalentList.add(devNV);
+//            NameValue codeNV = NameValue.builder()
+//                    .name(levelName)
+//                    .value(String.valueOf(codeS))
+//                    .build();
+//            levelCodeLineList.add(codeNV);
+//        });
+//        levelDevEquivalentList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
+//        levelCodeLineList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
 
 
         /**
          * 职级工程指标统计-职级趋势统计
          */
-        List<LevelTendencyItem> levelTendencyItemList = new ArrayList<>(16);
-        levelMap.forEach((levelName, list) -> {
-            Map<String, List<AnalysisResp>> dateMap = list.stream().collect(
-                    Collectors.groupingBy(o -> this.parse_yyyyMMdd(this.dateToLocalDateTime(o.getStatisticTime()))));
-            long[] dataArray = new long[32];
-            dateMap.forEach((date, record) -> {
-                int day = Integer.parseInt(date.substring(date.length() - 2));
-                long sum = record.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
-                dataArray[day] = sum;
-            });
-
-            LevelTendencyItem levelTendencyItem = LevelTendencyItem.builder()
-                    .name(levelName)
-                    .type("line")
-                    .data(Arrays.stream(dataArray).boxed().collect(Collectors.toList()))
-                    .build();
-            levelTendencyItemList.add(levelTendencyItem);
-        });
-        LevelTendency levelTendency = LevelTendency.builder()
-                .monthList(monthList)
-                .levelTendencyItemList(levelTendencyItemList)
-                .build();
+//        List<LevelTendencyItem> levelTendencyItemList = new ArrayList<>(16);
+//        levelMap.forEach((levelName, list) -> {
+//            Map<String, List<AnalysisResp>> dateMap = list.stream().collect(
+//                    Collectors.groupingBy(o -> this.parse_yyyyMMdd(this.dateToLocalDateTime(o.getStatisticTime()))));
+//            long[] dataArray = new long[32];
+//            dateMap.forEach((date, record) -> {
+//                int day = Integer.parseInt(date.substring(date.length() - 2));
+//                long sum = record.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
+//                dataArray[day] = sum;
+//            });
+//
+//            LevelTendencyItem levelTendencyItem = LevelTendencyItem.builder()
+//                    .name(levelName)
+//                    .type("line")
+//                    .data(Arrays.stream(dataArray).boxed().collect(Collectors.toList()))
+//                    .build();
+//            levelTendencyItemList.add(levelTendencyItem);
+//        });
+//        LevelTendency levelTendency = LevelTendency.builder()
+//                .monthList(monthList)
+//                .levelTendencyItemList(levelTendencyItemList)
+//                .build();
 
         return CtoResp.builder()
                 .teamOverviewResp(overviewRespList)
@@ -678,18 +685,18 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     private EmployeeProportion getEmployeeProportion(Map<String, List<AnalysisResp>> map, Map<String, EhrUserDetailResp> userMap) {
 
         return EmployeeProportion.builder()
-                .devEquivalentList(buildNameValueSortedList(map, AnalysisResp::getDevEquivalent, userMap))
-                .codeLineList(buildNameValueSortedList(map, AnalysisResp::getInsertions, userMap))
-                .commitList(buildNameValueSortedList(map, AnalysisResp::getCommitCount, userMap))
-                .publishList(buildNameValueSortedList(map, AnalysisResp::getPublishNum, userMap))
-                .compileList(buildNameValueSortedList(map, AnalysisResp::getCompileNum, userMap))
-                .onlineList(buildNameValueSortedList(map, AnalysisResp::getOnlineNum, userMap))
-                .rollbackList(buildNameValueSortedList(map, AnalysisResp::getRollbackNum, userMap))
-                .restartList(buildNameValueSortedList(map, AnalysisResp::getRestartNum, userMap))
+                .devEquivalentList(buildNameValueSortedLimitList(map, AnalysisResp::getDevEquivalent, userMap))
+                .codeLineList(buildNameValueSortedLimitList(map, AnalysisResp::getInsertions, userMap))
+                .commitList(buildNameValueSortedLimitList(map, AnalysisResp::getCommitCount, userMap))
+                .publishList(buildNameValueSortedLimitList(map, AnalysisResp::getPublishNum, userMap))
+                .compileList(buildNameValueSortedLimitList(map, AnalysisResp::getCompileNum, userMap))
+                .onlineList(buildNameValueSortedLimitList(map, AnalysisResp::getOnlineNum, userMap))
+                .rollbackList(buildNameValueSortedLimitList(map, AnalysisResp::getRollbackNum, userMap))
+                .restartList(buildNameValueSortedLimitList(map, AnalysisResp::getRestartNum, userMap))
                 .build();
     }
 
-    private List<NameValue> buildNameValueSortedList(Map<String, List<AnalysisResp>> map, ToLongFunction<AnalysisResp> mapper, Map<String, EhrUserDetailResp> userMap) {
+    private List<NameValue> buildNameValueSortedLimitList(Map<String, List<AnalysisResp>> map, ToLongFunction<AnalysisResp> mapper, Map<String, EhrUserDetailResp> userMap) {
 
         List<NameValue> nameValueList = new ArrayList<>();
         map.forEach((uid, list) -> {
@@ -748,6 +755,69 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         return employeeTendencyItemList;
     }
 
+    private LevelProportion getLevelProportion(Map<String, List<AnalysisResp>> map) {
+
+        return LevelProportion.builder()
+                .devEquivalentList(buildNameValueListSorted(map, AnalysisResp::getDevEquivalent))
+                .codeLineList(buildNameValueListSorted(map, AnalysisResp::getInsertions))
+                .commitList(buildNameValueListSorted(map, AnalysisResp::getCommitCount))
+                .publishList(buildNameValueListSorted(map, AnalysisResp::getPublishNum))
+                .compileList(buildNameValueListSorted(map, AnalysisResp::getCompileNum))
+                .onlineList(buildNameValueListSorted(map, AnalysisResp::getOnlineNum))
+                .rollbackList(buildNameValueListSorted(map, AnalysisResp::getRollbackNum))
+                .restartList(buildNameValueListSorted(map, AnalysisResp::getRestartNum))
+                .build();
+    }
+
+    private List<NameValue> buildNameValueListSorted(Map<String, List<AnalysisResp>> map, ToLongFunction<AnalysisResp> mapper) {
+        List<NameValue> nameValueList = new ArrayList<>(16);
+        map.forEach((name, list) -> {
+            long sum = list.stream().mapToLong(mapper).sum();
+            NameValue build = NameValue.builder()
+                    .name(name)
+                    .value(String.valueOf(sum))
+                    .build();
+            nameValueList.add(build);
+        });
+        nameValueList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
+        return nameValueList;
+    }
+
+    private LevelTendency getLevelTendency(Map<String, List<AnalysisResp>> levelMap) {
+
+        return LevelTendency.builder()
+                .devEquivalentTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getDevEquivalent))
+                .codeListTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getInsertions))
+                .commitTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getCommitCount))
+                .publishTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getPublishNum))
+                .compileTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getCompileNum))
+                .onlineTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getOnlineNum))
+                .restartTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getRestartNum))
+                .rollbackTendencyList(buildLevelTendencyList(levelMap, AnalysisResp::getRollbackNum))
+                .build();
+    }
+
+    private List<LevelTendencyItem> buildLevelTendencyList(Map<String, List<AnalysisResp>> levelMap, ToLongFunction<AnalysisResp> mapper) {
+        List<LevelTendencyItem> levelTendencyItemList = new ArrayList<>(16);
+        levelMap.forEach((levelName, list) -> {
+            Map<String, List<AnalysisResp>> dateMap = list.stream().collect(
+                    Collectors.groupingBy(o -> this.parse_yyyyMMdd(this.dateToLocalDateTime(o.getStatisticTime()))));
+            long[] dataArray = new long[32];
+            dateMap.forEach((date, record) -> {
+                int day = Integer.parseInt(date.substring(date.length() - 2));
+                long sum = record.stream().mapToLong(mapper).sum();
+                dataArray[day] = sum;
+            });
+
+            LevelTendencyItem levelTendencyItem = LevelTendencyItem.builder()
+                    .name(levelName)
+                    .type("line")
+                    .data(Arrays.stream(dataArray).boxed().collect(Collectors.toList()))
+                    .build();
+            levelTendencyItemList.add(levelTendencyItem);
+        });
+        return levelTendencyItemList;
+    }
 
 
     private String parse_yyyyMMdd(LocalDateTime time) {

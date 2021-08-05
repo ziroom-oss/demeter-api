@@ -31,4 +31,11 @@ public interface UserEmailService {
      * @return
      */
     List<UserEmailDto> selectSubEmail(UserEmailQo qo);
+
+    /**
+     * 批量查询
+     * @param emailList
+     * @return
+     */
+    List<UserEmailDto> batchSelectEmail(List<String> emailList);
 }

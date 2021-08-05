@@ -10,10 +10,6 @@ import lombok.Data;
 @Data
 @Builder
 public class LevelProportion {
-
-    /**
-     * 开发当量
-     */
     private List<NameValue> devEquivalentList;
 
     /**
@@ -50,4 +46,14 @@ public class LevelProportion {
      * 行价值密度
      */
     private List<NameValue> lineDensityList;
+
+    private List<NameValue> publishList;
+
+    private List<NameValue> compileList;
+
+    private List<NameValue> onlineList;
+
+    private List<NameValue> rollbackList;
+
+    private List<NameValue> restartList;
 }

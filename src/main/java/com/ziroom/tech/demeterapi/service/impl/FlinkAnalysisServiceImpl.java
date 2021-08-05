@@ -7,6 +7,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PersonReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CostResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CtoResp;
@@ -15,6 +16,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.flink.PersonOverview;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.PersonResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.QualityResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.StabilityResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PersonalByDay;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptProportion;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptTendency;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.DeptTendencyItem;
@@ -28,6 +30,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.Metric;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +43,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -47,7 +51,6 @@ import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Resource;
-import javax.naming.Name;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -868,9 +871,17 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     @Override
     public PersonResp getPersonData(PersonReq personReq) {
 
+        UserDetailResp userDetail = ehrComponent.getUserDetail(personReq.getUid());
+        String adCode;
+        if (Objects.nonNull(userDetail)) {
+            adCode = convertEmail2Adcode(userDetail.getEmail());
+        } else {
+            return PersonResp.builder().build();
+        }
+
         List<AnalysisResp> analysisResp
                 = flinkAnalysisComponent.getAnalysisResp(personReq.getStartTime(), personReq.getEndTime(),
-                        Lists.newArrayList("daijk"));
+                        Lists.newArrayList(adCode));
         long devEquivalentS = analysisResp.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
         long insertionsS = analysisResp.stream().mapToLong(AnalysisResp::getInsertions).sum();
         long deletionsS = analysisResp.stream().mapToLong(AnalysisResp::getDeletions).sum();
@@ -899,8 +910,20 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .restartNum(restartS)
                 .build();
 
+        List<PersonalByDay> personalDevEquivalentByDays = new ArrayList<>(32);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+        analysisResp.forEach(resp -> {
+            PersonalByDay personalByDay = PersonalByDay.builder()
+                    .day(simpleDateFormat.format(resp.getStatisticTime()))
+                    .devEquivalent(resp.getDevEquivalent().intValue())
+                    .insertions(resp.getInsertions().intValue())
+                    .build();
+            personalDevEquivalentByDays.add(personalByDay);
+        });
+
         return PersonResp.builder()
                 .personOverview(personOverview)
+                .personalByDays(personalDevEquivalentByDays)
                 .build();
     }
 }

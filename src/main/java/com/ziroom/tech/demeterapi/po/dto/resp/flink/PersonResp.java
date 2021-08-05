@@ -1,5 +1,7 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.flink;
 
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.PersonalByDay;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ public class PersonResp {
      */
     private PersonOverview personOverview;
 
-
+    private List<PersonalByDay> personalByDays;
 
 
 }

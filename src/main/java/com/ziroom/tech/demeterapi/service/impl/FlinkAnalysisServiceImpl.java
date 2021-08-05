@@ -94,6 +94,20 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         return userRespSet;
     }
 
+    private Set<EhrUserDetailResp> getUserSetFromAdList(List<String> adCodeList) {
+        List<List<String>> partition = Lists.partition(adCodeList, 10);
+        List<CompletableFuture<List<EhrUserDetailResp>>> list = new ArrayList<>();
+        Set<EhrUserDetailResp> userRespSet = new HashSet<>(16);
+        partition.forEach(codeGroup -> {
+            String codeString = String.join(",", codeGroup);
+            List<EhrUserDetailResp> ehrUserDetail = ehrComponent.getEhrUserDetail(codeString);
+            if (CollectionUtils.isNotEmpty(ehrUserDetail)) {
+                userRespSet.addAll(ehrUserDetail);
+            }
+        });
+        return userRespSet;
+    }
+
     @Override
     public CtoResp getCtoResp(CTOReq ctoReq) {
 
@@ -539,7 +553,15 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
          * 员工工程指标统计
          */
         Map<String, List<AnalysisResp>> empMap;
-        if (StringUtils.isNotEmpty(ctoReq.getSubDeptId())) {
+        if (CollectionUtils.isNotEmpty(ctoReq.getSelectUserCode())) {
+            Set<EhrUserDetailResp> userSetFromDept = getUserSetFromAdList(ctoReq.getSelectUserCode());
+            List<String> subAdCodeList = userSetFromDept.stream().map(EhrUserDetailResp::getEmail).filter(StringUtils::isNotEmpty).map(this::convertEmail2Adcode)
+                    .collect(Collectors.toList());
+            List<AnalysisResp> analysisResp =
+                    flinkAnalysisComponent.getAnalysisResp(ctoReq.getStartDate(), ctoReq.getEndDate(), subAdCodeList);
+            empMap = analysisResp.stream().filter(x -> StringUtils.isNotEmpty(x.getUid()))
+                    .collect(Collectors.groupingBy(AnalysisResp::getUid));
+        } else if (StringUtils.isNotEmpty(ctoReq.getSubDeptId())) {
             Set<EhrUserDetailResp> userSetFromDept = getUserSetFromDept(ctoReq.getSubDeptId());
             List<String> subAdCodeList = userSetFromDept.stream().map(EhrUserDetailResp::getEmail).filter(StringUtils::isNotEmpty).map(this::convertEmail2Adcode)
                     .collect(Collectors.toList());

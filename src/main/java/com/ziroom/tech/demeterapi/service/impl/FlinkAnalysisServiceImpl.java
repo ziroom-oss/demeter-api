@@ -32,6 +32,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.UserEmailService;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -41,20 +42,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Resource;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -131,50 +134,125 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         Calendar yoyEnd = getYoyEnd(ctoReq.getStartDate());
 
         CompletableFuture<List<AnalysisResp>> currentFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new ArrayList<>();
+        });
         CompletableFuture<List<AnalysisResp>> qoqFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(qoqStart.getTime(), qoqEnd.getTime(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(qoqStart.getTime(), qoqEnd.getTime(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new ArrayList<>();
+                });
         CompletableFuture<List<AnalysisResp>> yoyFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(yoyStart. getTime(), yoyEnd.getTime(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(yoyStart. getTime(), yoyEnd.getTime(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new ArrayList<>();
+                });
         List<List<AnalysisResp>> collect = Stream.of(currentFuture, qoqFuture, yoyFuture).map(CompletableFuture::join)
                 .collect(Collectors.toList());
 
         CompletableFuture<StabilityResp> stabilityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new StabilityResp();
+                });
         CompletableFuture<StabilityResp> qoqStabilityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new StabilityResp();
+                });
         CompletableFuture<StabilityResp> yoyStabilityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getStabilityResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new StabilityResp();
+                });
         List<StabilityResp> collect1 =
                 Stream.of(stabilityFuture, qoqStabilityFuture, yoyStabilityFuture).map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
         CompletableFuture<QualityResp> qualityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getQualityResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getQualityResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new QualityResp();
+                });
         CompletableFuture<QualityResp> qoqQualityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getQualityResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getQualityResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new QualityResp();
+                });
         CompletableFuture<QualityResp> yoyQualityFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getQualityResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getQualityResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new QualityResp();
+                });
         List<QualityResp> collect2 =
                 Stream.of(qualityFuture, qoqQualityFuture, yoyQualityFuture).map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
         CompletableFuture<CostResp> costFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getCostResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getCostResp(ctoReq.getStartDate(), ctoReq.getEndDate(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new CostResp();
+                });
         CompletableFuture<CostResp> qoqCostFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getCostResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getCostResp(qoqStart.getTime(), qoqEnd.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new CostResp();
+                });
         CompletableFuture<CostResp> yoyCostFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getCostResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getCostResp(yoyStart.getTime(), yoyStart.getTime(), ctoReq.getDeptId()))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new CostResp();
+                });
         List<CostResp> collect3 =
                 Stream.of(costFuture, qoqCostFuture, yoyCostFuture).map(CompletableFuture::join)
                         .collect(Collectors.toList());
 
         CompletableFuture<EfficientResp> efficientFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(ctoReq.getStartDate(), ctoReq.getEndDate(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new EfficientResp();
+                });
         CompletableFuture<EfficientResp> qoqEfficientFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(qoqStart.getTime(), qoqEnd.getTime(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(qoqStart.getTime(), qoqEnd.getTime(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new EfficientResp();
+                });
         CompletableFuture<EfficientResp> yoyEfficientFuture
-                = CompletableFuture.supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(yoyStart.getTime(), yoyStart.getTime(), adCodeList));
+                = CompletableFuture
+                .supplyAsync(() -> flinkAnalysisComponent.getEfficientResponse(yoyStart.getTime(), yoyEnd.getTime(), adCodeList))
+                .exceptionally(e -> {
+                    log.error("", e);
+                    return new EfficientResp();
+                });
         List<EfficientResp> collect4 =
                 Stream.of(efficientFuture, qoqEfficientFuture, yoyEfficientFuture).map(CompletableFuture::join)
                         .collect(Collectors.toList());
@@ -257,14 +335,21 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         getCalculateData("代码提交次数", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getCommitCount, qoqProductionMetric, yoyProductionMetric);
         qoqProductionMetric.add(Metric.builder()
                 .name("项目数/功能数/修复bug数")
-                .value(efficientResp.getCompleteProjectCount() + "/" + efficientResp.getProcessDemandCount() + "/" + efficientResp.getFixBugCount())
-                .oldValue(qoqEfficientResp.getCompleteProjectCount() + "/" + qoqEfficientResp.getProcessDemandCount() + "/" + qoqEfficientResp.getFixBugCount()).rate("-")
+                .value(Optional.ofNullable(efficientResp.getCompleteProjectCount()).orElse(0) + "/"
+                        + Optional.ofNullable(efficientResp.getProcessDemandCount()).orElse(0) + "/"
+                        + Optional.ofNullable(efficientResp.getFixBugCount()).orElse(0))
+                .oldValue(Optional.ofNullable(qoqEfficientResp.getCompleteProjectCount()).orElse(0) + "/"
+                        + Optional.ofNullable(qoqEfficientResp.getProcessDemandCount()).orElse(0) + "/"
+                        + Optional.ofNullable(qoqEfficientResp.getFixBugCount()).orElse(0)).rate("-")
                 .tendency(0).build());
         yoyProductionMetric.add(Metric.builder()
                 .name("项目数/功能数/修复bug数")
-                .value(efficientResp.getCompleteProjectCount() + "/" + efficientResp.getProcessDemandCount() + "/" + efficientResp.getFixBugCount())
-                .oldValue(yoyEfficientResp.getCompleteProjectCount() + "/" + yoyEfficientResp.getProcessDemandCount() + "/" + yoyEfficientResp.getFixBugCount()).rate("-")
-                .tendency(0).build());
+                .value(Optional.ofNullable(efficientResp.getCompleteProjectCount()).orElse(0) + "/"
+                        + Optional.ofNullable(efficientResp.getProcessDemandCount()).orElse(0) + "/"
+                        + Optional.ofNullable(efficientResp.getFixBugCount()).orElse(0))
+                .oldValue(Optional.ofNullable(yoyEfficientResp.getCompleteProjectCount()).orElse(0) + "/"
+                        + Optional.ofNullable(yoyEfficientResp.getProcessDemandCount()).orElse(0) + "/"
+                        + Optional.ofNullable(yoyEfficientResp.getFixBugCount()).orElse(0)).rate("-")                .tendency(0).build());
         qoqProductionMetric.add(Metric.builder().name("开发价值/价值密度").value("-").oldValue("-").rate("-").tendency(0).build());
         yoyProductionMetric.add(Metric.builder().name("开发价值/价值密度").value("-").oldValue("-").rate("-").tendency(0).build());
         TeamOverviewResp production = TeamOverviewResp.builder()
@@ -277,49 +362,57 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
 
         List<Metric> qoqEfficiencyMetric = new ArrayList<>();
         List<Metric> yoyEfficiencyMetric = new ArrayList<>();
+        double projectV1 = Double.parseDouble(Optional.ofNullable(efficientResp.getProjectAverageTime()).orElse("0"));
+        double projectV2 = Double.parseDouble(Optional.ofNullable(qoqEfficientResp.getProjectAverageTime()).orElse("0"));
+        double projectV3 = Double.parseDouble(Optional.ofNullable(yoyEfficientResp.getProjectAverageTime()).orElse("0"));
+        double functionV1 = Double.parseDouble(Optional.ofNullable(efficientResp.getFunctionAverageTime()).orElse("0"));
+        double functionV2 = Double.parseDouble(Optional.ofNullable(qoqEfficientResp.getFunctionAverageTime()).orElse("0"));
+        double functionV3 = Double.parseDouble(Optional.ofNullable(yoyEfficientResp.getFunctionAverageTime()).orElse("0"));
+        double bugV1 = Double.parseDouble(Optional.ofNullable(efficientResp.getBugAverageFixTime()).orElse("0"));
+        double bugV2 = Double.parseDouble(Optional.ofNullable(qoqEfficientResp.getBugAverageFixTime()).orElse("0"));
+        double bugV3 = Double.parseDouble(Optional.ofNullable(yoyEfficientResp.getBugAverageFixTime()).orElse("0"));
         qoqEfficiencyMetric.add(Metric.builder()
                 .name("项目平均开发周期")
-                .value(efficientResp.getProjectAverageTime())
-                .oldValue(qoqEfficientResp.getProjectAverageTime())
-                .rate("")
-                .tendency(0)
+                .value(projectV1 + "h")
+                .oldValue(projectV2 + "h")
+                .rate(String.format("%.2f", Math.abs(projectV1 - projectV2) * 100 / projectV2))
+                .tendency(projectV1 > projectV2 ? 1 : 2)
                 .build());
         qoqEfficiencyMetric.add(Metric.builder()
                 .name("功能平均开发周期")
-                .value(efficientResp.getFunctionAverageTime())
-                .oldValue(qoqEfficientResp.getFunctionAverageTime())
-                .rate("")
-                .tendency(0)
+                .value(functionV1 + "h")
+                .oldValue(functionV2 + "h")
+                .rate(String.format("%.2f", Math.abs(functionV1 - functionV2) * 100 / functionV2))
+                .tendency(functionV1 > functionV2 ? 1 : 2)
                 .build());
         qoqEfficiencyMetric.add(Metric.builder()
                 .name("bug平均修复时间")
-                .value(efficientResp.getBugAverageFixTime())
-                .oldValue(qoqEfficientResp.getBugAverageFixTime())
-                .rate("")
-                .tendency(0)
+                .value(bugV1 + "h")
+                .oldValue(bugV2 + "h")
+                .rate(String.format("%.2f", Math.abs(bugV1 - bugV2) * 100 / bugV2))
+                .tendency(bugV1 > bugV2 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("项目平均开发周期")
-                .value(efficientResp.getProjectAverageTime())
-                .oldValue(yoyEfficientResp.getFunctionAverageTime())
-                .rate("")
-                .tendency(0)
+                .value(projectV1 + "h")
+                .oldValue(projectV3 + "h")
+                .rate(String.format("%.2f", Math.abs(projectV1 - projectV3) * 100 / projectV3))
+                .tendency(projectV1 > projectV3 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("功能平均开发周期")
-                .value(efficientResp.getFunctionAverageTime())
-                .oldValue(yoyEfficientResp.getFunctionAverageTime())
-                .rate("")
-                .tendency(0)
+                .value(functionV1 + "h")
+                .oldValue(functionV3 + "h")
+                .rate(String.format("%.2f", Math.abs(functionV1 - functionV3) * 100 / functionV3))
+                .tendency(functionV1 > functionV3 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("bug平均修复时间")
-                .value(efficientResp.getBugAverageFixTime())
-                .oldValue(yoyEfficientResp.getBugAverageFixTime())
-                .rate("")
-                .tendency(0)
+                .value(bugV1 + "h")
+                .oldValue(bugV3 + "h")
+                .rate(String.format("%.2f", Math.abs(bugV1 - bugV3) * 100 / bugV3))
+                .tendency(bugV1 > bugV3 ? 1 : 2)
                 .build());
-        getCalculateData("bug修复数", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getFixBugCount, qoqEfficiencyMetric, yoyEfficiencyMetric);
         TeamOverviewResp efficiency = TeamOverviewResp.builder()
                 .id(2)
                 .name("效率类")
@@ -534,8 +627,9 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         deptMap.forEach((depName, deptList) -> {
             List<Double> devEquivalent = new ArrayList<>(16);
             List<Object> l = new ArrayList<>(16);
-            Map<String, List<AnalysisResp>> collect5 =
-                    deptList.stream().collect(Collectors.groupingBy(AnalysisResp::getUid));
+            deptList.forEach(o -> o.setStatisticTime(dateToISODate(o.getStatisticTime())));
+            Map<Date, List<AnalysisResp>> collect5 =
+                    deptList.stream().collect(Collectors.groupingBy(AnalysisResp::getStatisticTime));
             collect5.forEach((k, v) -> {
                 double sum = v.stream().mapToDouble(AnalysisResp::getDevEquivalent).sum();
                 devEquivalent.add(sum);
@@ -584,51 +678,12 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 analysisData.stream().filter(x -> StringUtils.isNotEmpty(x.getUid()))
                         .collect(Collectors.groupingBy(AnalysisResp::getLevel));
         LevelProportion levelProportion = getLevelProportion(levelMap);
-        LevelTendency levelTendency = getLevelTendency(levelMap);
-
-//        levelMap.forEach((levelName, list) -> {
-//            long devS = list.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
-//            long codeS = list.stream().mapToLong(AnalysisResp::getInsertions).sum();
-//            NameValue devNV = NameValue.builder()
-//                    .name(levelName)
-//                    .value(String.valueOf(devS))
-//                    .build();
-//            levelDevEquivalentList.add(devNV);
-//            NameValue codeNV = NameValue.builder()
-//                    .name(levelName)
-//                    .value(String.valueOf(codeS))
-//                    .build();
-//            levelCodeLineList.add(codeNV);
-//        });
-//        levelDevEquivalentList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
-//        levelCodeLineList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
 
 
         /**
          * 职级工程指标统计-职级趋势统计
          */
-//        List<LevelTendencyItem> levelTendencyItemList = new ArrayList<>(16);
-//        levelMap.forEach((levelName, list) -> {
-//            Map<String, List<AnalysisResp>> dateMap = list.stream().collect(
-//                    Collectors.groupingBy(o -> this.parse_yyyyMMdd(this.dateToLocalDateTime(o.getStatisticTime()))));
-//            long[] dataArray = new long[32];
-//            dateMap.forEach((date, record) -> {
-//                int day = Integer.parseInt(date.substring(date.length() - 2));
-//                long sum = record.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
-//                dataArray[day] = sum;
-//            });
-//
-//            LevelTendencyItem levelTendencyItem = LevelTendencyItem.builder()
-//                    .name(levelName)
-//                    .type("line")
-//                    .data(Arrays.stream(dataArray).boxed().collect(Collectors.toList()))
-//                    .build();
-//            levelTendencyItemList.add(levelTendencyItem);
-//        });
-//        LevelTendency levelTendency = LevelTendency.builder()
-//                .monthList(monthList)
-//                .levelTendencyItemList(levelTendencyItemList)
-//                .build();
+        LevelTendency levelTendency = getLevelTendency(levelMap);
 
         return CtoResp.builder()
                 .teamOverviewResp(overviewRespList)
@@ -731,7 +786,8 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
             nameValueList.add(devNV);
         });
         nameValueList.sort(((o1, o2) -> Integer.parseInt(o2.getValue()) - Integer.parseInt(o1.getValue())));
-        return nameValueList.stream().limit(15L).collect(Collectors.toList());
+//        return nameValueList.stream().limit(15L).collect(Collectors.toList());
+        return nameValueList;
     }
 
     private EmployeeTendency getEmployeeTendency(Map<String, List<AnalysisResp>> empMap, EmployeeProportion employeeProportion, Map<String, EhrUserDetailResp> userMap) {
@@ -749,7 +805,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     }
 
     private List<EmployeeTendencyItem> buildEmpTendency(List<NameValue> nameValueList, Map<String, List<AnalysisResp>> empMap, ToLongFunction<AnalysisResp> mapper, Map<String, EhrUserDetailResp> userMap) {
-        List<String> nameList = nameValueList.stream().map(NameValue::getName).collect(Collectors.toList());
+        List<String> nameList = nameValueList.stream().map(NameValue::getName).limit(20L).collect(Collectors.toList());
         /**
          * 员工工程指标统计-员工趋势统计
          */
@@ -774,6 +830,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 employeeTendencyItemList.add(deptTendencyItem);
             }
         });
+//        return employeeTendencyItemList.stream().limit(20).collect(Collectors.toList());
         return employeeTendencyItemList;
     }
 
@@ -845,6 +902,29 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     private String parse_yyyyMMdd(LocalDateTime time) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return df.format(time);
+    }
+
+    private String parseDate_yyyyMMdd(Date time) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(time);
+    }
+
+    private Date removeDateTime(Date dateTime) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = dateFormat.format(dateTime);
+        return null;
+    }
+
+    private Date dateToISODate(Date dateStr) {
+        Date parse = null;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            parse = format.parse(format.format(dateStr));
+        } catch (ParseException e) {
+            log.info("e",e);
+        }
+        return parse;
     }
 
     private String parse_dd(LocalDateTime time) {
@@ -1020,12 +1100,3 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     }
 }
 
-@Data
-@Builder
-class Result {
-    long sum;
-    long qoqSum;
-    long yoySum;
-    double qoqRate;
-    double yoyRate;
-}

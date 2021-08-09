@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
+import ziroom.com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * @author daijiankun

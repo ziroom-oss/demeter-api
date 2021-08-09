@@ -357,7 +357,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .name("产出类")
                 .qoqMetricList(qoqProductionMetric)
                 .yoyMetricList(yoyProductionMetric)
-                .style("border-right: dashed #A9A9A9; border-bottom: dashed #A9A9A9; margin-top: 15px")
+                .style("border-right: dashed #A9A9A9; border-bottom: dashed #A9A9A9; border-width: 1px; margin-top: 15px")
                 .build();
 
         List<Metric> qoqEfficiencyMetric = new ArrayList<>();
@@ -416,7 +416,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         TeamOverviewResp efficiency = TeamOverviewResp.builder()
                 .id(2)
                 .name("效率类")
-                .style("border-bottom: dashed #A9A9A9; margin-top: 15px")
+                .style("border-bottom: dashed #A9A9A9; border-width: 1px; margin-top: 15px")
                 .qoqMetricList(qoqEfficiencyMetric)
                 .yoyMetricList(yoyEfficiencyMetric)
                 .build();
@@ -433,7 +433,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .name("发布类")
                 .qoqMetricList(qoqPublicationMetric)
                 .yoyMetricList(yoyPublicationMetric)
-                .style("border-right: dashed #A9A9A9; border-bottom: dashed #A9A9A9;")
+                .style("border-right: dashed #A9A9A9; border-bottom: dashed #A9A9A9; border-width: 1px;")
                 .build();
 
         List<Metric> qoqQualityMetric = new ArrayList<>();
@@ -462,7 +462,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .name("质量类")
                 .qoqMetricList(qoqQualityMetric)
                 .yoyMetricList(yoyQualityMetric)
-                .style("border-bottom: dashed #A9A9A9;")
+                .style("border-bottom: dashed #A9A9A9; border-width: 1px;")
                 .build();
 //        getCalculateData("注释覆盖度", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getCommitCount, qoqQualityMetric, yoyQualityMetric);
 //        getCalculateData("测试覆盖度", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getCommitCount, qoqQualityMetric, yoyQualityMetric);
@@ -537,22 +537,16 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .oldValue("<span style=\"font-weight: bold\">" + costResp.getDepartmentTotal() + "</span></span>/" + costResp.getDevelopmentNumber() + "/" + costResp.getDeveloperPercentage() * 100 +"%")
                 .rate("0")
                 .tendency(0).build());
-        yoyCostMetric.add(Metric.builder()
-                .name("休假天数")
-                .value("456")
-                .oldValue("673")
+        qoqCostMetric.add(Metric.builder()
+                .name("<span><span style=\"font-weight: bold\">休假天数</span>/人均休假天数</span>")
+                .value("<span style=\"font-weight: bold\">465</span></span>/6")
+                .oldValue("<span style=\"font-weight: bold\">565</span></span>/5")
                 .rate("12.67")
                 .tendency(2).build());
         yoyCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">出勤工时</span>/开发工时/工时饱和度</span>")
                 .value("<span style=\"font-weight: bold\">465</span></span>/312/67.09%")
                 .oldValue("<span style=\"font-weight: bold\">565</span></span>/472/87.32%")
-                .rate("12.67")
-                .tendency(2).build());
-        yoyCostMetric.add(Metric.builder()
-                .name("人均休假天数")
-                .value("456")
-                .oldValue("673")
                 .rate("12.67")
                 .tendency(2).build());
         TeamOverviewResp cost = TeamOverviewResp.builder()
@@ -679,11 +673,11 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                         .collect(Collectors.groupingBy(AnalysisResp::getLevel));
         LevelProportion levelProportion = getLevelProportion(levelMap);
 
-
         /**
          * 职级工程指标统计-职级趋势统计
          */
         LevelTendency levelTendency = getLevelTendency(levelMap);
+        levelTendency.setMonthList(monthList);
 
         return CtoResp.builder()
                 .teamOverviewResp(overviewRespList)

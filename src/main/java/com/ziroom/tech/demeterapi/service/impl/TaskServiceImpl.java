@@ -780,7 +780,7 @@ public class TaskServiceImpl implements TaskService {
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
                     .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                     .taskType(TaskType.SKILL.getCode())
-                    .receiverUid(OperatorContext.getOperator())
+                    .receiverUid(learnerUid)
                     .taskId(skillId)
                     .createTime(new Date())
                     .modifyTime(new Date())

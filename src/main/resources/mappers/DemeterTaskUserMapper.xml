@@ -18,6 +18,18 @@
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
         <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
     </resultMap>
+    <resultMap id="ForRankingPASSED" type="com.ziroom.tech.demeterapi.dao.entity.ForRankingPASSED">
+        <result column="receiver_uid" property="receiverUid" jdbcType="VARCHAR"/>
+        <result column="sumall" property="sumAll" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ForRankingTASK" type="com.ziroom.tech.demeterapi.dao.entity.ForRankingTASK">
+        <result column="task_id" property="taskId" jdbcType="BIGINT"/>
+        <result column="sumall" property="sumAll" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ForRankingPARENT" type="com.ziroom.tech.demeterapi.dao.entity.ForRankingPARENT">
+        <result column="parent_id" property="parentId" jdbcType="INTEGER"/>
+        <result column="sumall" property="sumAll" jdbcType="INTEGER"/>
+    </resultMap>
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -79,6 +91,55 @@
     <sql id="Base_Column_List">
         id, task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
     </sql>
+    <!--1、start已认证技能点-->
+    <select id="getSkillPointPASSED" resultMap="ForRankingPASSED">
+        select receiver_uid,  count(receiver_uid) as sumall from demeter_task_user WHERE
+        check_result = 1
+        <if test="taskIds != null">  <!--如果传了技能图谱-->
+            AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+        </if>
+            AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
+            group by receiver_uid order by sumall desc, checkout_time;
+    </select>
+    <!--已认证end-->
+    <!--start 当前登录用户排名-->
+
+    <!--当前登录用户排名 end-->
+    <!--2、start 认证技能数量 reciever_uid-->
+    <select id="getSkillNumPASSED" resultMap="ForRankingPASSED">
+        select receiver_uid, count(distinct parent_id) as sumall from demeter_task_user
+        WHERE
+        check_result = 1
+        <if test="taskIds != null">  <!--如果传了技能图谱-->
+            AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+        </if>
+        AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
+        group by receiver_uid order by sumall desc, create_time
+    </select>
+    <!--认证技能数量 end-->
+    <!--3、start热门技能点 task_id-->
+    <select id="getHotSkillPointName" resultMap="ForRankingTASK">
+        select task_id, count(task_id) as sumall from demeter_task_user
+        WHERE
+        <if test="taskIds != null">  <!--如果传了技能图谱-->
+             task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+        </if>
+        AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
+        group by task_id order by sumall desc, checkout_time
+    </select>
+    <!--热门技能点end-->
+    <!--4、start热门技能   parent_id-->
+    <select id="getHotSkill" resultMap="ForRankingPARENT" >
+        select parent_id, count(parent_id) as sumall from demeter_task_user
+        WHERE
+        <if test="taskIds != null">  <!--如果传了技能图谱-->
+             task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+        </if>
+        AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
+        group by parent_id order by sumall desc, create_time
+    </select>
+    <!--热门技能end-->
+
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample">
         select
         <if test="distinct">

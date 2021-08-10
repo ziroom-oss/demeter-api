@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.ehr;
 
+import com.ziroom.tech.demeterapi.dao.entity.Jobs;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

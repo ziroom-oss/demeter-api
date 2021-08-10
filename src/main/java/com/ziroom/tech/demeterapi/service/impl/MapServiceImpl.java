@@ -124,4 +124,9 @@ public class MapServiceImpl implements MapService {
         summaryData.setSkillGraph(summaryMapResps);
        return summaryData;
     }
+
+    @Override
+    public List<SkillMap> selectAll() {
+        return skillMapDao.selectAll();
+    }
 }

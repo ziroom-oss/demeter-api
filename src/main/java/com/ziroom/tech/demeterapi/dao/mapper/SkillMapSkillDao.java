@@ -7,10 +7,15 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-@SuppressWarnings("UnnecessaryInterfaceModifier")
 @Repository
 public interface SkillMapSkillDao {
+
+    /**
+     * 获取taskid
+     * @param mapId
+     * @return
+     */
+    public List<Long> getSkillTaskIds(Long mapId);
 
     /**
      * 移除指定 id 的表

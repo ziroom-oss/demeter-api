@@ -42,6 +42,15 @@ public interface EhrApiEndPoint {
     /**
      * 根据用户编号查询详情
      *
+     * @param simple 單個條件
+     * @return 结果
+     */
+    @GET("/api/ehr/emps/simple")
+    Call<JSONObject> getUserDetailBySimple(@Query("simple") String simple);
+
+    /**
+     * 根据用户编号查询详情
+     *
      * @param userCode 用户编号
      * @return 结果
      */

@@ -754,9 +754,9 @@ public class TaskServiceImpl implements TaskService {
 
                 //2.创建技能点学习任务
         String learnerUid = req.getLearner();
-        req.getSkillPathes().entrySet().stream().forEach(entry -> {
+        req.getSkillPaths().entrySet().stream().forEach(entry -> {
             Long skillId = Long.valueOf(entry.getKey());
-            List<String> learnPathes = entry.getValue();
+            List<String> learnPaths = entry.getValue();
 
             //2.1如果技能点编号不存在，则抛出异常
             DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
@@ -802,7 +802,7 @@ public class TaskServiceImpl implements TaskService {
             demeterTaskUserExtendDao.insertSelective(userExtend);
 
             //2.5【demeter_skill_learn_path】添加学习路径
-            learnPathes.stream().forEach(path -> {
+            learnPaths.stream().forEach(path -> {
                 DemeterSkillLearnPath demeterSkillLearnPath = DemeterSkillLearnPath.builder()
                         .taskUserId(taskUserId)
                         .taskId(skillId)
@@ -932,6 +932,7 @@ public class TaskServiceImpl implements TaskService {
         if (Objects.isNull(manifest)){
             return null;
         }
+        // 学习清单基本信息
         SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
         BeanUtils.copyProperties(manifest, detailResp);
         //根据人物uid查出姓名
@@ -947,7 +948,20 @@ public class TaskServiceImpl implements TaskService {
         taskUserExtends.stream().forEach(extend -> {
             demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
         });
+
+        /**
+         * 通过技能任务查询关联的学习路径
+         * 技能任务（点）的 id 对应学习任务的 taskId
+         */
+        List<DemeterSkillLearnPath> demeterSkillLearnPathResp = new ArrayList<>();
+        demeterSkillTasks.stream().forEach(skillTask -> {
+           DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
+           learnPathExample.createCriteria().andTaskIdEqualTo(skillTask.getId());
+           List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
+           demeterSkillLearnPathResp.addAll(demeterSkillLearnPaths);
+        });
         detailResp.setDemeterSkillTasks(demeterSkillTasks);
+        detailResp.setDemeterSkillLearnPaths(demeterSkillLearnPathResp);
         return detailResp;
     }
 

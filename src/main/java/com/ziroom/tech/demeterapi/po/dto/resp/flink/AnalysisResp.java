@@ -101,7 +101,12 @@ public class AnalysisResp {
     /**
      * 开发价值
      */
-    private String developmentValue;
+    private Double developmentValue = 0.0;
+
+    /**
+     * 价值密度
+     */
+    private Double valueDensity = 0.0;
 
     /*****Jira***/
     /**

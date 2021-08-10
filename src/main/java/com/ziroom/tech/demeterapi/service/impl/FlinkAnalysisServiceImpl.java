@@ -294,6 +294,12 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         long deletions = analysisData.stream().mapToLong(AnalysisResp::getDeletions).sum();
         long qoqDeletions = qoqAnalysisData.stream().mapToLong(AnalysisResp::getDeletions).sum();
         long yoyDeletions = yoyAnalysisData.stream().mapToLong(AnalysisResp::getDeletions).sum();
+        double developmentValue = analysisData.stream().mapToDouble(AnalysisResp::getDevelopmentValue).sum();
+        double qoqDevelopmentValue = qoqAnalysisData.stream().mapToDouble(AnalysisResp::getDevelopmentValue).sum();
+        double yoyDevelopmentValue = yoyAnalysisData.stream().mapToDouble(AnalysisResp::getDevelopmentValue).sum();
+        double valueDensity = analysisData.stream().mapToDouble(AnalysisResp::getValueDensity).sum();
+        double qoqValueDensity = qoqAnalysisData.stream().mapToDouble(AnalysisResp::getValueDensity).sum();
+        double yoyValueDensity = yoyAnalysisData.stream().mapToDouble(AnalysisResp::getValueDensity).sum();
 
         /**
          * 核心数据指标
@@ -350,8 +356,18 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .oldValue(Optional.ofNullable(yoyEfficientResp.getCompleteProjectCount()).orElse(0) + "/"
                         + Optional.ofNullable(yoyEfficientResp.getProcessDemandCount()).orElse(0) + "/"
                         + Optional.ofNullable(yoyEfficientResp.getFixBugCount()).orElse(0)).rate("-")                .tendency(0).build());
-        qoqProductionMetric.add(Metric.builder().name("开发价值/价值密度").value("-").oldValue("-").rate("-").tendency(0).build());
-        yoyProductionMetric.add(Metric.builder().name("开发价值/价值密度").value("-").oldValue("-").rate("-").tendency(0).build());
+        qoqProductionMetric.add(Metric.builder()
+                .name("开发价值/价值密度")
+                .value(String.format("%.2f", developmentValue) + "/" + String.format("%.2f", valueDensity))
+                .oldValue(String.format("%.2f", qoqDevelopmentValue) + "/" + String.format("%.2f", qoqValueDensity))
+                .rate("-")
+                .tendency(0).build());
+        yoyProductionMetric.add(Metric.builder()
+                .name("开发价值/价值密度")
+                .value(String.format("%.2f", developmentValue) + "/" + String.format("%.2f", valueDensity))
+                .oldValue(String.format("%.2f", yoyDevelopmentValue) + "/" + String.format("%.2f", yoyValueDensity))
+                .rate("-")
+                .tendency(0).build());
         TeamOverviewResp production = TeamOverviewResp.builder()
                 .id(1)
                 .name("产出类")

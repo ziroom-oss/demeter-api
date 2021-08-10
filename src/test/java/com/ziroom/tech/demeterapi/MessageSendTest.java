@@ -57,6 +57,9 @@ public class MessageSendTest {
 
     @Test
     public void testEhr() {
+        String a = "p";
+        String b = new String("p");
+        System.out.println(a == b);
         EhrApiSimpleReq req = new EhrApiSimpleReq();
         req.setAdCode("daijk");
         ehrApiService.getEmpSimple(req);

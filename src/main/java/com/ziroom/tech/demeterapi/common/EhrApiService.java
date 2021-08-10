@@ -6,33 +6,23 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
-import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiSimpleReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrApiResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrApiSimpleResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrDeptResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrEmpUserResp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 
@@ -55,6 +45,10 @@ public class EhrApiService {
      * ehr响应中的数据属性名
      */
     private final static String DATA_ATTRIBUTE = "data";
+
+    private final static String CODE_ATTRIBUTE = "code";
+
+    private final static String SUCCESS_CODE = "20000";
     /**
      * ehr响应中的状态属性名
      */
@@ -91,14 +85,12 @@ public class EhrApiService {
         return result;
     }
 
-    public void getEmpSimple(EhrApiSimpleReq ehrApiSimpleReq) {
-
+    public EhrApiSimpleResp getEmpSimple(EhrApiSimpleReq ehrApiSimpleReq) {
         Map<String, Object> stringObjectMap = initReqMap(ehrApiSimpleReq);
-        Call<JSONObject> call = ehrApiEndPoint.getEmpSimple(stringObjectMap);
-        JSONObject resp = RetrofitCallAdaptor.execute(call);
-
+        Call<EhrApiResp<EhrApiSimpleResp>> call = ehrApiEndPoint.getEmpSimple(stringObjectMap);
+        EhrApiResp<EhrApiSimpleResp> resp = RetrofitCallAdaptor.execute(call);
+        return resp.getData();
     }
-
 
     /**
      * 批量查询部门

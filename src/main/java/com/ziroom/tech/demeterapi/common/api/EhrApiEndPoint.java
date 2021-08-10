@@ -2,6 +2,9 @@ package com.ziroom.tech.demeterapi.common.api;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.boot.annotation.RetrofitService;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiSimpleReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrApiResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrApiSimpleResp;
 import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -36,5 +39,5 @@ public interface EhrApiEndPoint {
 
 
     @GET("/emps/simple")
-    Call<JSONObject> getEmpSimple(@QueryMap Map<String, Object> empSimpleReqMap);
+    Call<EhrApiResp<EhrApiSimpleResp>> getEmpSimple(@QueryMap Map<String, Object> empSimpleReqMap);
 }

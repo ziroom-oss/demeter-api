@@ -20,6 +20,10 @@ public class SkillLearnManifestResp {
 
     private Date createTime;//4、创建时间
 
+    private Date learnPeriodStart; // 学习周期开始时间
+
+    private Date learnPeriodEnd; // 学习周期结束时间
+
     //学习清单技能奖励值
     private Integer reward;//5、技能点奖励
 

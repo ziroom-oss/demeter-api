@@ -740,9 +740,10 @@ public class TaskServiceImpl implements TaskService {
         //1.【demeter_user_learn_manifest】创建学习清单
         DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
                 .assignerUid(OperatorContext.getOperator())
-                .learnerUid(req.getLearner())
+                .learnerUid(req.getLearnerUid())
                 .name(req.getName())
-                .learnPeriod(req.getLearnPeriod())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
                 .createTime(new Date())
                 .modifyTime(new Date())
                 .createId(OperatorContext.getOperator())
@@ -753,7 +754,7 @@ public class TaskServiceImpl implements TaskService {
         long manifestId = manifest.getId();//获取当前学习清单id
 
                 //2.创建技能点学习任务
-        String learnerUid = req.getLearner();
+        String learnerUid = req.getLearnerUid();
         req.getSkillPaths().entrySet().stream().forEach(entry -> {
             Long skillId = Long.valueOf(entry.getKey());
             List<String> learnPaths = entry.getValue();

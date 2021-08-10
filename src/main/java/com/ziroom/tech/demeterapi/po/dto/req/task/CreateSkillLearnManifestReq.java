@@ -29,5 +29,5 @@ public class CreateSkillLearnManifestReq {
     private List<Long> skills;
 
     @ApiModelProperty("学习技能点路径")
-    private Map<String, List<String>> skillPathes;
+    private Map<String, List<String>> skillPaths;
 }

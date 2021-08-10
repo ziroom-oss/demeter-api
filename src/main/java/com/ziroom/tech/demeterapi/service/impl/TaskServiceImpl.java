@@ -754,9 +754,9 @@ public class TaskServiceImpl implements TaskService {
 
                 //2.创建技能点学习任务
         String learnerUid = req.getLearner();
-        req.getSkillPathes().entrySet().stream().forEach(entry -> {
+        req.getSkillPaths().entrySet().stream().forEach(entry -> {
             Long skillId = Long.valueOf(entry.getKey());
-            List<String> learnPathes = entry.getValue();
+            List<String> learnPaths = entry.getValue();
 
             //2.1如果技能点编号不存在，则抛出异常
             DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
@@ -802,7 +802,7 @@ public class TaskServiceImpl implements TaskService {
             demeterTaskUserExtendDao.insertSelective(userExtend);
 
             //2.5【demeter_skill_learn_path】添加学习路径
-            learnPathes.stream().forEach(path -> {
+            learnPaths.stream().forEach(path -> {
                 DemeterSkillLearnPath demeterSkillLearnPath = DemeterSkillLearnPath.builder()
                         .taskUserId(taskUserId)
                         .taskId(skillId)

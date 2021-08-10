@@ -932,6 +932,7 @@ public class TaskServiceImpl implements TaskService {
         if (Objects.isNull(manifest)){
             return null;
         }
+        // 学习清单基本信息
         SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
         BeanUtils.copyProperties(manifest, detailResp);
         //根据人物uid查出姓名
@@ -947,7 +948,20 @@ public class TaskServiceImpl implements TaskService {
         taskUserExtends.stream().forEach(extend -> {
             demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
         });
+
+        /**
+         * 通过技能任务查询关联的学习路径
+         * 技能任务（点）的 id 对应学习任务的 taskId
+         */
+        List<DemeterSkillLearnPath> demeterSkillLearnPathResp = new ArrayList<>();
+        demeterSkillTasks.stream().forEach(skillTask -> {
+           DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
+           learnPathExample.createCriteria().andTaskIdEqualTo(skillTask.getId());
+           List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
+           demeterSkillLearnPathResp.addAll(demeterSkillLearnPaths);
+        });
         detailResp.setDemeterSkillTasks(demeterSkillTasks);
+        detailResp.setDemeterSkillLearnPaths(demeterSkillLearnPathResp);
         return detailResp;
     }
 

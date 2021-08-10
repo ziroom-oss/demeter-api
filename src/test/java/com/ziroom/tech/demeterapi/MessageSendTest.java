@@ -1,7 +1,9 @@
 package com.ziroom.tech.demeterapi;
 
+import com.ziroom.tech.demeterapi.common.EhrApiService;
 import com.ziroom.tech.demeterapi.common.message.WorkWechatSender;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiSimpleReq;
 import com.ziroom.tech.demeterapi.service.MapService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import javax.annotation.Resource;
@@ -22,6 +24,9 @@ public class MessageSendTest {
 
     @Autowired
     WorkWechatSender workWechatSender;
+
+    @Autowired
+    EhrApiService ehrApiService;
 
     @Resource
     private PortraitService portraitService;
@@ -48,6 +53,13 @@ public class MessageSendTest {
     @Test
     public void testSummaryData() {
         mapService.getSkillGraphData();
+    }
+
+    @Test
+    public void testEhr() {
+        EhrApiSimpleReq req = new EhrApiSimpleReq();
+        req.setAdCode("daijk");
+        ehrApiService.getEmpSimple(req);
     }
 
 }

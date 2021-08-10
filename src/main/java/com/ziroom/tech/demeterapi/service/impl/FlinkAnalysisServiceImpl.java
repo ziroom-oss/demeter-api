@@ -303,34 +303,34 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         List<Metric> yoyProductionMetric = new ArrayList<>(16);
 
         getCalculateData("开发当量", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getDevEquivalent, qoqProductionMetric, yoyProductionMetric);
-        Double capiteEquivalents = equivalents * 1.0 / costResp.getDepartmentTotal();
-        Double capiteQoQEquivalents = qoqEquivalents * 1.0 / costResp.getDepartmentTotal();
-        Double capiteYoYEquivalents = yoyEquivalents * 1.0 / costResp.getDepartmentTotal();
+        double capiteEquivalents = equivalents * 1.0 / costResp.getDepartmentTotal();
+        double capiteQoQEquivalents = qoqEquivalents * 1.0 / costResp.getDepartmentTotal();
+        double capiteYoYEquivalents = yoyEquivalents * 1.0 / costResp.getDepartmentTotal();
         qoqProductionMetric.add(Metric.builder()
                 .name("人均当量")
                 .value(String.format("%.0f", capiteEquivalents))
                 .oldValue(String.format("%.0f", capiteQoQEquivalents))
                 .rate(String.format("%.2f", Math.abs(capiteEquivalents - capiteQoQEquivalents) * 100.0 / capiteQoQEquivalents))
-                .tendency(capiteEquivalents - capiteQoQEquivalents > 0 ? 1 : 2).build());
+                .tendency(isEqual(capiteEquivalents, capiteQoQEquivalents) ? 0 : capiteEquivalents > capiteQoQEquivalents ? 1 : 2).build());
         yoyProductionMetric.add(Metric.builder()
                 .name("人均当量")
                 .value(String.format("%.0f", capiteEquivalents))
                 .oldValue(String.format("%.0f", capiteYoYEquivalents))
                 .rate(String.format("%.2f", Math.abs(capiteEquivalents - capiteYoYEquivalents) * 100.0 / capiteYoYEquivalents))
-                .tendency(capiteEquivalents - capiteYoYEquivalents > 0 ? 1 : 2).build());
+                .tendency(isEqual(capiteEquivalents, capiteYoYEquivalents) ? 0 : capiteEquivalents > capiteYoYEquivalents ? 1 : 2).build());
         qoqProductionMetric.add(Metric.builder()
                 .name("<span style=\"font-weight: bold\">代码增加行数</span>/删除行数")
                 .value("<span style=\"font-weight: bold\">" + insertions + "</span>/" + deletions)
                 .oldValue("<span style=\"font-weight: bold\">" + qoqInsertions + "</span>/" + qoqDeletions)
                 .rate(String.format("%.2f", Math.abs(insertions - qoqInsertions) * 100.0 / qoqInsertions))
-                .tendency(insertions - qoqInsertions > 0 ? 1 : 2)
+                .tendency(insertions == qoqInsertions ? 0 : insertions > qoqInsertions ? 1 : 2)
                 .build());
         yoyProductionMetric.add(Metric.builder()
                 .name("<span style=\"font-weight: bold\">代码增加行数</span>/删除行数")
                 .value("<span style=\"font-weight: bold\">" + insertions + "</span>/" + deletions)
                 .oldValue("<span style=\"font-weight: bold\">" + yoyInsertions + "</span>/" + yoyDeletions)
                 .rate(String.format("%.2f", Math.abs(insertions - yoyInsertions) * 100.0 / yoyInsertions))
-                .tendency(insertions - yoyInsertions > 0 ? 1 : 2)
+                .tendency(insertions == yoyInsertions ? 0 : insertions > qoqInsertions ? 1 : 2)
                 .build());
         getCalculateData("代码提交次数", analysisData, qoqAnalysisData, yoyAnalysisData, AnalysisResp::getCommitCount, qoqProductionMetric, yoyProductionMetric);
         qoqProductionMetric.add(Metric.builder()
@@ -376,42 +376,42 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .value(projectV1 + "h")
                 .oldValue(projectV2 + "h")
                 .rate(String.format("%.2f", Math.abs(projectV1 - projectV2) * 100 / projectV2))
-                .tendency(projectV1 > projectV2 ? 1 : 2)
+                .tendency(isEqual(projectV1, projectV2) ? 0 : projectV1 > projectV2 ? 1 : 2)
                 .build());
         qoqEfficiencyMetric.add(Metric.builder()
                 .name("功能平均开发周期")
                 .value(functionV1 + "h")
                 .oldValue(functionV2 + "h")
                 .rate(String.format("%.2f", Math.abs(functionV1 - functionV2) * 100 / functionV2))
-                .tendency(functionV1 > functionV2 ? 1 : 2)
+                .tendency(isEqual(functionV1, functionV2) ? 0 : functionV1 > functionV2 ? 1 : 2)
                 .build());
         qoqEfficiencyMetric.add(Metric.builder()
                 .name("bug平均修复时间")
                 .value(bugV1 + "h")
                 .oldValue(bugV2 + "h")
                 .rate(String.format("%.2f", Math.abs(bugV1 - bugV2) * 100 / bugV2))
-                .tendency(bugV1 > bugV2 ? 1 : 2)
+                .tendency(isEqual(bugV1, bugV2) ? 0 : bugV1 > bugV2 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("项目平均开发周期")
                 .value(projectV1 + "h")
                 .oldValue(projectV3 + "h")
                 .rate(String.format("%.2f", Math.abs(projectV1 - projectV3) * 100 / projectV3))
-                .tendency(projectV1 > projectV3 ? 1 : 2)
+                .tendency(isEqual(projectV1, projectV3) ? 0 : projectV1 > projectV3 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("功能平均开发周期")
                 .value(functionV1 + "h")
                 .oldValue(functionV3 + "h")
                 .rate(String.format("%.2f", Math.abs(functionV1 - functionV3) * 100 / functionV3))
-                .tendency(functionV1 > functionV3 ? 1 : 2)
+                .tendency(isEqual(functionV1, functionV3) ? 0 : functionV1 > functionV3 ? 1 : 2)
                 .build());
         yoyEfficiencyMetric.add(Metric.builder()
                 .name("bug平均修复时间")
                 .value(bugV1 + "h")
                 .oldValue(bugV3 + "h")
                 .rate(String.format("%.2f", Math.abs(bugV1 - bugV3) * 100 / bugV3))
-                .tendency(bugV1 > bugV3 ? 1 : 2)
+                .tendency(isEqual(bugV1, bugV3) ? 0 : bugV1 > bugV3 ? 1 : 2)
                 .build());
         TeamOverviewResp efficiency = TeamOverviewResp.builder()
                 .id(2)
@@ -440,22 +440,22 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         List<Metric> yoyQualityMetric = new ArrayList<>();
 
         // 千行bug率 = bug数 / 开发当量
-        Double value = bugNums * 100.0 / equivalents;
-        Double qoqValue = qoqBugNums * 100.0 / qoqEquivalents;
-        Double yoyValue = yoyBugNums * 100.0 / yoyEquivalents;
+        double value = bugNums * 100.0 / equivalents;
+        double qoqValue = qoqBugNums * 100.0 / qoqEquivalents;
+        double yoyValue = yoyBugNums * 100.0 / yoyEquivalents;
         qoqQualityMetric.add(Metric.builder()
                 .name("千行bug率")
                 .value(String.format("%.2f", value))
                 .oldValue(String.format("%.2f", qoqValue))
-                .rate(String.format("%.2f", Math.abs(value - qoqValue) * 100 / qoqValue) + "%")
-                .tendency(value - qoqValue > 0 ? 1 : 2)
+                .rate(String.format("%.2f", Math.abs(value - qoqValue) * 100 / qoqValue))
+                .tendency(isEqual(value, qoqValue) ? 0 : value > qoqValue ? 1 : 2)
                 .build());
         yoyQualityMetric.add(Metric.builder()
                 .name("千行bug率")
                 .value(String.format("%.2f", value))
                 .oldValue(String.format("%.2f", yoyValue))
-                .rate(String.format("%.2f", Math.abs(value - yoyValue) * 100 / yoyValue) + "%")
-                .tendency(value - yoyValue > 0 ? 1 : 2)
+                .rate(String.format("%.2f", Math.abs(value - yoyValue) * 100 / yoyValue))
+                .tendency(isEqual(value, yoyValue) ? 0 : value > yoyValue ? 1 : 2)
                 .build());
         TeamOverviewResp quality = TeamOverviewResp.builder()
                 .id(4)
@@ -559,30 +559,36 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
 
         List<Metric> qoqSlaMetric = new ArrayList<>();
         List<Metric> yoySlaMetric = new ArrayList<>();
+        double robustness = stabilityResp.getRobustness();
+        double qoqRobustness = qoqStabilityResp.getRobustness();
+        double yoyRobustness = yoyStabilityResp.getRobustness();
+        double stability = stabilityResp.getStability();
+        double qoqStability = qoqStabilityResp.getStability();
+        double yoyStability = yoyStabilityResp.getStability();
         qoqSlaMetric.add(Metric.builder()
                 .name("团队鲁棒性")
-                .value(String.format("%.2f", stabilityResp.getRobustness()))
-                .oldValue(String.format("%.2f", qoqStabilityResp.getRobustness()))
-                .rate(String.format("%.2f", Math.abs(stabilityResp.getRobustness() - qoqStabilityResp.getRobustness()) * 100 / qoqStabilityResp.getRobustness()))
-                .tendency(stabilityResp.getRobustness() - qoqStabilityResp.getRobustness() > 0 ? 1 : 2).build());
+                .value(String.format("%.2f", robustness))
+                .oldValue(String.format("%.2f", qoqRobustness))
+                .rate(String.format("%.2f", Math.abs(robustness - qoqRobustness) * 100 / qoqRobustness))
+                .tendency(isEqual(robustness, qoqRobustness) ? 0 : robustness > qoqRobustness ? 1 : 2).build());
         qoqSlaMetric.add(Metric.builder()
                 .name("团队稳定性")
-                .value(String.format("%.2f", stabilityResp.getStability()))
-                .oldValue(String.format("%.2f", qoqStabilityResp.getStability()))
-                .rate(String.format("%.2f", Math.abs(stabilityResp.getStability() - qoqStabilityResp.getStability()) * 100 / qoqStabilityResp.getStability()))
-                .tendency(stabilityResp.getStability() - qoqStabilityResp.getStability() > 0 ? 1 : 2).build());
+                .value(String.format("%.2f", stability))
+                .oldValue(String.format("%.2f", qoqStability))
+                .rate(String.format("%.2f", Math.abs(stability - qoqStability) * 100 / qoqStability))
+                .tendency(isEqual(stability, qoqStability) ? 0 : stability > qoqStability ? 1 : 2).build());
         yoySlaMetric.add(Metric.builder()
                 .name("团队鲁棒性")
-                .value(String.format("%.2f", stabilityResp.getRobustness()))
-                .oldValue(String.format("%.2f", yoyStabilityResp.getStability()))
-                .rate(String.format("%.2f", Math.abs(stabilityResp.getRobustness() - yoyStabilityResp.getRobustness()) * 100 / yoyStabilityResp.getRobustness()))
-                .tendency(stabilityResp.getRobustness() - yoyStabilityResp.getRobustness() > 0 ? 1 : 2).build());
+                .value(String.format("%.2f", robustness))
+                .oldValue(String.format("%.2f", yoyRobustness))
+                .rate(String.format("%.2f", Math.abs(robustness - yoyRobustness) * 100 / yoyRobustness))
+                .tendency(isEqual(robustness, yoyRobustness) ? 0 : robustness > qoqRobustness ? 1 : 2).build());
         yoySlaMetric.add(Metric.builder()
                 .name("团队稳定性")
-                .value(String.format("%.2f", stabilityResp.getStability()))
-                .oldValue(String.format("%.2f", yoyStabilityResp.getStability()))
-                .rate(String.format("%.2f", Math.abs(stabilityResp.getStability() - yoyStabilityResp.getStability()) * 100 / yoyStabilityResp.getStability()))
-                .tendency(stabilityResp.getStability() - yoyStabilityResp.getStability() > 0 ? 1 : 2).build());
+                .value(String.format("%.2f", stability))
+                .oldValue(String.format("%.2f", yoyStability))
+                .rate(String.format("%.2f", Math.abs(stability - yoyStability) * 100 / yoyStability))
+                .tendency(isEqual(stability, yoyStability) ? 0 : stability > yoyStability ? 1 : 2).build());
         TeamOverviewResp sla = TeamOverviewResp.builder()
                 .id(6)
                 .name("稳定性类")
@@ -965,13 +971,13 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .value(Long.toString(sum))
                 .oldValue(Long.toString(qoqSum))
                 .rate(String.format("%.2f", qoqRate))
-                .tendency(sum - qoqSum > 0 ? 1 : 2).build();
+                .tendency(sum == qoqSum ? 0 : sum > qoqSum ? 1 : 2).build();
         Metric yoyMetric = Metric.builder()
                 .name(name)
                 .value(Long.toString(sum))
                 .oldValue(Long.toString(yoySum))
                 .rate(String.format("%.2f", yoyRate))
-                .tendency(sum - qoqSum > 0 ? 1 : 2).build();
+                .tendency(sum == qoqSum ? 0 : sum > yoySum ? 1 : 2).build();
         qoqMetricList.add(qoqMetric);
         yoyMetricList.add(yoyMetric);
     }
@@ -1008,6 +1014,11 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         return yoyEnd;
     }
 
+    /**
+     * 计算标准差
+     * @param xx
+     * @return
+     */
     private double Variance(List<Double> xx) {
         Double[] x = xx.toArray(new Double[0]);
         int m = x.length;
@@ -1023,6 +1034,11 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         return Math.sqrt(dVar / m);
     }
 
+    /**
+     * 计算平均值
+     * @param xx
+     * @return
+     */
     private double Mean(List<Double> xx) {
         Double[] x = xx.toArray(new Double[0]);
         int m = x.length;
@@ -1031,6 +1047,19 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
             sum += value;
         }
         return sum / m;
+    }
+
+    /**
+     * 判断浮点数是否相等
+     * @param a
+     * @param b
+     * @return
+     */
+    public boolean isEqual(double a, double b) {
+        if (Double.isNaN(a) || Double.isNaN(b) || Double.isInfinite(a) || Double.isInfinite(b)) {
+            return false;
+        }
+        return Math.abs(a - b) < 0.001d;
     }
 
 

@@ -2,7 +2,10 @@ package com.ziroom.tech.demeterapi.controller;
 
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
+import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
+import com.ziroom.tech.demeterapi.service.PortraitService;
 import com.ziroom.tech.demeterapi.service.RankingListService;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author zhangxintong
@@ -24,77 +28,33 @@ public class RankingListController {
 
     @Resource
    private RankingListService rankingListService;
+    @Resource
+    private FlinkAnalysisService flinkAnalysisService;
 
     /**
-     *zhangxt3
+     * @zhangxt3
+     * 所有需要排行的放入数组
      */
-    @PostMapping("authSkillpointnum")
-    @ApiOperation(value = "认证技能点数量", httpMethod = "POST")
-    public Resp<RankingResp> authSkillpointnum(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.authSkillpointnum(rankingReq));
+    @PostMapping("getAllskillmapIndiactorInfo")
+    @ApiOperation(value = "技能图谱相关", httpMethod = "POST")
+    public Resp<RankingResp[]> getAllskillmapIndiactorInfo(@RequestBody RankingReq rankingReq){
+        return Resp.success(rankingListService.getAllskillmapIndiactorInfo(rankingReq));
+    }
+ /**
+  *
+  * @param rankingReq
+  * @return
+  */
+    @PostMapping("getAllIndividualProjectIndiactorInfo")
+    @ApiOperation(value = "個人工程指标排行", httpMethod = "POST")
+    public Resp<List<RankResp>> getAllIndividualProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
+       return Resp.success(flinkAnalysisService.getAllIndividualProjectIndiactorInfo(rankingReq));
     }
 
-    /**
-     *zhangxt3
-     */
-    @PostMapping("authSkillnum")
-    @ApiOperation(value = "认证技能数量", httpMethod = "POST")
-    public Resp<RankingResp> authSkillnum(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.authSkillnum(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("hotSkillpoint")
-    @ApiOperation(value = "热门技能点", httpMethod = "POST")
-    public Resp<RankingResp> hotSkillpoint(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.hotSkillpoint(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("hotSkill")
-    @ApiOperation(value = "热门技能", httpMethod = "POST")
-    public Resp<RankingResp> hotSkill(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.hotSkill(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("devEquiv")
-    @ApiOperation(value = "开发当量", httpMethod = "POST")
-    public Resp<RankingResp> devEquiv(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.devEquiv(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("devEvalue")
-    @ApiOperation(value = "开发价值", httpMethod = "POST")
-    public Resp<RankingResp> devEvalue(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.devEvalue(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("devQuality")
-    @ApiOperation(value = "开发质量", httpMethod = "POST")
-    public Resp<RankingResp> devQuality(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.devQuality(rankingReq));
-    }
-
-    /**
-     *zhangxt3
-     */
-    @PostMapping("devEfficiency")
-    @ApiOperation(value = "开发效率", httpMethod = "POST")
-    public Resp<RankingResp> devEfficiency(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.authSkillpointnum(rankingReq));
-    }
+@PostMapping("getAlldeptProjectIndiactorInfo")
+@ApiOperation(value = "部門工程指标排行", httpMethod = "POST")
+public Resp<List<RankResp>> getAlldeptProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
+    return Resp.success(flinkAnalysisService.getAlldeptProjectIndiactorInfo(rankingReq));
+}
 
 }

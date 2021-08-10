@@ -6,24 +6,24 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @Builder
 @ApiModel("排行榜列表")
-public class RankingResp {
+public class RankResp {
+
 
     @ApiModelProperty("我的排名")
     private Integer myRanking;
     @ApiModelProperty("排名信息")
     private List<RankingInfo> rankingList;
-//    @ApiModelProperty("title")
+    //    @ApiModelProperty("title")
 //    private String title;
-    public RankingResp(Integer myRanking, List<RankingInfo> rankingList){
+    public RankResp(Integer myRanking, List<RankingInfo> rankingList){
         this.myRanking = myRanking;
         this.rankingList = rankingList;
     }
-    public RankingResp() {
+    public RankResp() {
     }
 
     @Override

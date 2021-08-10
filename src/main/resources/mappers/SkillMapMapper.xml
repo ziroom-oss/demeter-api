@@ -14,6 +14,11 @@
     <sql id="Base_Column_List">
         id, name, is_enable, job_id, create_time, modify_time
     </sql>
+    <select id="selectAll" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM skill_map
+    </select>
     <select id="selectByConditionSelective" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />

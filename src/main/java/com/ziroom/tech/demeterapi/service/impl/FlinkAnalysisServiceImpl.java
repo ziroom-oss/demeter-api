@@ -139,7 +139,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .exceptionally(e -> {
                     log.error("", e);
                     return new ArrayList<>();
-        });
+                });
         CompletableFuture<List<AnalysisResp>> qoqFuture
                 = CompletableFuture
                 .supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(qoqStart.getTime(), qoqEnd.getTime(), adCodeList))
@@ -1092,7 +1092,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
 
         List<AnalysisResp> analysisResp
                 = flinkAnalysisComponent.getAnalysisResp(personReq.getStartTime(), personReq.getEndTime(),
-                        Lists.newArrayList(adCode));
+                Lists.newArrayList(adCode));
         long devEquivalentS = analysisResp.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
         long insertionsS = analysisResp.stream().mapToLong(AnalysisResp::getInsertions).sum();
         long deletionsS = analysisResp.stream().mapToLong(AnalysisResp::getDeletions).sum();
@@ -1136,6 +1136,26 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .personOverview(personOverview)
                 .personalByDays(personalDevEquivalentByDays)
                 .build();
+    }
+
+    /**
+     *    search individual ranking about from flink
+     * @zhangxt 以数组形式获取所有个人相关工程指标排行
+     * @param rankingReq
+     * @return
+     */
+    @Override
+    public List<RankResp> getAllIndividualProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getIndividualProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        return projectIndiactorInfos;
+    }
+
+
+    //部門
+    @Override
+    public List<RankResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getdeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        return projectIndiactorInfos;
     }
 }
 

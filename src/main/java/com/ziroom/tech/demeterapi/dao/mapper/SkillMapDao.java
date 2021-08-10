@@ -41,4 +41,10 @@ public interface SkillMapDao {
      * 返回指定 id 的技术图谱
      */
     public SkillMap selectByPrimaryKey(Long id);
+
+    /**
+     * 获取所有
+     * @return
+     */
+    public List<SkillMap> selectAll();
 }

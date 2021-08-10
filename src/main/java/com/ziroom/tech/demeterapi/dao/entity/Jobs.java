@@ -1,10 +1,12 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@Builder
 public class Jobs {
 
     private Long id;

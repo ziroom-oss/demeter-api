@@ -14,6 +14,12 @@
     <sql id="Base_Column_List">
         id, name, parent_id, sort, create_time, modify_time
     </sql>
+    <select id="getSkillsName" resultType="java.util.HashMap" >
+        select id, name from skill_tree where
+        <if test="parentIds != null">  <!--如果传了技能图谱-->
+            id in <foreach collection="parentIds" item="id" index="parentId" open="(" close=")" separator=","> #{parentIds,jdbcType=INT} </foreach>
+        </if>
+    </select>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         SELECT 
         <include refid="Base_Column_List"/>

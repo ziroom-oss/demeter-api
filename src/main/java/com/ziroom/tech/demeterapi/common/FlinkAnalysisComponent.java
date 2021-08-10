@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.InfoRanking;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +39,9 @@ public class FlinkAnalysisComponent {
 
     @Resource
     private FlinkAnalysisEndPoint flinkAnalysisEndPoint;
+
+    @Resource
+    private EhrComponent ehrComponent;
 
     @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
     public List<AnalysisResp> getAnalysisResp(Date startTime, Date endTime, List<String> adCodes) {
@@ -131,8 +136,6 @@ public class FlinkAnalysisComponent {
             return data;
         }
         return new EfficientResp();
-    @Resource
-    private EhrComponent ehrComponent;
     }
 
     /**

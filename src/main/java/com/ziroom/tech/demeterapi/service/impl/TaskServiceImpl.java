@@ -820,6 +820,25 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
+     * 修改学习清单
+     */
+    @Transactional
+    @Override
+    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
+        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
+        manifestUpdateExample.createCriteria()
+                .andIdEqualTo(req.getId());
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .name(req.getName())
+                .modifyId(OperatorContext.getOperator())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .learnerUid(req.getLearnerUid())
+                .build();
+        return demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
+    }
+
+    /**
      * 查询分配技能学习清单
      *
      * @param req 任务列表查询请求体

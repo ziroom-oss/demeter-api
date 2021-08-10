@@ -66,6 +66,13 @@ public interface TaskService {
     Resp createSkillLearnManifest(CreateSkillLearnManifestReq req);
 
     /**
+     * 修改学习清单
+     * @param req
+     * @return
+     */
+    Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req);
+
+    /**
      * 获取学习清单详情
      * @param req
      * @return Resp

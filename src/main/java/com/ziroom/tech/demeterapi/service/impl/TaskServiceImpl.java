@@ -852,6 +852,41 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
+     * 移除学习清单中的技能点
+     * 在编辑学习清单的时候，会为技能点添加学习路径 Skill_Learn_Path 表
+     * 所以在移除技能点的话也得去移除属下的所有学习路径
+     */
+    @Transactional
+    @Override
+    public Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId) {
+        // 先移除 Task_User_Extend 表的记录
+        DemeterTaskUserExtendExample taskUserExtendExample = new DemeterTaskUserExtendExample();
+        taskUserExtendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId)
+                .andTaskIdEqualTo(taskId);
+        DemeterTaskUserExtend taskUserExtend = DemeterTaskUserExtend.builder()
+                .isDel((byte)1)
+                .build();
+        demeterTaskUserExtendDao.updateByExampleSelective(taskUserExtend, taskUserExtendExample);
+
+        /**
+         * 移除该清单下指定技能点关联的学习路径
+         * 先批量查询有相同 taskId 和 manifestId 的 taskUserExtend
+         * 然后遍历 taskUserExtend 拿到 taskUserId 与 taskId 组合条件查询学习路径并批量设置 isDel = 1
+         */
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(taskUserExtendExample);
+        taskUserExtends.stream().forEach(item -> {
+            DemeterSkillLearnPathExample skillLearnPathExample = new DemeterSkillLearnPathExample();
+            skillLearnPathExample.createCriteria()
+                    .andTaskIdEqualTo(taskId)
+                    .andTaskUserIdEqualTo(item.getTaskUserId());
+            DemeterSkillLearnPath skillLearnPath = DemeterSkillLearnPath.builder().isDel((byte)1).build();
+            demeterSkillLearnPathDao.updateByExampleSelective(skillLearnPath, skillLearnPathExample);
+        });
+        return 1;
+    }
+
+    /**
      * 查询分配技能学习清单
      *
      * @param req 任务列表查询请求体
@@ -982,7 +1017,9 @@ public class TaskServiceImpl implements TaskService {
         List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
         List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
         taskUserExtends.stream().forEach(extend -> {
-            demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+            if (extend.getIsDel() < 1) {
+                demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+            }
         });
 
         /**
@@ -994,7 +1031,11 @@ public class TaskServiceImpl implements TaskService {
            DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
            learnPathExample.createCriteria().andTaskIdEqualTo(skillTask.getId());
            List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
-           demeterSkillLearnPathResp.addAll(demeterSkillLearnPaths);
+           demeterSkillLearnPaths.stream().forEach(item -> {
+               if (item.getIsDel() < 1) {
+                   demeterSkillLearnPathResp.add(item);
+               }
+           });
         });
         long count = demeterSkillTasks.stream()
                         .filter(o -> o.getTaskStatus().equals(SkillTaskFlowStatus.PASS.getCode()))

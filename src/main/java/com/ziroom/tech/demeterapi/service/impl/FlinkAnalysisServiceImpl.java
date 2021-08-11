@@ -536,15 +536,15 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .tendency(0).build());
         qoqCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">休假天数</span>/人均休假天数</span>")
-                .value("<span style=\"font-weight: bold\">465</span></span>/6")
-                .oldValue("<span style=\"font-weight: bold\">565</span></span>/5")
-                .rate("12.67")
+                .value("<span style=\"font-weight: bold\">0</span></span>/0")
+                .oldValue("<span style=\"font-weight: bold\">0</span></span>/0")
+                .rate("0")
                 .tendency(2).build());
         qoqCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">出勤工时</span>/开发工时/工时饱和度</span>")
-                .value("<span style=\"font-weight: bold\">465</span></span>/312/67.09%")
-                .oldValue("<span style=\"font-weight: bold\">565</span></span>/472/87.32%")
-                .rate("12.67")
+                .value("<span style=\"font-weight: bold\">0</span></span>/0/0%")
+                .oldValue("<span style=\"font-weight: bold\">0</span></span>/0/0%")
+                .rate("0")
                 .tendency(2).build());
 
         yoyCostMetric.add(Metric.builder()
@@ -555,15 +555,15 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .tendency(0).build());
         yoyCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">休假天数</span>/人均休假天数</span>")
-                .value("<span style=\"font-weight: bold\">465</span></span>/6")
-                .oldValue("<span style=\"font-weight: bold\">565</span></span>/5")
-                .rate("12.67")
+                .value("<span style=\"font-weight: bold\">0</span></span>/0")
+                .oldValue("<span style=\"font-weight: bold\">0</span></span>/0")
+                .rate("0")
                 .tendency(2).build());
         yoyCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">出勤工时</span>/开发工时/工时饱和度</span>")
-                .value("<span style=\"font-weight: bold\">465</span></span>/312/67.09%")
-                .oldValue("<span style=\"font-weight: bold\">565</span></span>/472/87.32%")
-                .rate("12.67")
+                .value("<span style=\"font-weight: bold\">0</span></span>/0/0%")
+                .oldValue("<span style=\"font-weight: bold\">0</span></span>/0/0%")
+                .rate("0")
                 .tendency(2).build());
         TeamOverviewResp cost = TeamOverviewResp.builder()
                 .id(5)

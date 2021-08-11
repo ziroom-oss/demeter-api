@@ -8,21 +8,21 @@ import lombok.Data;
 @Data
 public class CostResp {
 
-    private Integer departmentTotal;
+    private Integer departmentTotal = 0;
 
-    private Integer developmentNumber;
+    private Integer developmentNumber = 0;
 
-    private Double developerPercentage;
+    private Double developerPercentage = 0.0;
 
     /**
      * 出勤工时
      */
-    private Integer workTime;
+    private Integer workTime = 0;
 
     /**
      * 开发工时
      */
-    private Integer developTime;
+    private Integer developTime = 0;
 
     private Object lavel;
 

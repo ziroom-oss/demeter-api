@@ -115,11 +115,13 @@ import java.util.List;
 
     @ApiOperation(value = "为学习清单创建单条的技能点")
     @PostMapping(value = "/create/skill/manifest/{manifestId}/task/{taskId}/learner/{learnerUid}")
-    public Resp<Integer> createSkillTaskIntoManifest(@PathVariable Long manifestId, @PathVariable Long taskId, @PathVariable String learnerUid) {
+    public Resp<Long> createSkillTaskIntoManifest(@PathVariable Long manifestId, @PathVariable Long taskId, @PathVariable String learnerUid) {
         DemeterTaskUser taskUser = taskService.createTaskUser(taskId, learnerUid);
-        return Resp.success(taskService.createSkillTaskIntoManifest(manifestId, taskId, taskUser.getId()));
+        taskService.createSkillTaskIntoManifest(taskId, manifestId, taskUser.getId());
+        // 添加单条技能点以后需要返回 taskUserId 方便后续在该技能点继续添加学习路径
+        return Resp.success(taskUser.getId());
     }
-//
+
     @ApiModelProperty(value = "为单条技能点创建单条学习路径")
     @PostMapping(value = "/create/skill/manifest/taskuser/{taskUserId}/task/{taskId}/path/{path}")
     public Resp<Integer> createSkillLearnPath(@PathVariable Long taskUserId, @PathVariable Long taskId, @PathVariable String path) {

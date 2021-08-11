@@ -780,7 +780,7 @@ public class TaskServiceImpl implements TaskService {
             DemeterTaskUser taskUser = this.createTaskUser(skillId, learnerUid);
             long taskUserId = taskUser.getId();
             // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
-            this.createSkillTaskIntoManifest(taskUserId, skillId, manifestId);
+            this.createSkillTaskIntoManifest(skillId, manifestId, taskUserId);
             // 2.5【demeter_skill_learn_path】添加学习路径
             learnPaths.stream().forEach(path -> {
                 this.createLearnPathIntoSkill(taskUserId, skillId, path);
@@ -1060,7 +1060,9 @@ public class TaskServiceImpl implements TaskService {
         List<DemeterSkillLearnPath> demeterSkillLearnPathResp = new ArrayList<>();
         demeterSkillTasks.stream().forEach(skillTask -> {
            DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
-           learnPathExample.createCriteria().andTaskIdEqualTo(skillTask.getId());
+           learnPathExample.createCriteria()
+                   .andTaskIdEqualTo(skillTask.getId())
+                   .andTaskUserIdEqualTo(skillTask.getTaskUserId());
            List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
            demeterSkillLearnPaths.stream().forEach(item -> {
                if (item.getIsDel() < 1) {

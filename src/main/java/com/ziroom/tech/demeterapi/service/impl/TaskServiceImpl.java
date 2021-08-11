@@ -734,64 +734,7 @@ public class TaskServiceImpl implements TaskService {
      * @param skillPaths 学习路径
      */
     public void createSkillLearnManifestCommon(Long manifestId, String learnerUid, Map<String, List<String>> skillPaths) {
-        // 先添加技能点到 demeter_task_user
-        skillPaths.entrySet().forEach(entry -> {
-            Long skillId = Long.valueOf(entry.getKey());
-            List<String> learnPaths = entry.getValue();
-            // 2.1如果技能点编号不存在，则抛出异常
-            DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
-            if (Objects.isNull(skillTask)){
-                throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
-            }
-            // 2.2 如果是员工已经学习过的技能点，则抛出异常
-            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-            demeterTaskUserExample.createCriteria()
-                    .andTaskTypeEqualTo(TaskType.SKILL.getCode())
-                    .andReceiverUidEqualTo(learnerUid)
-                    .andTaskIdEqualTo(skillId);
-            List<DemeterTaskUser> taskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
-            if (taskUsers.size() > 0){
-                throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, skillId));
-            }
-            // 2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
-            DemeterTaskUser entity = DemeterTaskUser.builder()
-                    .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
-                    .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
-                    .taskType(TaskType.SKILL.getCode())
-                    .receiverUid(learnerUid)
-                    .taskId(skillId)
-                    .createTime(new Date())
-                    .modifyTime(new Date())
-                    .createId(OperatorContext.getOperator())
-                    .modifyId(OperatorContext.getOperator())
-                    .build();
-            demeterTaskUserDao.insertSelective(entity);
-            long taskUserId = entity.getId();
-            // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
-            DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
-                    .taskUserId(taskUserId)
-                    .taskId(skillId)
-                    .manifestId(manifestId)
-                    .createTime(new Date())
-                    .modifyTime(new Date())
-                    .createId(OperatorContext.getOperator())
-                    .modifyId(OperatorContext.getOperator())
-                    .build();
-            demeterTaskUserExtendDao.insertSelective(userExtend);
-            // 2.5【demeter_skill_learn_path】添加学习路径
-            learnPaths.stream().forEach(path -> {
-                DemeterSkillLearnPath demeterSkillLearnPath = DemeterSkillLearnPath.builder()
-                        .taskUserId(taskUserId)
-                        .taskId(skillId)
-                        .path(path)
-                        .createTime(new Date())
-                        .modifyTime(new Date())
-                        .createId(OperatorContext.getOperator())
-                        .modifyId(OperatorContext.getOperator())
-                        .build();
-                demeterSkillLearnPathDao.insertSelective(demeterSkillLearnPath);
-            });
-        });
+
     }
 
     /**
@@ -824,8 +767,58 @@ public class TaskServiceImpl implements TaskService {
 
         // 2.创建技能点学习任务
         String learnerUid = req.getLearnerUid();
-        this.createSkillLearnManifestCommon(manifestId, learnerUid, req.getSkillPaths());
+        // 先添加技能点到 demeter_task_user
+        req.getSkillPaths().entrySet().forEach(entry -> {
+            Long skillId = Long.valueOf(entry.getKey());
+            List<String> learnPaths = entry.getValue();
+            // 2.1如果技能点编号不存在，则抛出异常
+            DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
+            if (Objects.isNull(skillTask)){
+                throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
+            }
+            // 2.2 demeter_task_user 添加技能任务
+            DemeterTaskUser taskUser = this.createTaskUser(skillId, learnerUid);
+            long taskUserId = taskUser.getId();
+            // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
+            this.createSkillTaskIntoManifest(taskUserId, skillId, manifestId);
+            // 2.5【demeter_skill_learn_path】添加学习路径
+            learnPaths.stream().forEach(path -> {
+                this.createLearnPathIntoSkill(taskUserId, skillId, path);
+            });
+        });
         return Resp.success();
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    @Override
+    public DemeterTaskUser createTaskUser(Long taskId, String learnerUid) {
+            // 2.2 如果是员工已经学习过的技能点，则抛出异常
+            DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+            demeterTaskUserExample.createCriteria()
+                    .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                    .andReceiverUidEqualTo(learnerUid)
+                    .andTaskIdEqualTo(taskId);
+            List<DemeterTaskUser> taskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+            if (taskUsers.size() > 0){
+                throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, taskId));
+            }
+            // 2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
+            DemeterTaskUser entity = DemeterTaskUser.builder()
+                    .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
+                    .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
+                    .taskType(TaskType.SKILL.getCode())
+                    .receiverUid(learnerUid)
+                    .taskId(taskId)
+                    .createTime(new Date())
+                    .modifyTime(new Date())
+                    .createId(OperatorContext.getOperator())
+                    .modifyId(OperatorContext.getOperator())
+                    .build();
+            demeterTaskUserDao.insertSelective(entity);
+            return entity;
     }
 
     /**
@@ -844,11 +837,43 @@ public class TaskServiceImpl implements TaskService {
                 .learnPeriodEnd(req.getLearnPeriodEnd())
                 .learnerUid(req.getLearnerUid())
                 .build();
-        List<Long> skills = req.getSkills();
-        if (skills.size() > 0) {
+        demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
+        return 1;
+    }
 
-        }
-        return demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
+    @Transactional
+    @Override
+    public Integer createLearnPathIntoSkill(Long taskUserId, Long taskId, String path) {
+        DemeterSkillLearnPathExample skillLearnPathExample = new DemeterSkillLearnPathExample();
+        skillLearnPathExample.createCriteria()
+                .andTaskUserIdEqualTo(taskUserId)
+                .andTaskIdEqualTo(taskId)
+                .andPathEqualTo(path);
+        DemeterSkillLearnPath learnPath = DemeterSkillLearnPath.builder()
+                .taskUserId(taskUserId)
+                .taskId(taskId)
+                .path(path)
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+        return demeterSkillLearnPathDao.insertSelective(learnPath);
+    }
+
+    @Transactional
+    @Override
+    public Integer createSkillTaskIntoManifest(Long taskUserId, Long taskId, Long manifestId) {
+        DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
+                .taskUserId(taskUserId)
+                .taskId(taskId)
+                .manifestId(manifestId)
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+        return demeterTaskUserExtendDao.insertSelective(userExtend);
     }
 
     /**
@@ -885,6 +910,8 @@ public class TaskServiceImpl implements TaskService {
         });
         return 1;
     }
+
+
 
     /**
      * 查询分配技能学习清单

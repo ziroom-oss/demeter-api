@@ -26,9 +26,6 @@ public class ModifySkillLearnManifestReq {
     @ApiModelProperty("学习者")
     private String learnerUid;
 
-    @ApiModelProperty("学习技能点")
-    private List<Long> skills;
-
     @ApiModelProperty("学习技能点路径")
     private Map<String, List<String>> skillPaths;
 }

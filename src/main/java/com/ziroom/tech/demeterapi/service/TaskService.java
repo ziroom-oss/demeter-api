@@ -75,7 +75,7 @@ public interface TaskService {
     /**
      * 为学习清单中的单条技能点添加单条学习路径
      */
-    Integer createLearnPathIntoSkill(Long taskUserId, Long taskId, String path);
+    Long createLearnPathIntoSkill(Long taskUserId, Long taskId, String path);
 
     /**
      * 为学习清单添加单条技能点
@@ -91,6 +91,11 @@ public interface TaskService {
      * 移除学习清单中的技能任务
      */
     Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId);
+
+    /**
+     * 移除单个学习路径
+     */
+    Integer deleteSkillLearnPath(Long id);
 
     /**
      * 获取学习清单详情

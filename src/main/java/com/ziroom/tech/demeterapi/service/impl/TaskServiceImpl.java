@@ -843,7 +843,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public Integer createLearnPathIntoSkill(Long taskUserId, Long taskId, String path) {
+    public Long createLearnPathIntoSkill(Long taskUserId, Long taskId, String path) {
         DemeterSkillLearnPathExample skillLearnPathExample = new DemeterSkillLearnPathExample();
         skillLearnPathExample.createCriteria()
                 .andTaskUserIdEqualTo(taskUserId)
@@ -858,7 +858,8 @@ public class TaskServiceImpl implements TaskService {
                 .createId(OperatorContext.getOperator())
                 .modifyId(OperatorContext.getOperator())
                 .build();
-        return demeterSkillLearnPathDao.insertSelective(learnPath);
+        demeterSkillLearnPathDao.insertSelective(learnPath);
+        return learnPath.getId();
     }
 
     @Transactional
@@ -911,7 +912,14 @@ public class TaskServiceImpl implements TaskService {
         return 1;
     }
 
-
+    @Override
+    public Integer deleteSkillLearnPath(Long id) {
+        DemeterSkillLearnPathExample LearnPathExample = new DemeterSkillLearnPathExample();
+        LearnPathExample.createCriteria()
+                .andIdEqualTo(id);
+        DemeterSkillLearnPath learnPath = DemeterSkillLearnPath.builder().isDel((byte)1).build();
+        return demeterSkillLearnPathDao.updateByExampleSelective(learnPath, LearnPathExample);
+    }
 
     /**
      * 查询分配技能学习清单

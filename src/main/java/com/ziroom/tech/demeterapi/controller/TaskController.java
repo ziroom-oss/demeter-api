@@ -124,8 +124,14 @@ import java.util.List;
 
     @ApiModelProperty(value = "为单条技能点创建单条学习路径")
     @PostMapping(value = "/create/skill/manifest/taskuser/{taskUserId}/task/{taskId}/path/{path}")
-    public Resp<Integer> createSkillLearnPath(@PathVariable Long taskUserId, @PathVariable Long taskId, @PathVariable String path) {
+    public Resp<Long> createSkillLearnPath(@PathVariable Long taskUserId, @PathVariable Long taskId, @PathVariable String path) {
         return Resp.success(taskService.createLearnPathIntoSkill(taskUserId, taskId, path));
+    }
+
+    @ApiModelProperty(value = "移除指定技能点下的单条学习路径")
+    @DeleteMapping(value = "/skill/manifest/learnpath/{id}")
+    public Resp<Integer> deleteSkillLearnPath(@PathVariable Long id) {
+        return Resp.success(taskService.deleteSkillLearnPath(id));
     }
 
     @PostMapping(value = "/modify/skill/manifest")

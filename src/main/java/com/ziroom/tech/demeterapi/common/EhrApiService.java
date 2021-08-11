@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 
@@ -84,7 +85,7 @@ public class EhrApiService {
         }
         return result;
     }
-
+    @Cacheable(value = "caffeine", key = "#root.args[0].adCode")
     public EhrApiSimpleResp getEmpSimple(EhrApiSimpleReq ehrApiSimpleReq) {
         Map<String, Object> stringObjectMap = initReqMap(ehrApiSimpleReq);
         Call<EhrApiResp<EhrApiSimpleResp>> call = ehrApiEndPoint.getEmpSimple(stringObjectMap);

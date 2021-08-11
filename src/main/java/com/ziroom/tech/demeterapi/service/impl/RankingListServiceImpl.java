@@ -46,7 +46,7 @@ public class RankingListServiceImpl implements RankingListService {
        List<RankingInfo> skillPointPASSED = demeterTaskUserDao.getSkillPointPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
                     return RankingInfo.builder()
                             .name(ehrComponent.getUserDetail(forRanking.getReceiverUid()).getUserName())
-                            .num(forRanking.getSumAll())
+                            .num(forRanking.getSumAll().toString())
                             .build();
                 }).collect(Collectors.toList());
         skillPoint.setRankingList(skillPointPASSED);
@@ -61,7 +61,7 @@ public class RankingListServiceImpl implements RankingListService {
         List<RankingInfo> skillPASSED = demeterTaskUserDao.getSkillNumPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
              return RankingInfo.builder()
                      .name(ehrComponent.getUserDetail(forRanking.getReceiverUid()).getUserName())
-                    .num(forRanking.getSumAll())
+                    .num(forRanking.getSumAll().toString())
                     .build();
         }).collect(Collectors.toList()); //ForRankingTASK
         skill.setRankingList(skillPASSED);
@@ -78,7 +78,7 @@ public class RankingListServiceImpl implements RankingListService {
         List<RankingInfo> hotSkillPoint = demeterTaskUserDao.getHotSkillPointName(rankingReq, skillTaskIds).stream().map(forRanking -> {
              return RankingInfo.builder()
                     .name(tasksNames.get(forRanking.getTaskId()))
-                    .num(forRanking.getSumAll())
+                    .num(forRanking.getSumAll().toString())
                     .build();
         }).collect(Collectors.toList());
         skillPointHot.setRankingList(hotSkillPoint);
@@ -87,7 +87,7 @@ public class RankingListServiceImpl implements RankingListService {
         List<RankingInfo> hotSkill = demeterTaskUserDao.getHotSkill(rankingReq, skillTaskIds).stream().map(forRanking -> {
              return RankingInfo.builder()
                      .name(skillTreeDao.selectByPrimaryKey(forRanking.getParentId()).getName())
-                    .num(forRanking.getSumAll())
+                    .num(forRanking.getSumAll().toString())
                     .build();
         }).collect(Collectors.toList());
         skillHot.setRankingList(hotSkill);

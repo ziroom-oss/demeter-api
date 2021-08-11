@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class ForRankingTASK {
 
-   private Integer taskId;
+   private Long taskId;
     //统计总数
     private Integer sumAll;
 }

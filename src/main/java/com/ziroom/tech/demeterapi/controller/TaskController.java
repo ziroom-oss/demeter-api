@@ -5,11 +5,13 @@ import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -109,6 +111,19 @@ import java.util.List;
     @ApiOperation(value = "创建员工学习清单", httpMethod = "POST")
     public Resp createSkillLearnManifest(@RequestBody CreateSkillLearnManifestReq req) {
         return taskService.createSkillLearnManifest(req);
+    }
+
+    @ApiOperation(value = "为学习清单创建单条的技能点")
+    @PostMapping(value = "/create/skill/manifest/{manifestId}/task/{taskId}/learner/{learnerUid}")
+    public Resp<Integer> createSkillTaskIntoManifest(@PathVariable Long manifestId, @PathVariable Long taskId, @PathVariable String learnerUid) {
+        DemeterTaskUser taskUser = taskService.createTaskUser(taskId, learnerUid);
+        return Resp.success(taskService.createSkillTaskIntoManifest(manifestId, taskId, taskUser.getId()));
+    }
+//
+    @ApiModelProperty(value = "为单条技能点创建单条学习路径")
+    @PostMapping(value = "/create/skill/manifest/taskuser/{taskUserId}/task/{taskId}/path/{path}")
+    public Resp<Integer> createSkillLearnPath(@PathVariable Long taskUserId, @PathVariable Long taskId, @PathVariable String path) {
+        return Resp.success(taskService.createLearnPathIntoSkill(taskUserId, taskId, path));
     }
 
     @PostMapping(value = "/modify/skill/manifest")

@@ -80,7 +80,7 @@ public interface TaskService {
     /**
      * 为学习清单添加单条技能点
      */
-    Integer createSkillTaskIntoManifest(Long taskUserId, Long taskId, Long manifestId);
+    Integer createSkillTaskIntoManifest(Long taskId, Long manifestId, Long taskUserId);
 
     /**
      * 为学习清单添加单条技能点前先添加到 task_user

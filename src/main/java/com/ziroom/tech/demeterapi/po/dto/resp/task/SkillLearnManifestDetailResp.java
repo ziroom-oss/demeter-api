@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.po.dto.resp.task;
 import com.ziroom.tech.demeterapi.core.SkillTree;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillLearnPath;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
+import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskUserExtend;
 import lombok.Data;
 
 import java.util.List;
@@ -16,6 +17,6 @@ import java.util.List;
 public class SkillLearnManifestDetailResp extends SkillLearnManifestResp {
 
     //private SkillTree skillTree;
-    private List<DemeterSkillTask> demeterSkillTasks;
+    private List<SkillTaskUserExtend> demeterSkillTasks;
     private List<DemeterSkillLearnPath> demeterSkillLearnPaths;
 }

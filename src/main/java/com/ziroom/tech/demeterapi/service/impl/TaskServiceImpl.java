@@ -863,7 +863,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public Integer createSkillTaskIntoManifest(Long taskUserId, Long taskId, Long manifestId) {
+    public Integer createSkillTaskIntoManifest(Long taskId, Long manifestId, Long taskUserId) {
         DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
                 .taskUserId(taskUserId)
                 .taskId(taskId)
@@ -1042,10 +1042,14 @@ public class TaskServiceImpl implements TaskService {
         extendExample.createCriteria()
                 .andManifestIdEqualTo(manifestId);
         List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
-        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        List<SkillTaskUserExtend> demeterSkillTasks = new ArrayList<>();
         taskUserExtends.stream().forEach(extend -> {
             if (extend.getIsDel() < 1) {
-                demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+                DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId());
+                SkillTaskUserExtend skillTaskUserExtend = new SkillTaskUserExtend();
+                skillTaskUserExtend.setTaskUserId(extend.getTaskUserId());
+                BeanUtils.copyProperties(demeterSkillTask, skillTaskUserExtend);
+                demeterSkillTasks.add(skillTaskUserExtend);
             }
         });
 

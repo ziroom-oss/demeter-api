@@ -23,7 +23,9 @@ import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
+import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
+import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -917,7 +919,7 @@ public class TaskServiceImpl implements TaskService {
             skillLearnManifestResp.setStatusName(status.getName());
 
             // 如果查询清单状态是通过的话
-            if (req.getStatus() == SkillManifestFlowStatus.PASS.getCode()){
+            if (req.getStatus().equals(SkillManifestFlowStatus.PASS.getCode())){
                 // 并且清单状态（包含的任务也都是通过状态）
                 if (passed){
                     manifestResps.add(skillLearnManifestResp);
@@ -931,7 +933,7 @@ public class TaskServiceImpl implements TaskService {
         });
 
         // 因为 manifestResps 内综合除分页以外的结果
-        List<SkillLearnManifestResp> resps = manifestResps.stream().skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
+        List<SkillLearnManifestResp> resps = manifestResps.stream().sorted(Comparator.comparing(SkillLearnManifestResp::getCreateTime).reversed()).skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
         pageListResp.setTotal(manifestResps.size());
         pageListResp.setData(resps);
 
@@ -955,6 +957,9 @@ public class TaskServiceImpl implements TaskService {
         // 学习清单基本信息
         SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
         BeanUtils.copyProperties(manifest, detailResp);
+        detailResp.setLearnPeriod(
+                DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodStart().toInstant().atZone(ZoneId.systemDefault())) + " 至 " +
+                        DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodEnd().toInstant().atZone(ZoneId.systemDefault())));
         //根据人物uid查出姓名
         detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
         detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
@@ -980,6 +985,18 @@ public class TaskServiceImpl implements TaskService {
            List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
            demeterSkillLearnPathResp.addAll(demeterSkillLearnPaths);
         });
+        long count = demeterSkillTasks.stream()
+                        .filter(o -> o.getTaskStatus().equals(SkillTaskFlowStatus.PASS.getCode()))
+                        .count();
+        if (demeterSkillTasks.size() == count) {
+            detailResp.setStatus(SkillManifestFlowStatus.PASS.getCode());
+            detailResp.setStatusName(SkillManifestFlowStatus.PASS.getName());
+        } else {
+            detailResp.setStatus(SkillManifestFlowStatus.ONGOING.getCode());
+            detailResp.setStatusName(SkillManifestFlowStatus.ONGOING.getName());
+        }
+        long sum = demeterSkillTasks.stream().mapToLong(DemeterSkillTask::getSkillReward).sum();
+        detailResp.setReward(sum);
         detailResp.setDemeterSkillTasks(demeterSkillTasks);
         detailResp.setDemeterSkillLearnPaths(demeterSkillLearnPathResp);
         return detailResp;

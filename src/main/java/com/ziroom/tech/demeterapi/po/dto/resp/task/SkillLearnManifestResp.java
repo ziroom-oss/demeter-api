@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
+import java.util.List;
 import lombok.Data;
 
 import java.util.Date;
@@ -25,7 +26,7 @@ public class SkillLearnManifestResp {
     private Date learnPeriodEnd; // 学习周期结束时间
 
     //学习清单技能奖励值
-    private Integer reward;//5、技能点奖励
+    private Long reward;//5、技能点奖励
 
     private String assignerName;//6、分配人
 

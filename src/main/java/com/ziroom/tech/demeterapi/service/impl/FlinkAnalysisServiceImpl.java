@@ -44,7 +44,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,8 +52,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
@@ -555,7 +552,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .oldValue("<span style=\"font-weight: bold\">" + costResp.getDepartmentTotal() + "</span></span>/" + costResp.getDevelopmentNumber() + "/" + costResp.getDeveloperPercentage() * 100 +"%")
                 .rate("0")
                 .tendency(0).build());
-        qoqCostMetric.add(Metric.builder()
+        yoyCostMetric.add(Metric.builder()
                 .name("<span><span style=\"font-weight: bold\">休假天数</span>/人均休假天数</span>")
                 .value("<span style=\"font-weight: bold\">465</span></span>/6")
                 .oldValue("<span style=\"font-weight: bold\">565</span></span>/5")

@@ -21,6 +21,6 @@ public class RankingInfo{
     private String name;
 
     @ApiModelProperty("数量")
-    private Integer num;
+    private String num;
 
 }

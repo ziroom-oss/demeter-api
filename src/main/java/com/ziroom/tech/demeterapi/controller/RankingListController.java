@@ -6,7 +6,6 @@ import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
-import com.ziroom.tech.demeterapi.service.PortraitService;
 import com.ziroom.tech.demeterapi.service.RankingListService;
 import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
@@ -49,14 +48,8 @@ public class RankingListController {
   */
     @PostMapping("getAllIndividualProjectIndiactorInfo")
     @ApiOperation(value = "個人工程指标排行", httpMethod = "POST")
-    public Resp<List<RankResp>> getAllIndividualProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
+    public Resp<List<RankingResp>> getAllIndividualProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
        return Resp.success(flinkAnalysisService.getAllIndividualProjectIndiactorInfo(rankingReq));
     }
-
-@PostMapping("getAlldeptProjectIndiactorInfo")
-@ApiOperation(value = "部門工程指标排行", httpMethod = "POST")
-public Resp<List<RankResp>> getAlldeptProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
-    return Resp.success(flinkAnalysisService.getAlldeptProjectIndiactorInfo(rankingReq));
-}
 
 }

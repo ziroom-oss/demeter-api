@@ -32,6 +32,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.Metric;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.UserEmailService;
 import java.text.ParseException;
@@ -1144,17 +1145,17 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
      * @return
      */
     @Override
-    public List<RankResp> getAllIndividualProjectIndiactorInfo(RankingReq rankingReq) {
-        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getIndividualProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+    public List<RankingResp> getAllIndividualProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankingResp> projectIndiactorInfos = flinkAnalysisComponent.getIndividualProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
         return projectIndiactorInfos;
     }
 
 
     //部門
-    @Override
-    public List<RankResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq) {
-        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getdeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
-        return projectIndiactorInfos;
-    }
+//    @Override
+//    public List<RankingResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq) {
+//        List<RankingResp> projectIndiactorInfos = flinkAnalysisComponent.getdeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+//        return projectIndiactorInfos;
+//    }
 }
 

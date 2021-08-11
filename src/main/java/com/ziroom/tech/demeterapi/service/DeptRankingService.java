@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.controller;
+package com.ziroom.tech.demeterapi.service;
 
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.DeptRankingInfo;

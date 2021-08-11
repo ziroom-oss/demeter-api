@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 //import com.magicframework.core.cache.CacheType;
 //import com.magicframework.core.cache.Cached;
+import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.config.RecordLogger;
@@ -64,6 +65,9 @@ public class EhrComponent {
 
     @Resource
     private EhrEndPoint ehrEndPoint;
+
+    @Resource
+    private EhrApiEndPoint ehrApiEndPoint;
 
     /**
      * 通过部门编码获取部门下的人员列表

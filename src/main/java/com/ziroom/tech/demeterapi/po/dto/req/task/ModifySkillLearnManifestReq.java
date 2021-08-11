@@ -1,21 +1,18 @@
 package com.ziroom.tech.demeterapi.po.dto.req.task;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author lipp3
- * @date 2021/6/30 11:02
- * @Description
- */
+@ApiOperation("修改学习清单")
 @Data
-@ApiModel("创建学习清单请求体")
-public class CreateSkillLearnManifestReq {
+public class ModifySkillLearnManifestReq {
+    @ApiModelProperty("学习清单 id")
+    private Long id;
 
     @ApiModelProperty("学习清单名称")
     private String name;

@@ -7,20 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Objects;
-
 @Data
-@Builder
 @ApiModel("排名列表")
-public class RankingInfo{
-//
-//    @ApiModelProperty("排名")
-//    private long sort;
+public class InfoRanking implements Serializable {
 
     @ApiModelProperty("姓名")
-    private String name;
-
+    private String uid;
     @ApiModelProperty("数量")
-    private Integer num;
+    private String count;
 
 }

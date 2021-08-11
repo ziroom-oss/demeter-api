@@ -15,6 +15,7 @@ import com.ziroom.tech.demeterapi.service.MapService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +48,16 @@ public class MapController {
         return Resp.success(mapService.deleteByPrimaryKey(id));
     }
 
-    @ApiOperation("获取指定 id 的技能图谱")
+    @ApiOperation("获取指定 id 的技能图谱") //
     @GetMapping("/{id}")
     public Resp<SkillMap> getMap(@PathVariable Long id) {
         return Resp.success(mapService.selectByPrimaryKey(id));
+    }
+
+    @ApiOperation("获取所有图谱信息")
+    @GetMapping("/listall")
+    public Resp<List<SkillMap>> listall() {
+        return Resp.success(mapService.selectAll());
     }
 
     @ApiOperation("按条件查询技能图谱")

@@ -740,9 +740,10 @@ public class TaskServiceImpl implements TaskService {
         //1.【demeter_user_learn_manifest】创建学习清单
         DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
                 .assignerUid(OperatorContext.getOperator())
-                .learnerUid(req.getLearner())
+                .learnerUid(req.getLearnerUid())
                 .name(req.getName())
-                .learnPeriod(req.getLearnPeriod())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
                 .createTime(new Date())
                 .modifyTime(new Date())
                 .createId(OperatorContext.getOperator())
@@ -753,7 +754,7 @@ public class TaskServiceImpl implements TaskService {
         long manifestId = manifest.getId();//获取当前学习清单id
 
                 //2.创建技能点学习任务
-        String learnerUid = req.getLearner();
+        String learnerUid = req.getLearnerUid();
         req.getSkillPaths().entrySet().stream().forEach(entry -> {
             Long skillId = Long.valueOf(entry.getKey());
             List<String> learnPaths = entry.getValue();
@@ -779,7 +780,7 @@ public class TaskServiceImpl implements TaskService {
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
                     .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                     .taskType(TaskType.SKILL.getCode())
-                    .receiverUid(OperatorContext.getOperator())
+                    .receiverUid(learnerUid)
                     .taskId(skillId)
                     .createTime(new Date())
                     .modifyTime(new Date())
@@ -816,6 +817,25 @@ public class TaskServiceImpl implements TaskService {
             });
         });
         return Resp.success();
+    }
+
+    /**
+     * 修改学习清单
+     */
+    @Transactional
+    @Override
+    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
+        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
+        manifestUpdateExample.createCriteria()
+                .andIdEqualTo(req.getId());
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .name(req.getName())
+                .modifyId(OperatorContext.getOperator())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .learnerUid(req.getLearnerUid())
+                .build();
+        return demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
     }
 
     /**

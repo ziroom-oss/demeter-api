@@ -2,12 +2,16 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 
 import com.ziroom.tech.demeterapi.dao.entity.SkillTree;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-@SuppressWarnings("UnnecessaryInterfaceModifier")
 @Repository
 public interface SkillTreeDao {
+
+    public Map<Integer, String> getSkillsName(@Param("parentIds") List<Long> parentIds);
+
     public List<SkillTree> selectByParentId(Integer parentId);
 
     public Integer deleteByPrimaryKey(Integer id);

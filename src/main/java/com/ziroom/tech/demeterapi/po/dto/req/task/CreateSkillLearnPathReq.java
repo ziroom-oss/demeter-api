@@ -19,5 +19,5 @@ public class CreateSkillLearnPathReq {
     private Integer skillId;
 
     @ApiModelProperty("技能学习路径列表")
-    private List<String> learnPathes;
+    private List<String> learnPaths;
 }

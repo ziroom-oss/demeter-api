@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.common.FlinkAnalysisComponent;
 import com.ziroom.tech.demeterapi.po.dto.req.email.UserEmailDto;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PersonReq;
+import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
@@ -30,6 +31,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.LevelTendencyItem;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.Metric;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.UserEmailService;
 import java.text.ParseException;
@@ -139,7 +141,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .exceptionally(e -> {
                     log.error("", e);
                     return new ArrayList<>();
-        });
+                });
         CompletableFuture<List<AnalysisResp>> qoqFuture
                 = CompletableFuture
                 .supplyAsync(() -> flinkAnalysisComponent.getAnalysisResp(qoqStart.getTime(), qoqEnd.getTime(), adCodeList))
@@ -1092,7 +1094,7 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
 
         List<AnalysisResp> analysisResp
                 = flinkAnalysisComponent.getAnalysisResp(personReq.getStartTime(), personReq.getEndTime(),
-                        Lists.newArrayList(adCode));
+                Lists.newArrayList(adCode));
         long devEquivalentS = analysisResp.stream().mapToLong(AnalysisResp::getDevEquivalent).sum();
         long insertionsS = analysisResp.stream().mapToLong(AnalysisResp::getInsertions).sum();
         long deletionsS = analysisResp.stream().mapToLong(AnalysisResp::getDeletions).sum();
@@ -1136,6 +1138,26 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
                 .personOverview(personOverview)
                 .personalByDays(personalDevEquivalentByDays)
                 .build();
+    }
+
+    /**
+     *    search individual ranking about from flink
+     * @zhangxt 以数组形式获取所有个人相关工程指标排行
+     * @param rankingReq
+     * @return
+     */
+    @Override
+    public List<RankResp> getAllIndividualProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getIndividualProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        return projectIndiactorInfos;
+    }
+
+
+    //部門
+    @Override
+    public List<RankResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankResp> projectIndiactorInfos = flinkAnalysisComponent.getdeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        return projectIndiactorInfos;
     }
 }
 

@@ -22,6 +22,7 @@
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
         <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
     </resultMap>
+
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">

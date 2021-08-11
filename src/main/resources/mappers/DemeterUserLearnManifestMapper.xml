@@ -7,7 +7,8 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="assigner_uid" property="assignerUid" jdbcType="VARCHAR"/>
         <result column="learner_uid" property="learnerUid" jdbcType="VARCHAR"/>
-        <result column="learn_period" property="learnPeriod" jdbcType="VARCHAR"/>
+        <result column="learn_period_start" property="learnPeriodStart" jdbcType="TIMESTAMP"/>
+        <result column="learn_period_end" property="learnPeriodEnd" jdbcType="TIMESTAMP"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
@@ -72,7 +73,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, name, assigner_uid, learner_uid, learn_period, create_time, modify_time, create_id, modify_id
+        id, name, assigner_uid, learner_uid, learn_period_start, learn_period_end, create_time, modify_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifestExample">
         select
@@ -102,9 +103,9 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_user_learn_manifest (name, assigner_uid, learner_uid, learn_period, create_time, modify_time, create_id, 
+        INSERT INTO demeter_user_learn_manifest (name, assigner_uid, learner_uid, learn_period_start, learn_period_end, create_time, modify_time, create_id,
             modify_id)
-        VALUES (#{name,jdbcType=VARCHAR}, #{assignerUid,jdbcType=VARCHAR}, #{learnerUid,jdbcType=VARCHAR}, #{learnPeriod,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, 
+        VALUES (#{name,jdbcType=VARCHAR}, #{assignerUid,jdbcType=VARCHAR}, #{learnerUid,jdbcType=VARCHAR}, #{learnPeriodStart}, #{learnPeriodEnd}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR},
             #{modifyId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterUserLearnManifest">
@@ -122,8 +123,11 @@
             <if test="learnerUid != null">
                 learner_uid,
             </if>
-            <if test="learnPeriod != null">
-                learn_period,
+            <if test="learnPeriodStart">
+                learn_period_start,
+            </if>
+            <if test="learnPeriodEnd">
+                learn_period_end,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -148,8 +152,11 @@
             <if test="learnerUid != null">
                 #{learnerUid,jdbcType=VARCHAR},
             </if>
-            <if test="learnPeriod != null">
-                #{learnPeriod,jdbcType=VARCHAR},
+            <if test="learnPeriodStart != null">
+                #{learnPeriodStart},
+            </if>
+            <if test="learnPeriodEnd != null">
+                #{learnPeriodEnd},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -186,8 +193,11 @@
             <if test="record.learnerUid != null">
                 learner_uid = #{record.learnerUid,jdbcType=VARCHAR},
             </if>
-            <if test="record.learnPeriod != null">
-                learn_period = #{record.learnPeriod,jdbcType=VARCHAR},
+            <if test="record.learnPeriodStart">
+                learn_period_start = #{record.learnPeriodStart},
+            </if>
+            <if test="record.learnPeriodEnd">
+                learn_period_end = #{record.learnPeriodEnd},
             </if>
             <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -212,7 +222,8 @@
             name = #{record.name,jdbcType=VARCHAR},
             assigner_uid = #{record.assignerUid,jdbcType=VARCHAR},
             learner_uid = #{record.learnerUid,jdbcType=VARCHAR},
-            learn_period = #{record.learnPeriod,jdbcType=VARCHAR},
+            learn_period_start = #{record.learnPeriodStart},
+            learn_period_end = #{record.learnPeriodEnd},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
             modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
             create_id = #{record.createId,jdbcType=VARCHAR},
@@ -233,8 +244,11 @@
             <if test="learnerUid != null">
                 learner_uid = #{learnerUid,jdbcType=VARCHAR},
             </if>
-            <if test="learnPeriod != null">
-                learn_period = #{learnPeriod,jdbcType=VARCHAR},
+            <if test="learnPeriodStart">
+                learn_period_start = #{learnPeriodStart},
+            </if>
+            <if test="learnPeriodEnd">
+                learn_period_end = #{learnPeriodEnd},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -256,7 +270,8 @@
         SET name = #{name,jdbcType=VARCHAR},
             assigner_uid = #{assignerUid,jdbcType=VARCHAR},
             learner_uid = #{learnerUid,jdbcType=VARCHAR},
-            learn_period = #{learnPeriod,jdbcType=VARCHAR},
+            learn_period_start = #{record.learnPeriodStart},
+            learn_period_end = #{record.learnPeriodEnd},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             modify_time = #{modifyTime,jdbcType=TIMESTAMP},
             create_id = #{createId,jdbcType=VARCHAR},

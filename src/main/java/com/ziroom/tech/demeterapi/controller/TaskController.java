@@ -98,7 +98,7 @@ import java.util.List;
      *
      * @param req
      * @return {@link Resp}
-     * @throws
+     * @throwsP
      *
      * @author lipp3
      * @date 2021/6/30 18:56
@@ -115,6 +115,12 @@ import java.util.List;
     @ApiOperation(value = "修改员工学学习清单", httpMethod = "POST")
     public Resp<Integer> modifySkillLearnManifest(@RequestBody ModifySkillLearnManifestReq req) {
         return Resp.success(taskService.modifySkillLearnManifest(req));
+    }
+
+    @ApiOperation(value = "移除学习清单中的技能任务")
+    @DeleteMapping(value = "/skill/manifest/{manifestId}/task/{taskId}")
+    public Resp<Integer> deleteManifestTask(@PathVariable Long manifestId, @PathVariable Long taskId) {
+        return Resp.success(taskService.deleteSkillLearnManifestSkill(manifestId, taskId));
     }
 
     @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

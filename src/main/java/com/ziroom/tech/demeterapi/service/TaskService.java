@@ -73,6 +73,11 @@ public interface TaskService {
     Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req);
 
     /**
+     * 移除学习清单中的技能任务
+     */
+    Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId);
+
+    /**
      * 获取学习清单详情
      * @param req
      * @return Resp

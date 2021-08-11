@@ -109,6 +109,12 @@ import java.util.List;
         return taskService.createSkillLearnManifest(req);
     }
 
+    @PostMapping(value = "/modify/skill/manifest")
+    @ApiOperation(value = "修改员工学学习清单", httpMethod = "POST")
+    public Resp<Integer> modifySkillLearnManifest(@RequestBody ModifySkillLearnManifestReq req) {
+        return Resp.success(taskService.modifySkillLearnManifest(req));
+    }
+
     @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
     public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {

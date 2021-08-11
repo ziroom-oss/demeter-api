@@ -219,7 +219,7 @@ public class EhrComponent {
      * @return 结果
      */
     public String getUserDetailBysimple(String query) {
-        Call<JSONObject> response = ehrApiEndPoint.getUserDetailBySimple(Lists.newArrayList(query).toString());
+        Call<JSONObject> response = ehrEndPoint.getUserDetail(Lists.newArrayList(query).toString());
         UserResp userDetailResp = new UserResp();
         Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
             if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {

@@ -780,7 +780,7 @@ public class TaskServiceImpl implements TaskService {
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
                     .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                     .taskType(TaskType.SKILL.getCode())
-                    .receiverUid(OperatorContext.getOperator())
+                    .receiverUid(learnerUid)
                     .taskId(skillId)
                     .createTime(new Date())
                     .modifyTime(new Date())
@@ -817,6 +817,25 @@ public class TaskServiceImpl implements TaskService {
             });
         });
         return Resp.success();
+    }
+
+    /**
+     * 修改学习清单
+     */
+    @Transactional
+    @Override
+    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
+        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
+        manifestUpdateExample.createCriteria()
+                .andIdEqualTo(req.getId());
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .name(req.getName())
+                .modifyId(OperatorContext.getOperator())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .learnerUid(req.getLearnerUid())
+                .build();
+        return demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
     }
 
     /**

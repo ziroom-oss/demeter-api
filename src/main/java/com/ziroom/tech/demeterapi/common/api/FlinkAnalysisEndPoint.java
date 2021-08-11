@@ -12,6 +12,8 @@ import com.ziroom.tech.demeterapi.po.dto.resp.flink.Resp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.StabilityReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.StabilityResp;
 import java.util.List;
+
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.InfoRanking;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

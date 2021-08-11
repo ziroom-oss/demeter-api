@@ -3,6 +3,9 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample;
 import java.util.List;
+import java.util.Map;
+
+import com.ziroom.tech.demeterapi.dao.entity.ForTaskName;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
@@ -30,9 +33,10 @@ import org.springframework.stereotype.Repository;
  * ━━━━━━感觉萌萌哒━━━━━━
  * </pre>
  */
-@SuppressWarnings("UnnecessaryInterfaceModifier")
 @Repository
 public interface DemeterSkillTaskDao {
+
+    public List<ForTaskName> getTasksName(@Param("taskIds") List<Long> taskIds);
 
     public int countByExample(DemeterSkillTaskExample example);
 

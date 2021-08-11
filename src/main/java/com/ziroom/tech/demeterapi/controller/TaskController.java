@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.controller;
 
 import com.google.common.base.Preconditions;
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
@@ -25,17 +26,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/task")
+@LogHttpService
     public class TaskController {
 
     @Resource
     private TaskService taskService;
-
-    @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
-    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
-        assignTaskReq.validateAdd();
-        return taskService.createAssignTask(assignTaskReq);
-    }
 
     @PostMapping("get/assign")
     @ApiOperation(value = "查看指派类任务", httpMethod = "POST")
@@ -103,17 +98,36 @@ import java.util.List;
      *
      * @param req
      * @return {@link Resp}
-     * @throws
+     * @throwsP
      *
      * @author lipp3
      * @date 2021/6/30 18:56
      *
      * @Description  
      */
-    @PostMapping("/create/skill/manifest")
+    @PostMapping(value = "/create/skill/manifest")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     @ApiOperation(value = "创建员工学习清单", httpMethod = "POST")
-    public Resp createSkillLearnManifest(@RequestBody createSkillLearnManifestReq req) {
+    public Resp createSkillLearnManifest(@RequestBody CreateSkillLearnManifestReq req) {
         return taskService.createSkillLearnManifest(req);
+    }
+
+    @PostMapping(value = "/modify/skill/manifest")
+    @ApiOperation(value = "修改员工学学习清单", httpMethod = "POST")
+    public Resp<Integer> modifySkillLearnManifest(@RequestBody ModifySkillLearnManifestReq req) {
+        return Resp.success(taskService.modifySkillLearnManifest(req));
+    }
+
+    @ApiOperation(value = "移除学习清单中的技能任务")
+    @DeleteMapping(value = "/skill/manifest/{manifestId}/task/{taskId}")
+    public Resp<Integer> deleteManifestTask(@PathVariable Long manifestId, @PathVariable Long taskId) {
+        return Resp.success(taskService.deleteSkillLearnManifestSkill(manifestId, taskId));
+    }
+
+    @PostMapping(value = "save/assign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiOperation(value = "新建指派类任务", httpMethod = "POST")
+    public Resp<Object> createAssignTask(AssignTaskReq assignTaskReq) {
+        assignTaskReq.validateAdd();
+        return taskService.createAssignTask(assignTaskReq);
     }
 
     /**
@@ -125,11 +139,12 @@ import java.util.List;
      * @author lipp3
      * @date 2021/7/1 9:06
      *
-     * @Description  
+     * @Description
      */
     @PostMapping("/list/skill/manifest")
     @ApiOperation(value = "分页查询员工学习清单", httpMethod = "POST")
     public Resp getSkillLearnManifest(@RequestBody GetSkillLearnManifestReq req) {
+        req.validate();
         return Resp.success(taskService.getSkillLearnManifest(req));
     }
 
@@ -144,16 +159,16 @@ import java.util.List;
      *
      * @Description
      */
-    @GetMapping("/get/skill/manifest/detail")
-    @ApiOperation(value = "获取学习清单详情", httpMethod = "GET")
-    public Resp getSkillLearnManifestDetail(@RequestParam("manifestId") Long manifestId) {
+    @PostMapping("/get/skill/manifest/detail")
+    @ApiOperation(value = "获取学习清单详情", httpMethod = "POST")
+    public Resp getSkillLearnManifestDetail(@RequestParam Long manifestId) {
         return Resp.success(taskService.getSkillLearnManifestDetail(manifestId));
     }
 
     @PostMapping("/list/receive")
     @ApiOperation(value = "接收任务列表", httpMethod = "POST")
     public Resp<PageListResp<ReceiveQueryResp>> getExecuteList(@RequestBody TaskListQueryReq taskListQueryReq) {
-        taskListQueryReq.validate();
+       taskListQueryReq.validate();
         return Resp.success(taskService.getExecuteList(taskListQueryReq));
     }
 

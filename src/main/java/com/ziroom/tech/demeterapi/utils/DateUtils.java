@@ -30,17 +30,17 @@ public class DateUtils {
 
     public static Function<Date, LocalDateTime> DATE_TO_LOCAL_DATE_TIME = date -> date.toInstant().atZone(ZONE_UTC_P_8).toLocalDateTime();
 
-    public static DateTimeFormatter FORMATER_YYYY_MM_DD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static DateTimeFormatter FORMATTER_YYYY_MM_DD = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static DateTimeFormatter FORMATER_YYYY_MM = DateTimeFormatter.ofPattern("yyyy-MM");
+    public static DateTimeFormatter FORMATTER_YYYY_MM = DateTimeFormatter.ofPattern("yyyy-MM");
 
-    public static DateTimeFormatter FORMATER_YYYY = DateTimeFormatter.ofPattern("yyyy");
+    public static DateTimeFormatter FORMATTER_YYYY = DateTimeFormatter.ofPattern("yyyy");
 
-    public static DateTimeFormatter FORMATER_YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    public static DateTimeFormatter FORMATTER_YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     public static DateTimeFormatter YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static DateTimeFormatter FORMATER_YYYYMMDDHHMMSS = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static DateTimeFormatter FORMATTER_YYYYMMDDHHMMSS = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     public static Date toDate(String timeLabel) {
         LocalDateTime localDateTime = LocalDateTime.parse(timeLabel, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -56,11 +56,11 @@ public class DateUtils {
         return Date.from(LocalDateTime.now().atZone(ZONE_UTC_P_8).toInstant());
     }
 
-    public static Function<LocalDate, String> GROUP_BY_DAY = FORMATER_YYYY_MM_DD::format;
+    public static Function<LocalDate, String> GROUP_BY_DAY = FORMATTER_YYYY_MM_DD::format;
 
-    public static Function<LocalDate, String> GROUP_BY_MONTH = FORMATER_YYYY_MM::format;
+    public static Function<LocalDate, String> GROUP_BY_MONTH = FORMATTER_YYYY_MM::format;
 
-    public static Function<LocalDate, String> GROUP_BY_QUARTERLY = date -> FORMATER_YYYY.format(date)
+    public static Function<LocalDate, String> GROUP_BY_QUARTERLY = date -> FORMATTER_YYYY.format(date)
             + " Q"
             + date.get(QUARTER_OF_YEAR);
 

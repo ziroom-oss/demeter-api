@@ -37,6 +37,7 @@ import com.ziroom.tech.demeterapi.service.TreeService;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -367,16 +368,17 @@ public class PortraitServiceImpl implements PortraitService {
             }
         }
         engineeringMetricResp.setPersonalDeployResp(personalDeployResp);
-        PersonalDevResp devResp = codeAnalysisComponent
-                .getDevelopmentEquivalent(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        PersonalDevResp devResp = new PersonalDevResp();
+        codeAnalysisComponent.getDevelopmentEquivalent(userDetail.getEmail(), req.getStartTime(), req.getEndTime(), devResp);
+
         engineeringMetricResp.setPersonalDevResp(devResp);
 
-        List<PersonalByProject> personalDEByProject = codeAnalysisComponent
-                .getPersonalDEByProject(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        List<PersonalByProject> personalDEByProject = new ArrayList<>(16);
+        codeAnalysisComponent.getPersonalDEByProject(userDetail.getEmail(), req.getStartTime(), req.getEndTime(), personalDEByProject);
         engineeringMetricResp.setPersonalByProject(personalDEByProject);
 
-        List<PersonalByDay> personalDEByDay =
-                codeAnalysisComponent.getPersonalDEByDay(userDetail.getEmail(), req.getStartTime(), req.getEndTime());
+        List<PersonalByDay> personalDEByDay = new ArrayList<>(16);
+        codeAnalysisComponent.getPersonalDEByDay(userDetail.getEmail(), req.getStartTime(), req.getEndTime(), personalDEByDay);
         engineeringMetricResp.setPersonalByDays(personalDEByDay);
 
         PersonalResp personalMetrics = worktopComponent
@@ -671,5 +673,7 @@ public class PortraitServiceImpl implements PortraitService {
         UserDetailResp userDetailResp = ehrComponent.getUserDetail(uid);
         return userDetailResp;
     }
+
+
 }
 

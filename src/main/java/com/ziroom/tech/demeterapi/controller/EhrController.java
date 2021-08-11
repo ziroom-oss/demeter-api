@@ -39,7 +39,12 @@ public class EhrController {
         log.info("EhrController.getEmpList params:{}", JSON.toJSONString(ehrEmpListReq));
         return Resp.success(ehrComponent.getEmpList(ehrEmpListReq));
     }
-
+    @PostMapping("getEmp")
+    @ApiModelProperty("查询用户")
+    public Resp<List<UserResp>> getEmp(@RequestBody EhrEmpListReq ehrEmpListReq) {
+        log.info("EhrController.getEmp params:{}", JSON.toJSONString(ehrEmpListReq));
+        return Resp.success(ehrComponent.getEmpList(ehrEmpListReq));
+    }
     @PostMapping("nextOrg")
     @ApiOperation(value = "根据部门编码，查询子部门列表", notes = "目前公司编码默认为101", httpMethod = "POST")
     public Resp<Set<EhrDeptResp>> getNextOrgEmpList(@RequestBody EhrNextOrgReq ehrNextOrgReq) {

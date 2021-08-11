@@ -1,7 +1,9 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -30,6 +32,8 @@ import java.util.Date;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DemeterSkillLearnPath {
 
     private Long id;
@@ -48,67 +52,5 @@ public class DemeterSkillLearnPath {
 
     private String modifyId;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTaskUserId() {
-        return taskUserId;
-    }
-
-    public void setTaskUserId(Long taskUserId) {
-        this.taskUserId = taskUserId;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getModifyTime() {
-        return modifyTime;
-    }
-
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-
-    public String getCreateId() {
-        return createId;
-    }
-
-    public void setCreateId(String createId) {
-        this.createId = createId;
-    }
-
-    public String getModifyId() {
-        return modifyId;
-    }
-
-    public void setModifyId(String modifyId) {
-        this.modifyId = modifyId;
-    }
+    private Byte isDel;
 }

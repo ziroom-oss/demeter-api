@@ -20,9 +20,9 @@ public class CaffeineCacheConfig {
     @Bean
     public CaffeineCacheManager cacheManager(){
         Caffeine caffeine = Caffeine.newBuilder()
-                .initialCapacity(10000)
-                .maximumSize(10_000)
-                .expireAfterWrite(6,TimeUnit.HOURS);
+                .initialCapacity(100_0000)
+                .maximumSize(100_0000)
+                .expireAfterWrite(10, TimeUnit.MINUTES);
 
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setAllowNullValues(true);

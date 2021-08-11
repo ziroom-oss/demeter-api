@@ -23,7 +23,9 @@ import com.ziroom.tech.demeterapi.service.HaloService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
+import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
+import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -574,25 +576,32 @@ public class TaskServiceImpl implements TaskService {
     public PageListResp<ReceiveQueryResp> getExecuteList(TaskListQueryReq taskListQueryReq) {
         PageListResp<ReceiveQueryResp> pageListResp = new PageListResp<>();
         // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
-        List<ReceiveQueryResp> respList = new ArrayList<>(16);
+        List<ReceiveQueryResp> respList = new ArrayList<>(16);//任务列表表头、、、
 
-        DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();
+        DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();//DemeterSkillTask技能表
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
-        DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();
+        DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();//DemeterAssignTask任务指派表
         DemeterAssignTaskExample.Criteria assignTaskExampleCriteria = assignTaskExample.createCriteria();
-
-        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample(); //员工任务表
         DemeterTaskUserExample.Criteria demeterTaskUserCriteria = demeterTaskUserExample.createCriteria();
 
-        CurrentRole currentRole = this.getCurrentRole();
-        String receiverCode = taskListQueryReq.getSystemCode();
+        DemeterTaskUserExtendExample taskUserExtendExample = new DemeterTaskUserExtendExample();//员工任务扩展
+        DemeterTaskUserExtendExample.Criteria taskUserExtendCriteria = taskUserExtendExample.createCriteria();
+        DemeterUserLearnManifestExample userLearnManifestExample = new DemeterUserLearnManifestExample();//员工学习清单
+        DemeterUserLearnManifestExample.Criteria userLearnManifestCriteria = userLearnManifestExample.createCriteria();
+
+
+        CurrentRole currentRole = this.getCurrentRole();//当前登录人角色
+        String receiverCode = taskListQueryReq.getSystemCode();//获取发布人或接收人系统号
         switch (currentRole) {
+            //超级管理员
             case SUPER:
                 // 全部
                 if (StringUtils.isNotEmpty(receiverCode)) {
                     demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
                 }
                 break;
+                //部门管理员
             case DEPT:
                 if (StringUtils.isNotEmpty(receiverCode)) {
                     demeterTaskUserCriteria.andReceiverUidEqualTo(receiverCode);
@@ -601,6 +610,7 @@ public class TaskServiceImpl implements TaskService {
                     demeterTaskUserCriteria.andReceiverUidIn(currentDeptUsers);
                 }
                 break;
+                //普通用户
             case PLAIN:
                 demeterTaskUserCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
             default:
@@ -636,14 +646,15 @@ public class TaskServiceImpl implements TaskService {
             }
         }
 
-        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);//员工任务表
 
         List<Long> skillIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.SKILL.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
         List<Long> assignIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.ASSIGN.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
         Set<String> receiverId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
-
+        //技能表
         List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        //任务指派
         List<DemeterAssignTask> demeterAssignTasks = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(skillIds)) {
@@ -660,6 +671,7 @@ public class TaskServiceImpl implements TaskService {
         receiverId.addAll(skillPublisher);
         receiverId.addAll(assignPublisher);
 
+        //ehr系统获取用户信息UserResp:code、name、email
         Set<UserResp> userDetail = ehrComponent.getUserDetail(receiverId);
         Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
 
@@ -667,6 +679,7 @@ public class TaskServiceImpl implements TaskService {
         Map<Long, DemeterAssignTask> assignTaskMap = demeterAssignTasks.stream().collect(Collectors.toMap(DemeterAssignTask::getId, Function.identity()));
 
         demeterTaskUsers.forEach(taskUser -> {
+
             ReceiveQueryResp resp = new ReceiveQueryResp();
             Long taskId = taskUser.getTaskId();
 
@@ -678,6 +691,8 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.SKILL.getCode());
                     resp.setTaskTypeName(TaskType.SKILL.getDesc());
                     resp.setTaskReward(skill.getSkillReward());
+                    resp.setAssigner(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid());
+                    resp.setAssignerName(ehrComponent.getUserDetail(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid()).getUserName());
                     resp.setReceiver(taskUser.getReceiverUid());
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
@@ -693,6 +708,10 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskTypeName(TaskType.ASSIGN.getDesc());
                     resp.setReceiver(taskUser.getReceiverUid());
                     resp.setNeedAcceptance(assign.getNeedAcceptance());
+
+                    resp.setAssigner(taskUser.getReceiverUid());
+                    resp.setAssignerName(userMap.get(taskUser.getReceiverUid()).getName());
+
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(assign.getPublisher()).getName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
@@ -709,45 +728,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
-     * @param req
-     * @return {@link Resp}
-     * @throws
-     * @author lipp3
-     * @date 2021/6/30 11:06
-     * @Description 分配技能学习任务 TODO
+     * 创建学习技能点和学习路径到指定学习清单的公共逻辑
+     * @param manifestId 学习清单 id
+     * @param learnerUid 接收者 uid
+     * @param skillPaths 学习路径
      */
-    @Transactional
-    @Override
-    public Resp createSkillLearnManifest(createSkillLearnManifestReq req) {
-
-        //1.【demeter_user_learn_manifest】创建学习清单
-        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
-                .assignerUid(OperatorContext.getOperator())
-                .learnerUid(req.getLearner())
-                .name(req.getName())
-                .learnPeriod(req.getLearnPeriod())
-                .createTime(new Date())
-                .modifyTime(new Date())
-                .createId(OperatorContext.getOperator())
-                .modifyId(OperatorContext.getOperator())
-                .build();
-
-        demeterUserLearnManifestDao.insertSelective(manifest);
-        long manifestId = manifest.getId();
-
-                //2.创建技能点学习任务
-        String learnerUid = req.getLearner();
-        req.getSkillPathes().entrySet().stream().forEach(entry -> {
+    public void createSkillLearnManifestCommon(Long manifestId, String learnerUid, Map<String, List<String>> skillPaths) {
+        // 先添加技能点到 demeter_task_user
+        skillPaths.entrySet().forEach(entry -> {
             Long skillId = Long.valueOf(entry.getKey());
-            List<String> learnPathes = entry.getValue();
-
-            //2.1如果技能点编号不存在，则抛出异常
+            List<String> learnPaths = entry.getValue();
+            // 2.1如果技能点编号不存在，则抛出异常
             DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
             if (Objects.isNull(skillTask)){
                 throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
             }
-
-            //2.2如果是员工已经学习过的技能点，则抛出异常
+            // 2.2 如果是员工已经学习过的技能点，则抛出异常
             DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
             demeterTaskUserExample.createCriteria()
                     .andTaskTypeEqualTo(TaskType.SKILL.getCode())
@@ -757,12 +753,12 @@ public class TaskServiceImpl implements TaskService {
             if (taskUsers.size() > 0){
                 throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, skillId));
             }
-            //2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
+            // 2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
             DemeterTaskUser entity = DemeterTaskUser.builder()
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
                     .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                     .taskType(TaskType.SKILL.getCode())
-                    .receiverUid(OperatorContext.getOperator())
+                    .receiverUid(learnerUid)
                     .taskId(skillId)
                     .createTime(new Date())
                     .modifyTime(new Date())
@@ -771,8 +767,7 @@ public class TaskServiceImpl implements TaskService {
                     .build();
             demeterTaskUserDao.insertSelective(entity);
             long taskUserId = entity.getId();
-
-            //2.4【demeter_task_user_extend】表demeter_task_user_extend关联task_user_id到demeter_task_user主键，关联manifest_id到demeter_user_learn_manifest主键
+            // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
             DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
                     .taskUserId(taskUserId)
                     .taskId(skillId)
@@ -783,9 +778,8 @@ public class TaskServiceImpl implements TaskService {
                     .modifyId(OperatorContext.getOperator())
                     .build();
             demeterTaskUserExtendDao.insertSelective(userExtend);
-
-            //2.5【demeter_skill_learn_path】添加学习路径
-            learnPathes.stream().forEach(path -> {
+            // 2.5【demeter_skill_learn_path】添加学习路径
+            learnPaths.stream().forEach(path -> {
                 DemeterSkillLearnPath demeterSkillLearnPath = DemeterSkillLearnPath.builder()
                         .taskUserId(taskUserId)
                         .taskId(skillId)
@@ -798,8 +792,98 @@ public class TaskServiceImpl implements TaskService {
                 demeterSkillLearnPathDao.insertSelective(demeterSkillLearnPath);
             });
         });
+    }
 
+    /**
+     * @param req
+     * @return {@link Resp}
+     * @throws
+     * @author lipp3
+     * @date 2021/6/30 11:06
+     * @Description 分配技能学习任务 TODO
+     */
+    @Transactional
+    @Override
+    public Resp createSkillLearnManifest(CreateSkillLearnManifestReq req) {
+
+        // 1.【demeter_user_learn_manifest】创建学习清单
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .assignerUid(OperatorContext.getOperator())
+                .learnerUid(req.getLearnerUid())
+                .name(req.getName())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .createTime(new Date())
+                .modifyTime(new Date())
+                .createId(OperatorContext.getOperator())
+                .modifyId(OperatorContext.getOperator())
+                .build();
+
+        demeterUserLearnManifestDao.insertSelective(manifest);
+        long manifestId = manifest.getId();// 获取当前学习清单id
+
+        // 2.创建技能点学习任务
+        String learnerUid = req.getLearnerUid();
+        this.createSkillLearnManifestCommon(manifestId, learnerUid, req.getSkillPaths());
         return Resp.success();
+    }
+
+    /**
+     * 修改学习清单
+     */
+    @Transactional
+    @Override
+    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
+        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
+        manifestUpdateExample.createCriteria()
+                .andIdEqualTo(req.getId());
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .name(req.getName())
+                .modifyId(OperatorContext.getOperator())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .learnerUid(req.getLearnerUid())
+                .build();
+        List<Long> skills = req.getSkills();
+        if (skills.size() > 0) {
+
+        }
+        return demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
+    }
+
+    /**
+     * 移除学习清单中的技能点
+     * 在编辑学习清单的时候，会为技能点添加学习路径 Skill_Learn_Path 表
+     * 所以在移除技能点的话也得去移除属下的所有学习路径
+     */
+    @Transactional
+    @Override
+    public Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId) {
+        // 先移除 Task_User_Extend 表的记录
+        DemeterTaskUserExtendExample taskUserExtendExample = new DemeterTaskUserExtendExample();
+        taskUserExtendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId)
+                .andTaskIdEqualTo(taskId);
+        DemeterTaskUserExtend taskUserExtend = DemeterTaskUserExtend.builder()
+                .isDel((byte)1)
+                .build();
+        demeterTaskUserExtendDao.updateByExampleSelective(taskUserExtend, taskUserExtendExample);
+
+        /**
+         * 移除该清单下指定技能点关联的学习路径
+         * 先批量查询有相同 taskId 和 manifestId 的 taskUserExtend
+         * 然后遍历 taskUserExtend 拿到 taskUserId 与 taskId 组合条件查询学习路径并批量设置 isDel = 1
+         */
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(taskUserExtendExample);
+        taskUserExtends.stream().forEach(item -> {
+            DemeterSkillLearnPathExample skillLearnPathExample = new DemeterSkillLearnPathExample();
+            skillLearnPathExample.createCriteria()
+                    .andTaskIdEqualTo(taskId)
+                    .andTaskUserIdEqualTo(item.getTaskUserId());
+            DemeterSkillLearnPath skillLearnPath = DemeterSkillLearnPath.builder().isDel((byte)1).build();
+            demeterSkillLearnPathDao.updateByExampleSelective(skillLearnPath, skillLearnPathExample);
+        });
+        return 1;
     }
 
     /**
@@ -814,10 +898,12 @@ public class TaskServiceImpl implements TaskService {
         //1.【demeter_user_learn_manifest】根据清单名称或清单编号查询demeter_user_learn_manifest表
         DemeterUserLearnManifestExample example = new DemeterUserLearnManifestExample();
         DemeterUserLearnManifestExample.Criteria criteria = example.createCriteria();
+        // 模糊查询清单名称
         if (StringUtils.isNotEmpty(req.getManifestIdOrName())){
             criteria.andNameLike("%" + req.getManifestIdOrName() + "%");
         }
         List<DemeterUserLearnManifest> manifests = demeterUserLearnManifestDao.selectByExample(example);
+        // 如果清单名称是 long 类型则移除上述查询条件，并将其赋值到 id 重新查询
         if (manifests.size() == 0 && StringUtil.isLong(req.getManifestIdOrName())){
             example.clear();
             example.createCriteria().andIdEqualTo(Long.valueOf(req.getManifestIdOrName()));
@@ -832,7 +918,9 @@ public class TaskServiceImpl implements TaskService {
         manifests.stream().forEach(manifest -> {
             SkillLearnManifestResp skillLearnManifestResp = new SkillLearnManifestResp();
             BeanUtils.copyProperties(manifest, skillLearnManifestResp);
-            if (StringUtils.isNotEmpty(manifest.getAssignerUid())) {
+
+            // uid 查询分配者的姓名
+            if (StringUtils.isNotEmpty(manifest.getAssignerUid())) { //分配者不为空
                 UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getAssignerUid());
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setAssignerName(userDetail.getUserName());
@@ -841,35 +929,57 @@ public class TaskServiceImpl implements TaskService {
                 skillLearnManifestResp.setAssignerName("-");
             }
 
+            // 查询学习者的姓名
             if(StringUtils.isNotEmpty(manifest.getLearnerUid())){
                 UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getLearnerUid());
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setLearnerName(userDetail.getUserName());
                 }
             }
+
+            // 清单 id 关联到 taskUserExtend 表的查询
             DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
             extendExample.createCriteria()
                     .andManifestIdEqualTo(manifest.getId());
             List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+
+
             boolean passed = true;
+            // 从 extend 表拿到 taskUserId 到 taskUser 表批量查询任务状态和任务类型
             for(DemeterTaskUserExtend extend : taskUserExtends){
                 DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
+                skillLearnManifestResp.setTaskType(demeterTaskUser.getTaskType());
+                // 如果 taskUser 的任务状态不是 PASS
                 if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
                     passed = false;
                     break;
                 }
             }
+
+            // 初始化清单流程状态为进行中，如果清单内所有任务的状态都是 PASS 则该清单判断为通过
             SkillManifestFlowStatus status = SkillManifestFlowStatus.ONGOING;
             if (passed){
                 status = SkillManifestFlowStatus.PASS;
             }
             skillLearnManifestResp.setStatus(status.getCode());
             skillLearnManifestResp.setStatusName(status.getName());
-            manifestResps.add(skillLearnManifestResp);
+
+            // 如果查询清单状态是通过的话
+            if (req.getStatus().equals(SkillManifestFlowStatus.PASS.getCode())){
+                // 并且清单状态（包含的任务也都是通过状态）
+                if (passed){
+                    manifestResps.add(skillLearnManifestResp);
+                }
+             } else {
+                // 如果查询的是其它状态
+                if (!passed) {
+                    manifestResps.add(skillLearnManifestResp);
+                }
+            }
         });
 
-        List<SkillLearnManifestResp> resps = manifestResps.stream().skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
-
+        // 因为 manifestResps 内综合除分页以外的结果
+        List<SkillLearnManifestResp> resps = manifestResps.stream().sorted(Comparator.comparing(SkillLearnManifestResp::getCreateTime).reversed()).skip(req.getStart()).limit(req.getPageSize()).collect(Collectors.toList());
         pageListResp.setTotal(manifestResps.size());
         pageListResp.setData(resps);
 
@@ -880,7 +990,7 @@ public class TaskServiceImpl implements TaskService {
      * @param manifestId 清单id
      * @return {@link Resp}
      * @throws
-     * @author
+     * @author modified by zhangxt3
      * @date 2021/7/1 9:24
      * @Description TODO
      */
@@ -890,9 +1000,57 @@ public class TaskServiceImpl implements TaskService {
         if (Objects.isNull(manifest)){
             return null;
         }
+        // 学习清单基本信息
         SkillLearnManifestDetailResp detailResp = new SkillLearnManifestDetailResp();
         BeanUtils.copyProperties(manifest, detailResp);
-        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+        detailResp.setLearnPeriod(
+                DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodStart().toInstant().atZone(ZoneId.systemDefault())) + " 至 " +
+                        DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodEnd().toInstant().atZone(ZoneId.systemDefault())));
+        //根据人物uid查出姓名
+        detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
+        detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
+//        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
+        //1.根据manifestId获取所有demeter_task_user_extend
+        DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
+        extendExample.createCriteria()
+                .andManifestIdEqualTo(manifestId);
+        List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+        List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>();
+        taskUserExtends.stream().forEach(extend -> {
+            if (extend.getIsDel() < 1) {
+                demeterSkillTasks.add(demeterSkillTaskDao.selectByPrimaryKey(extend.getTaskId()));
+            }
+        });
+
+        /**
+         * 通过技能任务查询关联的学习路径
+         * 技能任务（点）的 id 对应学习任务的 taskId
+         */
+        List<DemeterSkillLearnPath> demeterSkillLearnPathResp = new ArrayList<>();
+        demeterSkillTasks.stream().forEach(skillTask -> {
+           DemeterSkillLearnPathExample learnPathExample = new DemeterSkillLearnPathExample();
+           learnPathExample.createCriteria().andTaskIdEqualTo(skillTask.getId());
+           List<DemeterSkillLearnPath> demeterSkillLearnPaths = demeterSkillLearnPathDao.selectByExample(learnPathExample);
+           demeterSkillLearnPaths.stream().forEach(item -> {
+               if (item.getIsDel() < 1) {
+                   demeterSkillLearnPathResp.add(item);
+               }
+           });
+        });
+        long count = demeterSkillTasks.stream()
+                        .filter(o -> o.getTaskStatus().equals(SkillTaskFlowStatus.PASS.getCode()))
+                        .count();
+        if (demeterSkillTasks.size() == count) {
+            detailResp.setStatus(SkillManifestFlowStatus.PASS.getCode());
+            detailResp.setStatusName(SkillManifestFlowStatus.PASS.getName());
+        } else {
+            detailResp.setStatus(SkillManifestFlowStatus.ONGOING.getCode());
+            detailResp.setStatusName(SkillManifestFlowStatus.ONGOING.getName());
+        }
+        long sum = demeterSkillTasks.stream().mapToLong(DemeterSkillTask::getSkillReward).sum();
+        detailResp.setReward(sum);
+        detailResp.setDemeterSkillTasks(demeterSkillTasks);
+        detailResp.setDemeterSkillLearnPaths(demeterSkillLearnPathResp);
         return detailResp;
     }
 
@@ -1263,7 +1421,7 @@ public class TaskServiceImpl implements TaskService {
             taskProgressResp.setId(taskUser.getId());
             taskProgressResp.setTaskId(taskUser.getTaskId());
             taskProgressResp.setTaskType(taskUser.getTaskType());
-            taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime());
+            taskProgressResp.setCheckoutTime(taskUser.getCheckoutTime()); //检查时间
             taskProgressResp.setCheckoutOpinion(taskUser.getCheckOpinion());
             taskProgressResp.setCheckoutResult(CheckoutResult.getByCode(taskUser.getCheckResult()).getDesc());
             taskProgressResp.setReceiverUid(taskUser.getReceiverUid());

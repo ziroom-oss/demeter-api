@@ -15,4 +15,17 @@ public class StringUtil {
             return false;
         }
     }
+
+    /**
+     * 转换为String类型
+     * @param obj
+     * @return
+     */
+    public static String toString(Object obj){
+        if(obj == null){
+            return "";
+        }else{
+            return obj.toString();
+        }
+    }
 }

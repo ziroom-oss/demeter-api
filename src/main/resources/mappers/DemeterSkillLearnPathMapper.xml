@@ -7,6 +7,7 @@
         <result column="task_user_id" property="taskUserId" jdbcType="BIGINT"/>
         <result column="task_id" property="taskId" jdbcType="BIGINT"/>
         <result column="path" property="path" jdbcType="VARCHAR"/>
+        <result column="is_del" property="isDel" jdbcType="TINYINT"></result>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
@@ -71,7 +72,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_user_id, task_id, path, create_time, modify_time, create_id, modify_id
+        id, task_user_id, task_id, path, is_del, create_time, modify_time, create_id, modify_id
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillLearnPathExample">
         select
@@ -101,9 +102,9 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_skill_learn_path (task_user_id, task_id, path, create_time, modify_time, create_id, modify_id
+        INSERT INTO demeter_skill_learn_path (task_user_id, task_id, path, is_del, create_time, modify_time, create_id, modify_id
             )
-        VALUES (#{taskUserId,jdbcType=BIGINT}, #{taskId,jdbcType=BIGINT}, #{path,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
+        VALUES (#{taskUserId,jdbcType=BIGINT}, #{taskId,jdbcType=BIGINT}, #{path,jdbcType=VARCHAR}, #{isDel,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillLearnPath">
@@ -120,6 +121,9 @@
             </if>
             <if test="path != null">
                 path,
+            </if>
+            <if test="isDel != null">
+                is_del,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -143,6 +147,9 @@
             </if>
             <if test="path != null">
                 #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="isDel != null">
+                #{isDel,jdbcType=TINYINT},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -179,6 +186,9 @@
             <if test="record.path != null">
                 path = #{record.path,jdbcType=VARCHAR},
             </if>
+            <if test="record.isDel != null">
+                is_del = #{record.isDel},
+            </if>
             <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
             </if>
@@ -202,6 +212,7 @@
             task_user_id = #{record.taskUserId,jdbcType=BIGINT},
             task_id = #{record.taskId,jdbcType=BIGINT},
             path = #{record.path,jdbcType=VARCHAR},
+            is_del = #{record.isDel,jdbcType=TINYINT},
             create_time = #{record.createTime,jdbcType=TIMESTAMP},
             modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
             create_id = #{record.createId,jdbcType=VARCHAR},
@@ -221,6 +232,9 @@
             </if>
             <if test="path != null">
                 path = #{path,jdbcType=VARCHAR},
+            </if>
+            <if test="isDel != null">
+                is_del = #{isDel,jdbcType=TINYINT},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -242,6 +256,7 @@
         SET task_user_id = #{taskUserId,jdbcType=BIGINT},
             task_id = #{taskId,jdbcType=BIGINT},
             path = #{path,jdbcType=VARCHAR},
+            is_del = #{isDel,jdbcType=TINYINT},
             create_time = #{createTime,jdbcType=TIMESTAMP},
             modify_time = #{modifyTime,jdbcType=TIMESTAMP},
             create_id = #{createId,jdbcType=VARCHAR},

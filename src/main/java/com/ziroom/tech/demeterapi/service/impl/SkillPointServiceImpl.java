@@ -191,7 +191,7 @@ public class SkillPointServiceImpl implements SkillPointService {
     }
 
     @Override
-    public Map<Integer, List<DemeterSkillTask>> querySkillPointFromTreeId(List<Integer> skillTreeId) {
+    public  Map<Integer, List<DemeterSkillTask>> querySkillPointFromTreeId(List<Integer> skillTreeId) {
 
         DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
         if (CollectionUtils.isNotEmpty(skillTreeId)) {
@@ -200,6 +200,7 @@ public class SkillPointServiceImpl implements SkillPointService {
             List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
             Map<Integer, List<DemeterSkillTask>> treeMap = demeterSkillTasks.stream()
                     .collect(Collectors.groupingBy(DemeterSkillTask::getSkillId));
+
             return treeMap;
         }
         return Maps.newHashMap();

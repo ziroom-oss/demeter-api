@@ -9,8 +9,10 @@ import com.google.common.collect.Sets;
 //import com.magicframework.core.cache.CacheType;
 //import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
+import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.config.RecordLogger;
+import com.ziroom.tech.demeterapi.dao.entity.Jobs;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrOrgListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.*;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
@@ -61,6 +64,9 @@ public class EhrComponent {
     private final static String DEFAULT_SETID = "101";
 
     @Resource
+    private EhrEndPoint ehrEndPoint;
+
+    @Resource
     private EhrApiEndPoint ehrApiEndPoint;
 
     /**
@@ -76,7 +82,7 @@ public class EhrComponent {
         if (Objects.isNull(setId)) {
             setId = 101;
         }
-        Call<JSONObject> call = ehrApiEndPoint.getUsers(deptId, setId);
+        Call<JSONObject> call = ehrEndPoint.getUsers(deptId, setId);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         if (response.getInteger(ERROR_CODE_ATTRIBUTE) != 0) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
@@ -110,7 +116,7 @@ public class EhrComponent {
         List<String> strings = Arrays.asList(uidString.split(","));
         List<String> collect = strings.stream().map(this::addQuotationMark).collect(Collectors.toList());
         String userCodes = "[" +  String.join(",", collect) + "]";
-        Call<JSONObject> call = ehrApiEndPoint.getUserDetail(userCodes);
+        Call<JSONObject> call = ehrEndPoint.getUserDetail(userCodes);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String failure = "failure";
         if (failure.equals(response.getString(STATUS_ATTRIBUTE))) {
@@ -156,7 +162,7 @@ public class EhrComponent {
      */
     public Set<UserResp> getUserDetail(Set<String> userCodes) {
         return Lists.partition(Lists.newArrayList(userCodes), 10).parallelStream().map(strings -> {
-            Call<JSONObject> call = ehrApiEndPoint.getUserDetail(strings.toString());
+            Call<JSONObject> call = ehrEndPoint.getUserDetail(strings.toString());
             JSONObject response = RetrofitCallAdaptor.execute(call);
             if (Objects.equals(response.getString("status"), "success")) {
                 Set<UserResp> userResps = Sets.newHashSet();
@@ -176,6 +182,14 @@ public class EhrComponent {
         }).orElseGet(Sets::newHashSet);
     }
 
+//    public UserDetailResp getUserDetailBysimple(String query){
+//        UserDetailResp userDetailResp = new UserDetailResp();
+//        Call<JSONObject> response = ehrApiEndPoint.getUserDetailBySimple(query);
+//
+//
+//    }
+
+
     /**
      * 模糊查询用户
      *
@@ -185,7 +199,7 @@ public class EhrComponent {
     public List<UserResp> getEmpList(EhrEmpListReq ehrEmpListReq) {
         List<UserResp> resp = Lists.newArrayList();
         Map<String, Object> empReqMap = initReqMap(ehrEmpListReq);
-        Call<JSONObject> response = ehrApiEndPoint.getEmpList(empReqMap);
+        Call<JSONObject> response = ehrEndPoint.getEmpList(empReqMap);
 
         Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
             if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {
@@ -205,11 +219,33 @@ public class EhrComponent {
     /**
      * 查询用户详情
      *
+     * @param query code
+     * @return 结果
+     */
+    public String getUserDetailBysimple(String query) {
+        Call<JSONObject> response = ehrEndPoint.getUserDetail(Lists.newArrayList(query).toString());
+        UserResp userDetailResp = new UserResp();
+        Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
+            if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {
+                JSONArray data = respData.getJSONArray(DATA_ATTRIBUTE);
+                data.stream().map(o -> JSONObject.parseObject(JSON.toJSONString(o))).filter(jsonObject -> Objects.equals(jsonObject.getString(
+                        "jobIndicator"), "P")).forEach(jsonObject -> {
+                        userDetailResp.setCode(jsonObject.getString("adCode"));
+                });
+            }
+        });
+        return getUserDetail(userDetailResp.getCode()).getUserName();
+    }
+
+
+    /**
+     * 查询用户详情
+     *
      * @param userCode code
      * @return 结果
      */
     public UserDetailResp getUserDetail(String userCode) {
-        Call<JSONObject> response = ehrApiEndPoint.getUserDetail(Lists.newArrayList(userCode).toString());
+        Call<JSONObject> response = ehrEndPoint.getUserDetail(Lists.newArrayList(userCode).toString());
         UserDetailResp userDetailResp = new UserDetailResp();
         Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
             if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {
@@ -233,6 +269,7 @@ public class EhrComponent {
                 });
             }
         });
+
         return userDetailResp;
     }
 
@@ -243,7 +280,8 @@ public class EhrComponent {
      */
     public Set<EhrDeptResp> getOrgList(EhrOrgListReq ehrOrgListReq) {
         log.info("EhrComponent.getOrgList params:{}", JSON.toJSONString(ehrOrgListReq));
-        Call<JSONObject> call = ehrApiEndPoint.getOrgList(ehrOrgListReq.getOrgLevel(), ehrOrgListReq.getPage(), ehrOrgListReq.getSize());
+        Call<JSONObject> call = ehrEndPoint
+                .getOrgList(ehrOrgListReq.getOrgLevel(), ehrOrgListReq.getPage(), ehrOrgListReq.getSize());
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "20000";
         if (!success.equals(response.getString(ERROR_CODE_ATTRIBUTE))) {
@@ -268,7 +306,7 @@ public class EhrComponent {
     public Set<EhrDeptResp> getAllThirdOrgList() {
         log.info("EhrComponent.getAllThirdOrgList");
         int size = 100, level = 3;
-        Call<JSONObject> call = ehrApiEndPoint.getOrgList(level, 1, size);
+        Call<JSONObject> call = ehrEndPoint.getOrgList(level, 1, size);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         Set<EhrDeptResp> result = Sets.newHashSet();
         String success = "20000";
@@ -329,7 +367,7 @@ public class EhrComponent {
     }
 
     public String getPrincipalDept() {
-        List<EhrUserDetailResp> ehrUserDetail = getEhrUserDetail("[" + OperatorContext.getOperator() + "]");
+        List<EhrUserDetailResp> ehrUserDetail = getEhrUserDetail(OperatorContext.getOperator());
         if (!CollectionUtils.isEmpty(ehrUserDetail)) {
             for (EhrUserDetailResp ehrUser : ehrUserDetail) {
                 if (ehrUser.getJobIndicator().equals("P")) {
@@ -364,7 +402,7 @@ public class EhrComponent {
         }
         // 目前公司编码只支持总部Ta
         log.info("EhrService.getOrgByCode params:{} {}", deptCode, setId);
-        Call<JSONObject> call = ehrApiEndPoint.getOrgByCode(deptCode, setId);
+        Call<JSONObject> call = ehrEndPoint.getOrgByCode(deptCode, setId);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String failure = "failure";
         if (failure.equals(response.getString(STATUS_ATTRIBUTE))) {
@@ -391,7 +429,7 @@ public class EhrComponent {
     @RecordLogger
     public Set<EhrDeptResp> getChildOrgs(String parentId, String setId) {
         log.info("EhrService.getChildOrgs params:{} {}", parentId, setId);
-        Call<JSONObject> call = ehrApiEndPoint.getChildOrgs(parentId, setId);
+        Call<JSONObject> call = ehrEndPoint.getChildOrgs(parentId, setId);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         if (response.getInteger(ERROR_CODE_ATTRIBUTE) != 0) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
@@ -449,7 +487,7 @@ public class EhrComponent {
     @RecordLogger
     @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public List<EhrJoinTimeResp> getJointime(String empCode) {
-        Call<JSONObject> call = ehrApiEndPoint.getJointime(empCode, 1, 10);
+        Call<JSONObject> call = ehrEndPoint.getJointime(empCode, 1, 10);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "20000";
         if (!success.equals(response.getString(ERROR_CODE_ATTRIBUTE))) {

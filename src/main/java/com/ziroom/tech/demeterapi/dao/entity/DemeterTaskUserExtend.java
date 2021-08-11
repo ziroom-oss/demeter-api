@@ -1,6 +1,9 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -28,6 +31,9 @@ import java.util.Date;
  * </pre>
  */
 @Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DemeterTaskUserExtend {
 
     private Long id;
@@ -35,6 +41,8 @@ public class DemeterTaskUserExtend {
     private Long taskUserId;
 
     private Long taskId;
+
+    private Byte isDel;
 
     private Long manifestId;
 
@@ -45,68 +53,4 @@ public class DemeterTaskUserExtend {
     private String createId;
 
     private String modifyId;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTaskUserId() {
-        return taskUserId;
-    }
-
-    public void setTaskUserId(Long taskUserId) {
-        this.taskUserId = taskUserId;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public Long getManifestId() {
-        return manifestId;
-    }
-
-    public void setManifestId(Long manifestId) {
-        this.manifestId = manifestId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getModifyTime() {
-        return modifyTime;
-    }
-
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-
-    public String getCreateId() {
-        return createId;
-    }
-
-    public void setCreateId(String createId) {
-        this.createId = createId;
-    }
-
-    public String getModifyId() {
-        return modifyId;
-    }
-
-    public void setModifyId(String modifyId) {
-        this.modifyId = modifyId;
-    }
 }

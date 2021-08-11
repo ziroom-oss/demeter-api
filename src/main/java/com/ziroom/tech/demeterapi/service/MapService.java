@@ -42,4 +42,7 @@ public interface MapService {
      * 技能图谱汇总数据-个人
      */
     SummaryData getSkillGraphData();
+
+    //获取所有
+    List<SkillMap> selectAll();
 }

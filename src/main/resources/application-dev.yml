@@ -32,6 +32,8 @@ spring:
       #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
       pool-prepared-statements: false
       max-pool-prepared-statement-per-connection-size: 20
+  main:
+    allow-bean-definition-overriding: true
 server:
   port: 8081
   tomcat:
@@ -61,6 +63,8 @@ retrofit:
       baseUrl: http://omega-api.kt.ziroom.com/
     - identity: worktop
       baseUrl: http://management-api.kt.ziroom.com/
+    - identity: flink-analysis
+      baseUrl: http://analysis.kt.ziroom.com/
   connection:
     connect-timeout: 5000
     read-timeout: 20000
@@ -69,8 +73,8 @@ retrofit:
     keep-alive-duration: 5
 mybatis:
   mapper-locations: classpath:mappers/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #logging:
 #  root:

@@ -1,8 +1,10 @@
 package com.ziroom.tech.demeterapi.dao.mapper;
 
-import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
-import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample;
+import com.ziroom.tech.demeterapi.dao.entity.*;
+
 import java.util.List;
+
+import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
@@ -30,9 +32,13 @@ import org.springframework.stereotype.Repository;
  * ━━━━━━感觉萌萌哒━━━━━━
  * </pre>
  */
-@SuppressWarnings("UnnecessaryInterfaceModifier")
 @Repository
 public interface DemeterTaskUserDao {
+
+    public List<ForRankingPASSED> getSkillPointPASSED(@Param("rankingReq") RankingReq rankingReq, @Param("taskIds") List<Long> taskIds); //已认证技能点
+    public List<ForRankingTASK> getHotSkillPointName(@Param("rankingReq")RankingReq rankingReq, @Param("taskIds") List<Long> taskIds); //获取热门技能点名称
+    public List<ForRankingPASSED> getSkillNumPASSED(@Param("rankingReq")RankingReq rankingReq, @Param("taskIds") List<Long> taskIds); // 认证技能数量
+    public List<ForRankingPARENT> getHotSkill(@Param("rankingReq")RankingReq rankingReq, @Param("taskIds") List<Long> taskIds); //热门技能
 
     public int countByExample(DemeterTaskUserExample example);
 

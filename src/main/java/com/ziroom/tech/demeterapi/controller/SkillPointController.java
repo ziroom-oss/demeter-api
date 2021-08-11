@@ -1,6 +1,8 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
+import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
@@ -12,6 +14,7 @@ import com.ziroom.tech.demeterapi.service.SkillPointService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author daijiankun
@@ -27,6 +31,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(value = "api/skill")
+@LogHttpService
 public class SkillPointController {
 
     @Resource
@@ -53,8 +58,20 @@ public class SkillPointController {
         return skillPointService.updateSkillTask(skillTaskReq);
     }
 
+    /**
+     * 技能点认证列表，查询当前登录人可以认证的技能点列表
+     * @param checkSkillReq
+     * @return
+     */
+    @PostMapping("/check/list")
+    public Resp<PageListResp<ReceiveQueryResp>> getSkillPointsCheckList(@RequestBody CheckSkillReq checkSkillReq) {
+        checkSkillReq.validate();
+        return Resp.success(skillPointService.getSkillPointsCheckList(checkSkillReq));
+    }
+
     @PostMapping("/query")
     public Resp<Object> querySkillPoint(@RequestParam List<Integer> skillTreeId) {
+       // Map<Integer, List<DemeterSkillTask>> integerListMap = skillPointService.querySkillPointFromTreeId(skillTreeId);
         return Resp.success(skillPointService.querySkillPointFromTreeId(skillTreeId));
     }
 
@@ -67,16 +84,4 @@ public class SkillPointController {
     public Resp<List<DemeterTaskUser>> batchQuerySkillPoints(@RequestBody BatchQueryReq batchQueryReq) {
         return Resp.success(skillPointService.batchQuerySkillPoints(batchQueryReq));
     }
-
-    /**
-     * 技能点认证列表，查询当前登录人可以认证的技能点列表
-     * @param checkSkillReq
-     * @return
-     */
-    @PostMapping("/check/list")
-    public Resp<PageListResp<ReceiveQueryResp>> getSkillPointsCheckList(@RequestBody CheckSkillReq checkSkillReq) {
-        checkSkillReq.validate();
-        return Resp.success(skillPointService.getSkillPointsCheckList(checkSkillReq));
-    }
-
 }

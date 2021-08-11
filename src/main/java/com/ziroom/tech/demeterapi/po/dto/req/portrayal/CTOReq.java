@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.po.dto.req.portrayal;
 
 import java.util.Date;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -16,4 +17,13 @@ public class CTOReq {
     private Date startDate;
 
     private Date endDate;
+
+    /**
+     * 环比 false，同比 true
+     */
+    private Boolean basePeriod;
+
+    private String subDeptId;
+
+    private List<String> selectUserCode;
 }

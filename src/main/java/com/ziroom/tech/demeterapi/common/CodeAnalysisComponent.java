@@ -42,8 +42,8 @@ public class CodeAnalysisComponent {
     @Resource
     private EhrComponent ehrComponent;
 
-    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
-    public PersonalDevResp getDevelopmentEquivalent(String userEmail, Date fromDate, Date toDate) {
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
+    public void getDevelopmentEquivalent(String userEmail, Date fromDate, Date toDate, PersonalDevResp devResp) {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
@@ -51,39 +51,37 @@ public class CodeAnalysisComponent {
 
         Call<JSONObject> call = codeAnalysisApiEndPoint.getSingleDE(userEmail, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
-        PersonalDevResp resp = new PersonalDevResp();
         String success = "200";
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONObject jsonObject = response.getJSONObject(DATA_ATTRIBUTE);
             Integer insertions = jsonObject.getInteger("insertions");
             if (insertions != null) {
-                resp.setInsertions(insertions);
+                devResp.setInsertions(insertions);
             }
             Integer deletions = jsonObject.getInteger("deletions");
             if (deletions != null) {
-                resp.setDeletions(deletions);
+                devResp.setDeletions(deletions);
             }
             Integer devEquivalent = jsonObject.getInteger("devEquivalent");
             if (devEquivalent != null) {
-                resp.setDevEquivalent(devEquivalent);
+                devResp.setDevEquivalent(devEquivalent);
             }
             Integer commitCount = jsonObject.getInteger("commitCount");
             if (commitCount != null) {
-                resp.setCommitCount(commitCount);
+                devResp.setCommitCount(commitCount);
             }
         }
-        return resp;
     }
 
-//    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
-    public List<PersonalByProject> getPersonalDEByProject(String userEmail, Date fromDate, Date toDate) {
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
+    public void getPersonalDEByProject(String userEmail, Date fromDate, Date toDate, List<PersonalByProject> personalDEByProject) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
         String toDateString = formatter.format(toDate);
         Call<JSONObject> call = codeAnalysisApiEndPoint.getDEByProject(userEmail, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "200";
-        List<PersonalByProject> personalByProjects = new ArrayList<>(16);
+
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONArray jsonArray = response.getJSONArray(DATA_ATTRIBUTE);
             for (Object o : jsonArray) {
@@ -91,37 +89,34 @@ public class CodeAnalysisComponent {
                 PersonalByProject resp = new PersonalByProject();
                 resp.setValue((Integer) map.get("devEquivalent"));
                 resp.setName((String) map.get("projectName"));
-                personalByProjects.add(resp);
+                personalDEByProject.add(resp);
             }
         }
-        return personalByProjects;
     }
 
-    public List<PersonalByDay> getPersonalDEByDay(String userEmail, Date fromDate, Date toDate) {
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
+    public void getPersonalDEByDay(String userEmail, Date fromDate, Date toDate, List<PersonalByDay> personalDEByDay) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String fromDateString = formatter.format(fromDate);
         String toDateString = formatter.format(toDate);
         Call<JSONObject> call = codeAnalysisApiEndPoint.getDEByDay(userEmail, fromDateString, toDateString);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String success = "200";
-        List<PersonalByDay> personalByDays = new ArrayList<>(16);
         if (response.getString(CODE_ATTRIBUTE).equals(success)) {
             JSONArray jsonArray = response.getJSONArray(DATA_ATTRIBUTE);
             for (Object o : jsonArray) {
                 Map<String, Object> map = (LinkedHashMap<String, Object>) o;
-                PersonalByDay resp = new PersonalByDay();
-                resp.setDay((String) map.get("day"));
-                resp.setDevEquivalent((Integer) map.get("devEquivalent"));
-                resp.setInsertions((Integer) map.get("insertions"));
-                personalByDays.add(resp);
+                PersonalByDay resp = PersonalByDay.builder()
+                        .day((String) map.get("day"))
+                        .devEquivalent((Integer) map.get("devEquivalent"))
+                        .insertions((Integer) map.get("insertions"))
+                        .build();
+                personalDEByDay.add(resp);
             }
         }
-        return personalByDays;
     }
 
-
-
-    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
+    @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0] + #root.args[1] + #root.args[2]")
     public CtoDevResp getDepartmentDe(String departmentCode, Date from, Date to) {
         CtoDevResp ctoDevResp = new CtoDevResp();
         SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");

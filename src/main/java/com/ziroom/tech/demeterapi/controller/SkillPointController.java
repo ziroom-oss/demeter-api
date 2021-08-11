@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
@@ -30,6 +31,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "api/skill")
+@LogHttpService
 public class SkillPointController {
 
     @Resource

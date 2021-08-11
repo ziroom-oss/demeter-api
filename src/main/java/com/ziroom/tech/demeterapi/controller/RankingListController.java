@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(value = "api/rankinglist")
+@LogHttpService
 public class RankingListController {
 
     @Resource

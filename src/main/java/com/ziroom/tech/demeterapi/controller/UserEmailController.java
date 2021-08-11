@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.BeanMapper;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.email.UserEmailDto;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/api/email")
 @Api(value = "维护用户邮箱", tags = "维护用户邮箱")
 @Slf4j
+@LogHttpService
 public class UserEmailController {
 
     @Autowired

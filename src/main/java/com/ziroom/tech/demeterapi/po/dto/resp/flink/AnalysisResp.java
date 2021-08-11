@@ -106,7 +106,7 @@ public class AnalysisResp {
     /**
      * 价值密度
      */
-    private Double valueDensity = 0.0;
+    private Double valueDensity;
 
     /*****Jira***/
     /**

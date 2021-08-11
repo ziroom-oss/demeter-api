@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.controller;
 
 import com.google.common.base.Preconditions;
+import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
@@ -25,6 +26,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/task")
+@LogHttpService
     public class TaskController {
 
     @Resource

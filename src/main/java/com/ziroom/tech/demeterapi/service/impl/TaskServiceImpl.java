@@ -835,6 +835,13 @@ public class TaskServiceImpl implements TaskService {
             if (taskUsers.size() > 0){
                 throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, taskId));
             }
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        demeterSkillTaskExample.createCriteria().andIdEqualTo(taskId);
+        List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+        DemeterSkillTask demeterSkillTask = null;
+        if (CollectionUtils.isNotEmpty(demeterSkillTasks)) {
+            demeterSkillTask  = demeterSkillTasks.get(0);
+        }
             // 2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
             DemeterTaskUser entity = DemeterTaskUser.builder()
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
@@ -842,6 +849,7 @@ public class TaskServiceImpl implements TaskService {
                     .taskType(TaskType.SKILL.getCode())
                     .receiverUid(learnerUid)
                     .taskId(taskId)
+                    .parentId(demeterSkillTask != null ? demeterSkillTask.getSkillId() : 0)
                     .createTime(new Date())
                     .modifyTime(new Date())
                     .createId(OperatorContext.getOperator())
@@ -1396,16 +1404,24 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private void acceptSkillTask(Long id) {
+    private void acceptSkillTask(Long taskId) {
         // 技能类任务无法指派，所以如果DemeterTaskUser有了任务分配记录，说明该任务已被接收。
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
-                .andTaskIdEqualTo(id)
+                .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(TaskType.SKILL.getCode())
                 .andReceiverUidEqualTo(OperatorContext.getOperator());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
             throw new BusinessException("重复接收技能类任务");
+        }
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        demeterSkillTaskExample.createCriteria()
+                            .andIdEqualTo(taskId);
+        List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+        DemeterSkillTask demeterSkillTask = null;
+        if (CollectionUtils.isNotEmpty(demeterSkillTasks)) {
+            demeterSkillTask  = demeterSkillTasks.get(0);
         }
         DemeterTaskUser entity = DemeterTaskUser.builder()
                 .modifyTime(new Date())
@@ -1416,7 +1432,8 @@ public class TaskServiceImpl implements TaskService {
                 .createId(OperatorContext.getOperator())
                 .taskType(TaskType.SKILL.getCode())
                 .receiverUid(OperatorContext.getOperator())
-                .taskId(id)
+                .taskId(taskId)
+                .parentId(demeterSkillTask != null ? demeterSkillTask.getSkillId() : 0)
                 .build();
         demeterTaskUserDao.insertSelective(entity);
     }

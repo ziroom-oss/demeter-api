@@ -2,8 +2,10 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.ziroom.tech.demeterapi.common.EhrComponent;
 import com.ziroom.tech.demeterapi.dao.entity.ForTaskName;
+import com.ziroom.tech.demeterapi.dao.entity.SkillTree;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.RankingListService;
@@ -43,8 +45,9 @@ public class RankingListServiceImpl implements RankingListService {
         //1、认证技能点数量排序，将sql查询的resultmap处理成前端需要的数据
         RankingResp skillPoint = new RankingResp();
        List<RankingInfo> skillPointPASSED = demeterTaskUserDao.getSkillPointPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
+           UserDetailResp userDetail = ehrComponent.getUserDetail(forRanking.getReceiverUid());
                     return RankingInfo.builder()
-                            .name(ehrComponent.getUserDetail(forRanking.getReceiverUid()).getUserName())
+                            .name(userDetail != null ? userDetail.getUserName() : "")
                             .num(forRanking.getSumAll().toString())
                             .build();
 
@@ -59,8 +62,9 @@ public class RankingListServiceImpl implements RankingListService {
         //2、认证技能数量排序，将sql查询的resultmap处理成前端需要的数据
         RankingResp skill = new RankingResp();
         List<RankingInfo> skillPASSED = demeterTaskUserDao.getSkillNumPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
-             return RankingInfo.builder()
-                     .name(ehrComponent.getUserDetail(forRanking.getReceiverUid()).getUserName())
+            UserDetailResp userDetail = ehrComponent.getUserDetail(forRanking.getReceiverUid());
+            return RankingInfo.builder()
+                    .name(userDetail != null ? userDetail.getUserName() : "")
                     .num(forRanking.getSumAll().toString())
                     .build();
         }).collect(Collectors.toList()); //ForRankingTASK
@@ -85,8 +89,9 @@ public class RankingListServiceImpl implements RankingListService {
         //4、热门技能数量排序，将sql查询的resultmap处理成前端需要的数据
         RankingResp skillHot = new RankingResp();
         List<RankingInfo> hotSkill = demeterTaskUserDao.getHotSkill(rankingReq, skillTaskIds).stream().map(forRanking -> {
-             return RankingInfo.builder()
-                     .name(skillTreeDao.selectByPrimaryKey(forRanking.getParentId()).getName())
+            SkillTree skillTree = skillTreeDao.selectByPrimaryKey(forRanking.getParentId());
+            return RankingInfo.builder()
+                    .name(skillTree != null ? skillTree.getName() : "")
                     .num(forRanking.getSumAll().toString())
                     .build();
         }).collect(Collectors.toList());

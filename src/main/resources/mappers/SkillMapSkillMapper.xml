@@ -16,10 +16,12 @@
     </sql>
     <select id="getSkillTaskIds" resultType="java.lang.Long"  parameterType="java.lang.Integer">
         select skill_task_id from skill_map_skill
-        where is_del = 0
-        <if test="mapId != null">
-            AND skill_map_id = #{mapId, jdbcType=INTEGER}
-        </if>
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="mapId != null">
+                AND skill_map_id = #{mapId, jdbcType=INTEGER}
+            </if>
+            AND is_del = 1
+        </trim>
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
@@ -39,18 +41,17 @@
         <include refid="Base_Column_List"/>
         from skill_map_skill
         <where>
-            1=1
-            and is_del=0
             <if test="mapSkillListReq.skillMapId != null">
                 and skill_map_id = #{mapSkillListReq.skillMapId}
             </if>
             <if test="mapSkillListReq.skillTaskId != null">
                 and skill_task_id = #{mapSkillListReq.skillTaskId}
             </if>
+            and is_del = 0
         </where>
     </select>
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        update skill_map_skill set is_del = 0
+        update skill_map_skill set is_del = 1
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill">

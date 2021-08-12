@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillListReq;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,7 @@ public interface SkillMapSkillDao {
      * @param mapId
      * @return
      */
-    public List<Long> getSkillTaskIds(Long mapId);
+    public List<Long> getSkillTaskIds(Integer mapId);
 
     /**
      * 移除指定 id 的表

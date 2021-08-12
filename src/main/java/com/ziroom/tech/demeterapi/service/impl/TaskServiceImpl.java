@@ -578,6 +578,7 @@ public class TaskServiceImpl implements TaskService {
         // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
         List<ReceiveQueryResp> respList = new ArrayList<>(16);//任务列表表头、、、
 
+        //技能-任务
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();//DemeterSkillTask技能表
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
         DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();//DemeterAssignTask任务指派表
@@ -615,18 +616,19 @@ public class TaskServiceImpl implements TaskService {
                 demeterTaskUserCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
             default:
         }
+
         Integer taskType = taskListQueryReq.getTaskType();
         Integer taskStatus = taskListQueryReq.getTaskStatus();
         if (taskType != null && TaskType.isValid(taskType)) {
             switch (TaskType.getByCode(taskType)) {
-                case ALL:
+                case ALL: //所有类型
                     break;
                 case SKILL:
                     demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode());
                     if (taskStatus != null && SkillTaskFlowStatus.isValid(taskStatus)) {
                         if (taskStatus.equals(SkillTaskFlowStatus.ALL.getCode())) {
-                            demeterTaskUserCriteria.andTaskStatusIn(SkillTaskStatus.getAllTaskType().stream()
-                                    .map(SkillTaskStatus::getCode).collect(Collectors.toList()));
+                            demeterTaskUserCriteria.andTaskStatusIn(SkillTaskFlowStatus.getAllTaskType().stream()
+                                    .map(SkillTaskFlowStatus::getCode).collect(Collectors.toList()));
                         } else {
                             demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
                         }
@@ -648,7 +650,12 @@ public class TaskServiceImpl implements TaskService {
 
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);//员工任务表
 
-        List<Long> skillIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.SKILL.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+        List<Long> skillIds = demeterTaskUsers.stream()
+                .filter(
+                    u -> u.getTaskType().equals(TaskType.SKILL.getCode()))
+                .map(
+                        DemeterTaskUser::getTaskId)
+                .collect(Collectors.toList());
         List<Long> assignIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.ASSIGN.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
         Set<String> receiverId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());

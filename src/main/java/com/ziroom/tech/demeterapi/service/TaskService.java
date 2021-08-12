@@ -73,9 +73,29 @@ public interface TaskService {
     Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req);
 
     /**
+     * 为学习清单中的单条技能点添加单条学习路径
+     */
+    Long createLearnPathIntoSkill(Long taskUserId, Long taskId, String path);
+
+    /**
+     * 为学习清单添加单条技能点
+     */
+    Integer createSkillTaskIntoManifest(Long taskId, Long manifestId, Long taskUserId);
+
+    /**
+     * 为学习清单添加单条技能点前先添加到 task_user
+     */
+    DemeterTaskUser createTaskUser(Long taskId, String learnerUid);
+
+    /**
      * 移除学习清单中的技能任务
      */
     Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId);
+
+    /**
+     * 移除单个学习路径
+     */
+    Integer deleteSkillLearnPath(Long id);
 
     /**
      * 获取学习清单详情

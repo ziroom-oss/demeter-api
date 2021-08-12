@@ -1012,41 +1012,45 @@ public class TaskServiceImpl implements TaskService {
 
             // 清单 id 关联到 taskUserExtend 表的查询
             DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
-            extendExample.createCriteria()
-                    .andManifestIdEqualTo(manifest.getId());
-            List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
+            Long manifestId = manifest.getId();
+            if (Objects.nonNull(manifestId)) {
+                extendExample.createCriteria()
+                        .andManifestIdEqualTo(manifest.getId());
+                List<DemeterTaskUserExtend> taskUserExtends = demeterTaskUserExtendDao.selectByExample(extendExample);
 
-
-            boolean passed = true;
-            // 从 extend 表拿到 taskUserId 到 taskUser 表批量查询任务状态和任务类型
-            for(DemeterTaskUserExtend extend : taskUserExtends){
-                DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
-                skillLearnManifestResp.setTaskType(demeterTaskUser.getTaskType());
-                // 如果 taskUser 的任务状态不是 PASS
-                if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
-                    passed = false;
-                    break;
+                boolean passed = true;
+                // 从 extend 表拿到 taskUserId 到 taskUser 表批量查询任务状态和任务类型
+                for(DemeterTaskUserExtend extend : taskUserExtends){
+                    DemeterTaskUser demeterTaskUser = demeterTaskUserDao.selectByPrimaryKey(extend.getTaskUserId());
+                    if (Objects.nonNull(demeterTaskUser)) {
+                        skillLearnManifestResp.setTaskType(demeterTaskUser.getTaskType());
+                        // 如果 taskUser 的任务状态不是 PASS
+                        if (demeterTaskUser.getTaskStatus() != SkillTaskFlowStatus.PASS.getCode()){
+                            passed = false;
+                            break;
+                        }
+                    }
                 }
-            }
 
-            // 初始化清单流程状态为进行中，如果清单内所有任务的状态都是 PASS 则该清单判断为通过
-            SkillManifestFlowStatus status = SkillManifestFlowStatus.ONGOING;
-            if (passed){
-                status = SkillManifestFlowStatus.PASS;
-            }
-            skillLearnManifestResp.setStatus(status.getCode());
-            skillLearnManifestResp.setStatusName(status.getName());
-
-            // 如果查询清单状态是通过的话
-            if (req.getStatus().equals(SkillManifestFlowStatus.PASS.getCode())){
-                // 并且清单状态（包含的任务也都是通过状态）
+                // 初始化清单流程状态为进行中，如果清单内所有任务的状态都是 PASS 则该清单判断为通过
+                SkillManifestFlowStatus status = SkillManifestFlowStatus.ONGOING;
                 if (passed){
-                    manifestResps.add(skillLearnManifestResp);
+                    status = SkillManifestFlowStatus.PASS;
                 }
-             } else {
-                // 如果查询的是其它状态
-                if (!passed) {
-                    manifestResps.add(skillLearnManifestResp);
+                skillLearnManifestResp.setStatus(status.getCode());
+                skillLearnManifestResp.setStatusName(status.getName());
+
+                // 如果查询清单状态是通过的话
+                if (req.getStatus().equals(SkillManifestFlowStatus.PASS.getCode())){
+                    // 并且清单状态（包含的任务也都是通过状态）
+                    if (passed){
+                        manifestResps.add(skillLearnManifestResp);
+                    }
+                 } else {
+                    // 如果查询的是其它状态
+                    if (!passed) {
+                        manifestResps.add(skillLearnManifestResp);
+                    }
                 }
             }
         });

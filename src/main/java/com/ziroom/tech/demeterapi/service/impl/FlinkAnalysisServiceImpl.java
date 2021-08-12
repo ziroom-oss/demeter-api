@@ -31,7 +31,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.LevelTendencyItem;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.Metric;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.NameValue;
 import com.ziroom.tech.demeterapi.po.dto.resp.portrait.latest.TeamOverviewResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.UserEmailService;

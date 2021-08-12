@@ -17,5 +17,5 @@ public class ForRankingPASSED {
 //    private Long parentId;
 //    private Integer taskId;
     //统计总数
-    private Integer sumAll;
+    private Long sumAll;
 }

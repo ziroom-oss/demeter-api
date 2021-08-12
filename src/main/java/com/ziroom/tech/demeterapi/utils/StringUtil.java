@@ -1,5 +1,7 @@
 package com.ziroom.tech.demeterapi.utils;
 
+import com.alibaba.nacos.api.utils.StringUtils;
+
 /**
  * @author lipp3
  * @date 2021/7/5 13:04
@@ -27,5 +29,9 @@ public class StringUtil {
         }else{
             return obj.toString();
         }
+    }
+
+    public static boolean isEmpty(Object str){
+        return str == null || "".equals(str);
     }
 }

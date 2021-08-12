@@ -34,7 +34,6 @@ public class RankingListServiceImpl implements RankingListService {
     //日期查询
     @Override
     public RankingResp[] getAllskillmapIndiactorInfo(RankingReq rankingReq) {
-
         //根据图谱id获取任务id
         List<Long> skillTaskIds = skillMapSkillDao.getSkillTaskIds(rankingReq.getSearchSkillMap());
         //根据任务id获取任务名称
@@ -48,6 +47,7 @@ public class RankingListServiceImpl implements RankingListService {
                             .name(ehrComponent.getUserDetail(forRanking.getReceiverUid()).getUserName())
                             .num(forRanking.getSumAll().toString())
                             .build();
+
                 }).collect(Collectors.toList());
         skillPoint.setRankingList(skillPointPASSED);
         //设置排名

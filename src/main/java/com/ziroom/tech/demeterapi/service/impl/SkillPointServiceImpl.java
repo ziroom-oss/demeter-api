@@ -248,6 +248,10 @@ public class SkillPointServiceImpl implements SkillPointService {
                 skillTaskExampleCriteria.andTaskNameLike(nameOrNo);
             }
         }
+//        Integer pointLevel = checkSkillReq.getSkillPointLevel();
+//        if (Objects.nonNull(pointLevel)) {
+//            skillTaskExampleCriteria.andSkillLevelEqualTo(pointLevel);
+//        }
         List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>(16);
         if (CollectionUtils.isNotEmpty(taskIds)) {
             skillTaskExampleCriteria.andIdIn(taskIds);
@@ -267,6 +271,9 @@ public class SkillPointServiceImpl implements SkillPointService {
          */
         Map<String, List<DemeterRole>> roleMap =
                 roleService.queryRoleByUid(Lists.newArrayList(OperatorContext.getOperator()));
+        if (roleMap.size() < 1) {
+            return PageListResp.emptyList();
+        }
 
         demeterTaskUsers.forEach(taskUser -> {
             ReceiveQueryResp resp = new ReceiveQueryResp();

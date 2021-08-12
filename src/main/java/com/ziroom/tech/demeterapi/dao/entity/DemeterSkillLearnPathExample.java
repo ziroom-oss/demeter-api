@@ -153,6 +153,11 @@ protected abstract static class GeneratedCriteria {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andIsDelEqualTo(Byte value) {
+            addCriterion("is_del =", value, "isDel");
+            return (Criteria) this;
+        }
+
         public Criteria andIdIsNull() {
             addCriterion("id is null");
             return (Criteria) this;

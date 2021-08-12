@@ -578,6 +578,7 @@ public class TaskServiceImpl implements TaskService {
         // 员工只能看到本人接收的任务，部门管理者可以看到本部门员工接收的所有任务，超级管理员可以看到所有部门员工接收的所有任务。
         List<ReceiveQueryResp> respList = new ArrayList<>(16);//任务列表表头、、、
 
+        //技能-任务
         DemeterSkillTaskExample skillTaskExample = new DemeterSkillTaskExample();//DemeterSkillTask技能表
         DemeterSkillTaskExample.Criteria skillTaskExampleCriteria = skillTaskExample.createCriteria();
         DemeterAssignTaskExample assignTaskExample = new DemeterAssignTaskExample();//DemeterAssignTask任务指派表
@@ -615,18 +616,19 @@ public class TaskServiceImpl implements TaskService {
                 demeterTaskUserCriteria.andReceiverUidEqualTo(OperatorContext.getOperator());
             default:
         }
+
         Integer taskType = taskListQueryReq.getTaskType();
         Integer taskStatus = taskListQueryReq.getTaskStatus();
         if (taskType != null && TaskType.isValid(taskType)) {
             switch (TaskType.getByCode(taskType)) {
-                case ALL:
+                case ALL: //所有类型
                     break;
                 case SKILL:
                     demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode());
                     if (taskStatus != null && SkillTaskFlowStatus.isValid(taskStatus)) {
                         if (taskStatus.equals(SkillTaskFlowStatus.ALL.getCode())) {
-                            demeterTaskUserCriteria.andTaskStatusIn(SkillTaskStatus.getAllTaskType().stream()
-                                    .map(SkillTaskStatus::getCode).collect(Collectors.toList()));
+                            demeterTaskUserCriteria.andTaskStatusIn(SkillTaskFlowStatus.getAllTaskType().stream()
+                                    .map(SkillTaskFlowStatus::getCode).collect(Collectors.toList()));
                         } else {
                             demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
                         }
@@ -648,7 +650,12 @@ public class TaskServiceImpl implements TaskService {
 
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);//员工任务表
 
-        List<Long> skillIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.SKILL.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+        List<Long> skillIds = demeterTaskUsers.stream()
+                .filter(
+                    u -> u.getTaskType().equals(TaskType.SKILL.getCode()))
+                .map(
+                        DemeterTaskUser::getTaskId)
+                .collect(Collectors.toList());
         List<Long> assignIds = demeterTaskUsers.stream().filter(u -> u.getTaskType().equals(TaskType.ASSIGN.getCode())).map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
 
         Set<String> receiverId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
@@ -828,6 +835,13 @@ public class TaskServiceImpl implements TaskService {
             if (taskUsers.size() > 0){
                 throw new BusinessException(String.format("学习者：%s已经学习了技能点：%d", learnerUid, taskId));
             }
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        demeterSkillTaskExample.createCriteria().andIdEqualTo(taskId);
+        List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+        DemeterSkillTask demeterSkillTask = null;
+        if (CollectionUtils.isNotEmpty(demeterSkillTasks)) {
+            demeterSkillTask  = demeterSkillTasks.get(0);
+        }
             // 2.3【demeter_task_user】添加学习的技能点到表demeter_task_user
             DemeterTaskUser entity = DemeterTaskUser.builder()
                     .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
@@ -835,6 +849,7 @@ public class TaskServiceImpl implements TaskService {
                     .taskType(TaskType.SKILL.getCode())
                     .receiverUid(learnerUid)
                     .taskId(taskId)
+                    .parentId(demeterSkillTask != null ? demeterSkillTask.getSkillId() : 0)
                     .createTime(new Date())
                     .modifyTime(new Date())
                     .createId(OperatorContext.getOperator())
@@ -1389,16 +1404,24 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private void acceptSkillTask(Long id) {
+    private void acceptSkillTask(Long taskId) {
         // 技能类任务无法指派，所以如果DemeterTaskUser有了任务分配记录，说明该任务已被接收。
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
-                .andTaskIdEqualTo(id)
+                .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(TaskType.SKILL.getCode())
                 .andReceiverUidEqualTo(OperatorContext.getOperator());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         if (CollectionUtils.isNotEmpty(demeterTaskUsers)) {
             throw new BusinessException("重复接收技能类任务");
+        }
+        DemeterSkillTaskExample demeterSkillTaskExample = new DemeterSkillTaskExample();
+        demeterSkillTaskExample.createCriteria()
+                            .andIdEqualTo(taskId);
+        List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByExample(demeterSkillTaskExample);
+        DemeterSkillTask demeterSkillTask = null;
+        if (CollectionUtils.isNotEmpty(demeterSkillTasks)) {
+            demeterSkillTask  = demeterSkillTasks.get(0);
         }
         DemeterTaskUser entity = DemeterTaskUser.builder()
                 .modifyTime(new Date())
@@ -1409,7 +1432,8 @@ public class TaskServiceImpl implements TaskService {
                 .createId(OperatorContext.getOperator())
                 .taskType(TaskType.SKILL.getCode())
                 .receiverUid(OperatorContext.getOperator())
-                .taskId(id)
+                .taskId(taskId)
+                .parentId(demeterSkillTask != null ? demeterSkillTask.getSkillId() : 0)
                 .build();
         demeterTaskUserDao.insertSelective(entity);
     }

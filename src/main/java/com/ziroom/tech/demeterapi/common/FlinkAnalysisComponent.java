@@ -1,10 +1,8 @@
 package com.ziroom.tech.demeterapi.common;
 
-import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.api.FlinkAnalysisEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiSimpleReq;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.resp.EhrApiSimpleResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.AnalysisResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CostReq;
@@ -26,14 +24,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.InfoRanking;
-import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
-import ziroom.com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * @author daijiankun

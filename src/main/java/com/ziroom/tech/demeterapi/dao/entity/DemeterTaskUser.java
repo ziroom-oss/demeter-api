@@ -50,6 +50,8 @@ public class DemeterTaskUser {
 
     private Date taskEndTime;
 
+    private Integer parentId;
+
     private Date createTime;
 
     private Date modifyTime;
@@ -72,6 +74,14 @@ public class DemeterTaskUser {
 
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     public Integer getTaskType() {

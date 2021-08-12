@@ -3,7 +3,6 @@ package com.ziroom.tech.demeterapi.controller;
 import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
-import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.RankingListService;

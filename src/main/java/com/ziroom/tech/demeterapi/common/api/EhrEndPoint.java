@@ -54,7 +54,6 @@ public interface EhrEndPoint {
     @GET("/api/ehr/getEmpList.action")
     Call<JSONObject> getEmpList(@QueryMap Map<String, Object> empListReqMap);
 
-
     @GET("/api/ehr/getAllOrg.action")
     Call<JSONObject> getAllOrgList(@Query("page") int page, @Query("size") int size, @Query("setId") String setId);
 

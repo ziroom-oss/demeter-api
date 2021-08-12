@@ -15,9 +15,6 @@ import java.util.List;
 @ApiModel("创建技能学习路径请求体")
 public class CreateSkillLearnPathReq {
 
-    @ApiModelProperty("技能编号")
-    private Integer skillId;
-
-    @ApiModelProperty("技能学习路径列表")
-    private List<String> learnPaths;
+    @ApiModelProperty("学习路径")
+    private String path;
 }

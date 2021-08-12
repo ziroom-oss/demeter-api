@@ -86,7 +86,11 @@
         id, task_name, task_status, skill_reward, attachment_url, attachment_uuid, attachment_name, publisher, check_role, task_remark, skill_id, skill_level, create_time, update_time, create_id, modify_id
     </sql>
     <select id="getTasksName" resultMap="TasksName" >
-        select id, task_name from demeter_skill_task where <if test="taskIds != null">  <!--如果传了技能图谱--> id in <foreach collection="taskIds" item="id" index="index" open="(" close=")" separator=","> #{id,jdbcType=BIGINT} </foreach></if>
+        select id, task_name from demeter_skill_task
+        where 1=1
+        <if test="taskIds != null">  <!--如果传了技能图谱-->
+            AND id in <foreach collection="taskIds" item="id" index="index" open="(" close=")" separator=","> #{id,jdbcType=BIGINT} </foreach>
+        </if>
     </select>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTaskExample">
         select

@@ -5,4 +5,10 @@
     <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.ForRankingPASSED">
         <id column="id" property="id" jdbcType="BIGINT"/>
     </resultMap>
+
+
+    <!--
+        update demeter_task_user dtu
+        set dtu.parent_id = (select skill_id from demeter_skill_task dst where dst.id = dtu.task_id)
+    -->
 </mapper>

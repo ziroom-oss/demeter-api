@@ -5,12 +5,10 @@ import com.ziroom.tech.demeterapi.po.dto.req.portrayal.PersonReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.CtoResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.flink.PersonResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author daijiankun

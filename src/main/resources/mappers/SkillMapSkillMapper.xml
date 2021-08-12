@@ -14,12 +14,14 @@
     <sql id="Base_Column_List">
         id, skill_map_id, skill_task_id, job_level , create_time, modify_time
     </sql>
-    <select id="getSkillTaskIds" resultType="java.lang.Long"  parameterType="java.lang.Long">
-        select skill_task_id from skill_map_skill
+    <select id="getSkillTaskIds" resultType="java.lang.Long"  parameterType="java.lang.Integer">
+        select skill_task_id from skill_map_skill WHERE
+        is_del = 0
         <if test="mapId != null">
-            where skill_map_id = #{mapId, jdbcType=INTEGER}
+            AND skill_map_id = #{mapId, jdbcType=INTEGER}
         </if>
     </select>
+
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT

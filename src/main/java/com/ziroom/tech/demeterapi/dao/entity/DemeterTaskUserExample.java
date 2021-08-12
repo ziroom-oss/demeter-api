@@ -953,7 +953,7 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andCreateIdIn(List<String> values) {
+        public Criteria andCreateIdIn(List<Long> values) {
             addCriterion("create_id in", values, "createId");
             return (Criteria) this;
         }

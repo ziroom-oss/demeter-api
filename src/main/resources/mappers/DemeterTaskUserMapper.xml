@@ -109,8 +109,7 @@
     <!--2、start 认证技能数量 reciever_uid-->
     <select id="getSkillNumPASSED" resultMap="ForRankingPASSED">
         select receiver_uid, count(distinct parent_id) as sumall from demeter_task_user
-        WHERE
-        check_result = 1
+        WHERE check_result = 1
         <if test="taskIds != null">  <!--如果传了技能图谱-->
             AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
         </if>
@@ -122,9 +121,9 @@
     <!--3、start热门技能点 task_id-->
     <select id="getHotSkillPointName" resultMap="ForRankingTASK">
         select task_id, count(task_id) as sumall from demeter_task_user
-        WHERE
+        WHERE 1=1
         <if test="taskIds != null">  <!--如果传了技能图谱-->
-             task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+             AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
         </if>
         AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
         group by task_id order by sumall desc, checkout_time
@@ -134,9 +133,9 @@
     <!--4、start热门技能   parent_id-->
     <select id="getHotSkill" resultMap="ForRankingPARENT" >
         select parent_id, count(parent_id) as sumall from demeter_task_user
-        WHERE
+        WHERE 1=1
         <if test="taskIds != null">  <!--如果传了技能图谱-->
-             task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+            AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
         </if>
         AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
         group by parent_id order by sumall desc, create_time

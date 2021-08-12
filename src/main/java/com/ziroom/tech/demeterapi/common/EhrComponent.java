@@ -6,13 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-//import com.magicframework.core.cache.CacheType;
-//import com.magicframework.core.cache.Cached;
 import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.config.RecordLogger;
-import com.ziroom.tech.demeterapi.dao.entity.Jobs;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrOrgListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.*;
@@ -20,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
@@ -155,6 +151,17 @@ public class EhrComponent {
     }
 
     /**
+     * @zhangxt3
+     * 根据用户系统码查询部门信息
+     * @param receiverUids 用户系统码
+     * @return
+     */
+    public List<EhrDeptResp> getDeptsInfoByUid(List<String> receiverUids){
+
+        return null;
+    }
+
+    /**
      * 根据用户系统号查询名称
      *
      * @param userCodes 用户系统号
@@ -182,14 +189,12 @@ public class EhrComponent {
         }).orElseGet(Sets::newHashSet);
     }
 
-//    public UserDetailResp getUserDetailBysimple(String query){
+    //    public UserDetailResp getUserDetailBysimple(String query){
 //        UserDetailResp userDetailResp = new UserDetailResp();
 //        Call<JSONObject> response = ehrApiEndPoint.getUserDetailBySimple(query);
 //
 //
 //    }
-
-
     /**
      * 模糊查询用户
      *
@@ -215,28 +220,6 @@ public class EhrComponent {
         });
         return resp;
     }
-
-    /**
-     * 查询用户详情
-     *
-     * @param query code
-     * @return 结果
-     */
-    public String getUserDetailBysimple(String query) {
-        Call<JSONObject> response = ehrEndPoint.getUserDetail(Lists.newArrayList(query).toString());
-        UserResp userDetailResp = new UserResp();
-        Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
-            if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {
-                JSONArray data = respData.getJSONArray(DATA_ATTRIBUTE);
-                data.stream().map(o -> JSONObject.parseObject(JSON.toJSONString(o))).filter(jsonObject -> Objects.equals(jsonObject.getString(
-                        "jobIndicator"), "P")).forEach(jsonObject -> {
-                        userDetailResp.setCode(jsonObject.getString("adCode"));
-                });
-            }
-        });
-        return getUserDetail(userDetailResp.getCode()).getUserName();
-    }
-
 
     /**
      * 查询用户详情
@@ -507,7 +490,6 @@ public class EhrComponent {
         }
         return respList;
     }
-
 
     private Map<String, Object> initReqMap(Object o) {
         Map<String, Object> result = Maps.newHashMap();

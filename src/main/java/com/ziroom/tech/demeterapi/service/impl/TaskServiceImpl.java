@@ -695,28 +695,33 @@ public class TaskServiceImpl implements TaskService {
 
                     // 从 taskUserExtend 表查询学习清单编号，获得学习清单实例从而查出 assigner 的身份
                     DemeterTaskUserExtend taskUserExtend = demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId());
-                    Long manifestId = taskUserExtend.getManifestId();
-                    DemeterUserLearnManifest learnManifest = demeterUserLearnManifestDao.selectByPrimaryKey(manifestId);
 
-                    String assignerUid = null;
-                    if (Objects.nonNull(learnManifest)) {
-                        assignerUid = learnManifest.getAssignerUid();
-                    }
+                    // TaskUser 与 TaskUserExtend 表的数据可能不一致
+                    if (Objects.nonNull(taskUserExtend)) {
+                        Long manifestId = taskUserExtend.getManifestId();
+                        DemeterUserLearnManifest learnManifest = demeterUserLearnManifestDao.selectByPrimaryKey(manifestId);
 
-                    if (Objects.nonNull(assignerUid)) {
-                        resp.setAssigner(assignerUid);
-                        UserDetailResp userDetailResp = ehrComponent.getUserDetail(assignerUid);
-                        if (Objects.nonNull(userDetailResp)) {
-                            resp.setAssignerName(userDetailResp.getUserName());
+                        String assignerUid = null;
+                        if (Objects.nonNull(learnManifest)) {
+                            assignerUid = learnManifest.getAssignerUid();
                         }
+
+                        if (Objects.nonNull(assignerUid)) {
+                            resp.setAssigner(assignerUid);
+                            UserDetailResp userDetailResp = ehrComponent.getUserDetail(assignerUid);
+                            if (Objects.nonNull(userDetailResp)) {
+                                resp.setAssignerName(userDetailResp.getUserName());
+                            }
+                        }
+
+                        resp.setReceiver(taskUser.getReceiverUid());
+                        resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
+                        resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                        resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                        resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                        respList.add(resp);
                     }
 
-                    resp.setReceiver(taskUser.getReceiverUid());
-                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
-                    resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
-                    resp.setTaskFlowStatus(taskUser.getTaskStatus());
-                    resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
-                    respList.add(resp);
                     break;
                 case ASSIGN:
                     DemeterAssignTask assign = assignTaskMap.get(taskId);

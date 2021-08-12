@@ -691,8 +691,26 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.SKILL.getCode());
                     resp.setTaskTypeName(TaskType.SKILL.getDesc());
                     resp.setTaskReward(skill.getSkillReward());
-                    resp.setAssigner(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid());
-                    resp.setAssignerName(ehrComponent.getUserDetail(demeterUserLearnManifestDao.selectByPrimaryKey(demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId()).getManifestId()).getAssignerUid()).getUserName());
+
+
+                    // 从 taskUserExtend 表查询学习清单编号，获得学习清单实例从而查出 assigner 的身份
+                    DemeterTaskUserExtend taskUserExtend = demeterTaskUserExtendDao.selectByTaskUserId(taskUser.getId());
+                    Long manifestId = taskUserExtend.getManifestId();
+                    DemeterUserLearnManifest learnManifest = demeterUserLearnManifestDao.selectByPrimaryKey(manifestId);
+
+                    String assignerUid = null;
+                    if (Objects.nonNull(learnManifest)) {
+                        assignerUid = learnManifest.getAssignerUid();
+                    }
+
+                    if (Objects.nonNull(assignerUid)) {
+                        resp.setAssigner(assignerUid);
+                        UserDetailResp userDetailResp = ehrComponent.getUserDetail(assignerUid);
+                        if (Objects.nonNull(userDetailResp)) {
+                            resp.setAssignerName(userDetailResp.getUserName());
+                        }
+                    }
+
                     resp.setReceiver(taskUser.getReceiverUid());
                     resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
                     resp.setPublisherName(userMap.get(skill.getPublisher()).getName());

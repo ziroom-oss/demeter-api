@@ -101,6 +101,10 @@
 <!--                       enableSelectByExample="true">-->
 <!--                    <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>-->
 <!--                </table>-->
+        <table tableName="demeter_user_info" enableCountByExample="true" enableUpdateByExample="true"
+        enableSelectByExample="true">
+        <generatedKey column="id" sqlStatement="MYSQL" identity="true"/>
+        </table>
 
     </context>
 </generatorConfiguration>

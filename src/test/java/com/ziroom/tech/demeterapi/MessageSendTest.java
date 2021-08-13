@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi;
 
 import com.ziroom.tech.demeterapi.common.EhrApiService;
+import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.message.WorkWechatSender;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehrapi.req.EhrApiSimpleReq;
@@ -64,5 +65,6 @@ public class MessageSendTest {
         req.setAdCode("daijk");
         ehrApiService.getEmpSimple(req);
     }
+
 
 }

@@ -57,14 +57,14 @@ public class DeptRankingServiceImpl implements DeptRankingService {
             List<String> receiverUids = demeterTaskUsers.stream().map((demeterTaskUser) -> {
                 return demeterTaskUser.getReceiverUid();
             }).collect(Collectors.toList());
-           // ehrComponent.getEmpList()
-
-
             /**
              * String： receiver_Uid
-             * Long: 分组之后的个数
+             * Long: 分组之后的个数,如下：
+             * 2131309    10
+             * 2131310    20
              */
             Map<String, Long> groupReceiverUid = demeterTaskUsers.stream().collect(groupingBy(DemeterTaskUser::getReceiverUid, counting()));
+
 
         }
 

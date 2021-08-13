@@ -14,9 +14,11 @@ public class DeptRankingResp implements Serializable {
     @ApiModelProperty("部门名称")
     @JsonProperty("departmentName")
     private String deptName;
+
     @ApiModelProperty("数量")
     @JsonProperty("count")
     private Long value;
+
     @ApiModelProperty("部门编码")
     private String deptCode;
 

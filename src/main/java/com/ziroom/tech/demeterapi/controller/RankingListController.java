@@ -51,4 +51,10 @@ public class RankingListController {
        return Resp.success(flinkAnalysisService.getAllIndividualProjectIndiactorInfo(rankingReq));
     }
 
+    @PostMapping("getDept")
+    @ApiOperation(value = "部门技能图谱相关", httpMethod = "POST")
+    public Resp<RankingResp[]> getAllskillmapDept(@RequestBody RankingReq rankingReq){
+        return Resp.success(rankingListService.getAllskillmapIndiactorInfo(rankingReq));
+    }
+
 }

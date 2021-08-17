@@ -177,7 +177,7 @@ public class FlinkAnalysisComponent {
         Integer rankingInfoindividevEvalue = RetrofitCallAdaptor.execute(flinkAnalysisEndPoint.individevEvaluesort(analysisReq)).getData();
         List<InfoRanking> rankingInfoEvalue = RetrofitCallAdaptor.execute(flinkAnalysisEndPoint.individualdevEvaluesearch(analysisReq)).getData();
         List<RankingInfo> rankingEvalue = rankingInfoEvalue.stream().limit(10).map((infoRanking) -> {
-            System.out.println("測試測試測試");
+            //System.out.println("測試測試測試");
             EhrApiSimpleReq ehrApiSimpleReq = new EhrApiSimpleReq();
                         ehrApiSimpleReq.setAdCode(infoRanking.getUid());
             return RankingInfo.builder().name(ehrApiService.getEmpSimple(ehrApiSimpleReq).getEmpName())

@@ -67,6 +67,7 @@ public class RankingListServiceImpl implements RankingListService {
         }
         System.out.println("測試測hi測試測試");
         System.out.println(skillPoint.getMyRanking());
+        System.out.println(skillPoint.getRankingList());
 
         //2、认证技能数量排序
         RankingResp skill = new RankingResp();

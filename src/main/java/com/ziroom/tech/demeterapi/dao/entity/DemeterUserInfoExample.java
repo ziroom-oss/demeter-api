@@ -511,7 +511,7 @@ protected abstract static class GeneratedCriteria {
         }
 
         public Criteria andUserCodeIn(List<String> values) {
-            addCriterion("user_code in", values, "userCode");
+            addCriterion("user_code  in", values, "userCode");
             return (Criteria) this;
         }
 

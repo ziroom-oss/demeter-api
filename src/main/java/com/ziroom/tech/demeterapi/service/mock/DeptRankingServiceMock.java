@@ -6,7 +6,6 @@ import com.ziroom.tech.demeterapi.service.DeptRankingService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-@Service
 public class DeptRankingServiceMock implements DeptRankingService {
 
     @Override

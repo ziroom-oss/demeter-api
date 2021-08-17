@@ -48,7 +48,7 @@ public class RankingListServiceImpl implements RankingListService {
         List<ForTaskName> names = demeterSkillTaskDao.getTasksName(skillTaskIds);
         Map<Long, String> tasksNames = names.stream().collect(Collectors.toMap(ForTaskName::getId, ForTaskName::getTaskName));
 
-        //1、认证技能点数量排序，将sql查询的resultmap处理成前端需要的数据
+        //1、认证技能点数量排序
         RankingResp skillPoint = new RankingResp();
         List<RankingInfo> skillPointPASSED = demeterTaskUserDao.getSkillPointPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
            UserDetailResp userDetail = ehrComponent.getUserDetail(forRanking.getReceiverUid());
@@ -67,7 +67,8 @@ public class RankingListServiceImpl implements RankingListService {
         }
         System.out.println("測試測hi測試測試");
         System.out.println(skillPoint.getMyRanking());
-        //2、认证技能数量排序，将sql查询的resultmap处理成前端需要的数据
+
+        //2、认证技能数量排序
         RankingResp skill = new RankingResp();
         List<RankingInfo> skillPASSED = demeterTaskUserDao.getSkillNumPASSED(rankingReq, skillTaskIds).stream().map(forRanking -> {
             UserDetailResp userDetail = ehrComponent.getUserDetail(forRanking.getReceiverUid());
@@ -85,7 +86,7 @@ public class RankingListServiceImpl implements RankingListService {
         }
 
         //热门相关无“我的排名”
-        //3、热门技能点数量排序，将sql查询的resultmap处理成前端需要的数据
+        //3、热门技能点数量排序
         RankingResp skillPointHot = new RankingResp();
         List<RankingInfo> hotSkillPoint = demeterTaskUserDao.getHotSkillPointName(rankingReq, skillTaskIds).stream().map(forRanking -> {
              return RankingInfo.builder()
@@ -94,7 +95,7 @@ public class RankingListServiceImpl implements RankingListService {
                     .build();
         }).collect(Collectors.toList());
         skillPointHot.setRankingList(hotSkillPoint);
-        //4、热门技能数量排序，将sql查询的resultmap处理成前端需要的数据
+        //4、热门技能数量排序
         RankingResp skillHot = new RankingResp();
         List<RankingInfo> hotSkill = demeterTaskUserDao.getHotSkill(rankingReq, skillTaskIds).stream().map(forRanking -> {
             SkillTree skillTree = skillTreeDao.selectByPrimaryKey(forRanking.getParentId());

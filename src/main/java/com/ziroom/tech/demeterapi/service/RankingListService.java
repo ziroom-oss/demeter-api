@@ -2,6 +2,7 @@ package com.ziroom.tech.demeterapi.service;
 
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.DeptRankingResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 
 import java.util.List;
@@ -10,10 +11,12 @@ import java.util.List;
 public interface RankingListService {
 
     //search individual ranking about
-    RankingResp[] getAllskillmapIndiactorInfo(RankingReq rankingReq);
+    RankingResp[] getAllIndividualSkillmap(RankingReq rankingReq);
 
-    //获取
-    public List<DeptRankingResp> getDeptSkillPoint(RankingReq rankingReq);
-    //获取
-    public List<DeptRankingResp> getDeptSkill(RankingReq rankingReq);
+    //search dept ranking about
+    List<RankingResp> getAllDeptSkillmap(RankingReq rankingReq);
+
+    List<RankingInfo> getDeptSkillPoint(RankingReq rankingReq);
+
+    List<RankingInfo> getDeptSkill(RankingReq rankingReq);
 }

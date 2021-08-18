@@ -41,7 +41,7 @@ public class RankingListServiceImpl implements RankingListService {
     //技能图谱查询
     //日期查询
     @Override
-    public RankingResp[] getAllskillmapIndiactorInfo(RankingReq rankingReq) {
+    public RankingResp[] getAllIndividualSkillmap(RankingReq rankingReq) {
         //根据图谱id获取任务id
         List<Long> skillTaskIds = skillMapSkillDao.getSkillTaskIds(rankingReq.getSearchSkillMap());
         //根据任务id获取任务名称
@@ -112,6 +112,13 @@ public class RankingListServiceImpl implements RankingListService {
 
 
 
+    @Override
+    public List<RankingResp> getAllDeptSkillmap(RankingReq rankingReq){
+
+        List<RankingResp> rankingResps = new ArrayList<>();
+
+        return rankingResps;
+    }
 
     //
     public List<Long> getTaskIds(Integer skillMapId){
@@ -119,10 +126,8 @@ public class RankingListServiceImpl implements RankingListService {
         List<Long> skillTaskIds = skillMapSkillDao.getSkillTaskIds(skillMapId);
         return skillTaskIds;
     }
-
-    //技能点排序
     @Override
-    public List<DeptRankingResp> getDeptSkillPoint(RankingReq rankingReq) {
+    public List<RankingInfo> getDeptSkillPoint(RankingReq rankingReq) {
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -171,20 +176,18 @@ public class RankingListServiceImpl implements RankingListService {
         /*
          * deptname    skillpointsum
          */
-        List<DeptRankingResp> deptRankingResp = userJoinDepts.stream()
+        List<RankingInfo> deptRankingResp = userJoinDepts.stream()
                 .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
                 //按数量排序
                 .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
-                    return new DeptRankingResp(e.getKey(), e.getValue());
+                    return new RankingInfo(e.getKey(), e.getValue().toString());
                 }).collect(toList());
         // Map<String, List<Long>> deptJoinSkillPointNum = userJoinDepts.stream().collect(groupingBy(UserJoinDept::getDeptName, mapping(UserJoinDept::getSumall, toList())));
         return deptRankingResp;
     }
 
-
-    //技能排序
     @Override
-    public List<DeptRankingResp> getDeptSkill(RankingReq rankingReq) {
+    public List<RankingInfo> getDeptSkill(RankingReq rankingReq) {
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -267,11 +270,11 @@ public class RankingListServiceImpl implements RankingListService {
         /*
          * deptname    skillpointsum
          */
-        List<DeptRankingResp> deptRankingResp = userJoinDepts.stream()
+        List<RankingInfo> deptRankingResp = userJoinDepts.stream()
                 .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
                 //按数量排序
                 .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
-                    return new DeptRankingResp(e.getKey(), e.getValue());
+                    return new RankingInfo(e.getKey(), e.getValue().toString());
                 }).collect(toList());
 
         return deptRankingResp;

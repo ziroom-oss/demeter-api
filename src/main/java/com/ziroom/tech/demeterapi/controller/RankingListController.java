@@ -3,6 +3,7 @@ package com.ziroom.tech.demeterapi.controller;
 import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.RankingListService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,13 +37,12 @@ public class RankingListController {
      * @zhangxt3
      * 所有需要排行的放入数组
      */
-    @PostMapping("getAllskillmapIndiactorInfo")
+    @PostMapping("getIndividualSkillmapInfo")
     @ApiOperation(value = "技能图谱相关", httpMethod = "POST")
     public Resp<RankingResp[]> getAllskillmapIndiactorInfo(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.getAllskillmapIndiactorInfo(rankingReq));
+        return Resp.success(rankingListService.getAllIndividualSkillmap(rankingReq));
     }
  /**
-  *
   * @param rankingReq
   * @return
   */
@@ -51,10 +52,28 @@ public class RankingListController {
        return Resp.success(flinkAnalysisService.getAllIndividualProjectIndiactorInfo(rankingReq));
     }
 
-    @PostMapping("getDept")
+    @PostMapping("getDeptSkillmapInfo")
     @ApiOperation(value = "部门技能图谱相关", httpMethod = "POST")
-    public Resp<RankingResp[]> getAllskillmapDept(@RequestBody RankingReq rankingReq){
-        return Resp.success(rankingListService.getAllskillmapIndiactorInfo(rankingReq));
+    public Resp<List<RankingResp>> getAllskillmapDept(@RequestBody RankingReq rankingReq){
+        List<RankingResp> rankingResps = new ArrayList<>();
+        RankingResp skillPoints = new RankingResp();
+        List<RankingInfo> deptSkillPoint = rankingListService.getDeptSkillPoint(rankingReq);
+        skillPoints.setRankingList(deptSkillPoint);
+        rankingResps.add(skillPoints);
+        RankingResp skills = new RankingResp();
+        List<RankingInfo> deptSkill = rankingListService.getDeptSkill(rankingReq);
+        skills.setRankingList(deptSkill);
+        rankingResps.add(skills);
+        return Resp.success(rankingListService.getAllDeptSkillmap(rankingReq));
+    }
+    /**
+     * @param rankingReq
+     * @return
+     */
+    @PostMapping("getAllDeptrojectIndiactorInfo")
+    @ApiOperation(value = "部门工程指标排行", httpMethod = "POST")
+    public Resp<List<RankingResp>> getAllDeptProjectIndiactorInfo(@RequestBody RankingReq rankingReq){
+        return Resp.success(flinkAnalysisService.getDeptProjectIndiactorInfo(rankingReq));
     }
 
 }

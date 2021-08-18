@@ -15,7 +15,7 @@ import java.util.Objects;
 public class DeptRankingResp implements Serializable {
 
     @ApiModelProperty("部门名称")
-    @JsonProperty("departmentName")
+    @JsonProperty("departMentName")
     private String deptName;
 
     @ApiModelProperty("数量")

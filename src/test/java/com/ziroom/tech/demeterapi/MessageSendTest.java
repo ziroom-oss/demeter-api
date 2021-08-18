@@ -1,15 +1,19 @@
 package com.ziroom.tech.demeterapi;
 
 import com.ziroom.tech.demeterapi.common.EhrApiService;
+import com.ziroom.tech.demeterapi.common.FlinkAnalysisComponent;
 import com.ziroom.tech.demeterapi.common.message.WorkWechatSender;
 import com.ziroom.tech.demeterapi.po.dto.req.portrayal.CTOReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.DeptRankingResp;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.MapService;
 import com.ziroom.tech.demeterapi.service.PortraitService;
 import javax.annotation.Resource;
 
 import com.ziroom.tech.demeterapi.service.RankingListService;
+import com.ziroom.tech.demeterapi.service.impl.RankingListServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,8 +43,12 @@ public class MessageSendTest {
     @Resource
     private MapService mapService;
 
+//    @Resource
+//    private RankingListService rankingService;
     @Resource
-    private RankingListService rankingService;
+    private RankingListServiceImpl rankingListServiceImpl;
+    @Resource
+    private FlinkAnalysisComponent flinkAnalysisComponent;
 
     @Test
     public void test() {
@@ -64,14 +72,15 @@ public class MessageSendTest {
     }
 
     @Test
-    public void testEhr() throws ParseException {
+    public void testDept() throws ParseException {
         RankingReq rankingReq = new RankingReq();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         rankingReq.setStartTime(simpleDateFormat.parse("2021-08-01 00:01:00"));
         rankingReq.setEndTime(simpleDateFormat.parse("2021-08-31 00:00:00"));
         System.out.println("测试！");
-        List<DeptRankingResp> deptSkill = rankingService.getDeptSkill(rankingReq);
-        System.out.println(deptSkill);
+        List<RankingInfo> deptSkillPoint = rankingListServiceImpl.getDeptSkillPoint(rankingReq);
+        //List<RankingResp> deptProjectIndiactorInfo = flinkAnalysisComponent.getDeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        System.out.println(deptSkillPoint);
     }
 
 

@@ -55,15 +55,6 @@ public class RankingListController {
     @PostMapping("getDeptSkillmapInfo")
     @ApiOperation(value = "部门技能图谱相关", httpMethod = "POST")
     public Resp<List<RankingResp>> getAllskillmapDept(@RequestBody RankingReq rankingReq){
-        List<RankingResp> rankingResps = new ArrayList<>();
-        RankingResp skillPoints = new RankingResp();
-        List<RankingInfo> deptSkillPoint = rankingListService.getDeptSkillPoint(rankingReq);
-        skillPoints.setRankingList(deptSkillPoint);
-        rankingResps.add(skillPoints);
-        RankingResp skills = new RankingResp();
-        List<RankingInfo> deptSkill = rankingListService.getDeptSkill(rankingReq);
-        skills.setRankingList(deptSkill);
-        rankingResps.add(skills);
         return Resp.success(rankingListService.getAllDeptSkillmap(rankingReq));
     }
     /**

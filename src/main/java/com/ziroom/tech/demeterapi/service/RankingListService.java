@@ -16,7 +16,4 @@ public interface RankingListService {
     //search dept ranking about
     List<RankingResp> getAllDeptSkillmap(RankingReq rankingReq);
 
-    List<RankingInfo> getDeptSkillPoint(RankingReq rankingReq);
-
-    List<RankingInfo> getDeptSkill(RankingReq rankingReq);
 }

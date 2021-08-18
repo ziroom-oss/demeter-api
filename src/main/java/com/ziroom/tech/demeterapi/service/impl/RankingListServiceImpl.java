@@ -116,7 +116,14 @@ public class RankingListServiceImpl implements RankingListService {
     public List<RankingResp> getAllDeptSkillmap(RankingReq rankingReq){
 
         List<RankingResp> rankingResps = new ArrayList<>();
-
+        RankingResp skillPoints = new RankingResp();
+        List<RankingInfo> deptSkillPoint = getDeptSkillPoint(rankingReq);
+        skillPoints.setRankingList(deptSkillPoint);
+        rankingResps.add(skillPoints);
+        RankingResp skills = new RankingResp();
+        List<RankingInfo> deptSkill = getDeptSkill(rankingReq);
+        skills.setRankingList(deptSkill);
+        rankingResps.add(skills);
         return rankingResps;
     }
 
@@ -126,7 +133,7 @@ public class RankingListServiceImpl implements RankingListService {
         List<Long> skillTaskIds = skillMapSkillDao.getSkillTaskIds(skillMapId);
         return skillTaskIds;
     }
-    @Override
+
     public List<RankingInfo> getDeptSkillPoint(RankingReq rankingReq) {
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
@@ -186,7 +193,7 @@ public class RankingListServiceImpl implements RankingListService {
         return deptRankingResp;
     }
 
-    @Override
+
     public List<RankingInfo> getDeptSkill(RankingReq rankingReq) {
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();

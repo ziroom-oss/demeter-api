@@ -198,6 +198,7 @@ import java.util.List;
     @PostMapping("/detail/all")
     @ApiOperation(value = "任务详情", httpMethod = "POST")
     public Resp<TaskDetailResp> getAllDetails(@RequestParam Long taskId, @RequestParam Integer taskType) {
+        System.out.println();
         return taskService.getAllDetails(taskId, taskType);
     }
 

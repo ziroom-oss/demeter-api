@@ -14,6 +14,7 @@ import com.ziroom.tech.demeterapi.service.JobsService;
 import com.ziroom.tech.demeterapi.service.MapService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -84,6 +85,7 @@ public class MapController {
             skillMapResp.setJobName(jobName);
             skillMapResps.add(skillMapResp);
         });
+        Collections.reverse(skillMapResps);
         resp.setData(skillMapResps);
         return Resp.success(resp);
     }

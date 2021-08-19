@@ -228,13 +228,13 @@ public class FlinkAnalysisComponent {
         List<InfoRanking> equivData = RetrofitCallAdaptor.execute(equivCall).getData();
         List<RankingInfo> collectEquiv = equivData.stream().map(data -> {
             return RankingInfo.builder().name(data.getDepartmentName()).num(data.getCount()).build();
-        }).collect(Collectors.toList());
+        }).limit(10).collect(Collectors.toList());
         RankingResp equiv = new RankingResp(collectEquiv);
         rankingResp.add(equiv);
         List<InfoRanking> valueData = RetrofitCallAdaptor.execute(valueCall).getData();
         List<RankingInfo> collectValue = valueData.stream().map(data -> {
             return RankingInfo.builder().name(data.getDepartmentName()).num(data.getCount()).build();
-        }).collect(Collectors.toList());
+        }).limit(10).collect(Collectors.toList());
         RankingResp value = new RankingResp(collectValue);
         rankingResp.add(value);
 //        List<DeptRankingResp> equivData = RetrofitCallAdaptor.execute(equivCall).getData();

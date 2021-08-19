@@ -17,6 +17,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="create_id" property="createId" jdbcType="VARCHAR"/>
         <result column="modify_id" property="modifyId" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="INTEGER"/>
     </resultMap>
     <resultMap id="ForRankingPASSED" type="com.ziroom.tech.demeterapi.dao.entity.ForRankingPASSED">
         <result column="receiver_uid" property="receiverUid" jdbcType="VARCHAR"/>
@@ -89,7 +90,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
+        id, task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, checkout_time, task_end_time, create_time, modify_time, create_id, modify_id, parent_id
     </sql>
     <!--1、start已认证技能点-->
     <select id="getSkillPointPASSED" resultMap="ForRankingPASSED">
@@ -98,9 +99,9 @@
         <if test="taskIds != null">  <!--如果传了技能图谱-->
             AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
         </if>
-            AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
-            group by receiver_uid order by sumall desc, checkout_time
-            limit 10;
+        AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
+        group by receiver_uid order by sumall desc, checkout_time
+        limit 10;
     </select>
     <!--已认证end-->
     <!--start 当前登录用户排名-->
@@ -123,7 +124,7 @@
         select task_id, count(task_id) as sumall from demeter_task_user
         WHERE 1=1
         <if test="taskIds != null">  <!--如果传了技能图谱-->
-             AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
+            AND task_id in <foreach collection="taskIds" item="idtask" index="index" open="(" close=")" separator=","> #{idtask,jdbcType=BIGINT} </foreach>
         </if>
         AND create_time between #{rankingReq.startTime, jdbcType=DATE} AND #{rankingReq.endTime, jdbcType=DATE}
         group by task_id order by sumall desc, checkout_time
@@ -158,7 +159,7 @@
         </if>
     </select>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        SELECT 
+        SELECT
         <include refid="Base_Column_List"/>
         FROM demeter_task_user
         WHERE id = #{id,jdbcType=BIGINT}
@@ -171,12 +172,12 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion, 
-            checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
-            )
-        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{rejectReason,jdbcType=VARCHAR}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR}, 
-            #{checkoutTime,jdbcType=TIMESTAMP}, #{taskEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
-            )
+        INSERT INTO demeter_task_user (task_id, task_type, receiver_uid, task_status, reject_reason, check_result, check_opinion,
+        checkout_time, task_end_time, create_time, modify_time, create_id, modify_id
+        )
+        VALUES (#{taskId,jdbcType=BIGINT}, #{taskType,jdbcType=INTEGER}, #{receiverUid,jdbcType=VARCHAR}, #{taskStatus,jdbcType=INTEGER}, #{rejectReason,jdbcType=VARCHAR}, #{checkResult,jdbcType=INTEGER}, #{checkOpinion,jdbcType=VARCHAR},
+        #{checkoutTime,jdbcType=TIMESTAMP}, #{taskEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=VARCHAR}, #{modifyId,jdbcType=VARCHAR}
+        )
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser">
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
@@ -325,19 +326,19 @@
     <update id="updateByExample" parameterType="map">
         UPDATE demeter_task_user
         SET id = #{record.id,jdbcType=BIGINT},
-            task_id = #{record.taskId,jdbcType=BIGINT},
-            task_type = #{record.taskType,jdbcType=INTEGER},
-            receiver_uid = #{record.receiverUid,jdbcType=VARCHAR},
-            task_status = #{record.taskStatus,jdbcType=INTEGER},
-            reject_reason = #{record.rejectReason,jdbcType=VARCHAR},
-            check_result = #{record.checkResult,jdbcType=INTEGER},
-            check_opinion = #{record.checkOpinion,jdbcType=VARCHAR},
-            checkout_time = #{record.checkoutTime,jdbcType=TIMESTAMP},
-            task_end_time = #{record.taskEndTime,jdbcType=TIMESTAMP},
-            create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
-            create_id = #{record.createId,jdbcType=VARCHAR},
-            modify_id = #{record.modifyId,jdbcType=VARCHAR}
+        task_id = #{record.taskId,jdbcType=BIGINT},
+        task_type = #{record.taskType,jdbcType=INTEGER},
+        receiver_uid = #{record.receiverUid,jdbcType=VARCHAR},
+        task_status = #{record.taskStatus,jdbcType=INTEGER},
+        reject_reason = #{record.rejectReason,jdbcType=VARCHAR},
+        check_result = #{record.checkResult,jdbcType=INTEGER},
+        check_opinion = #{record.checkOpinion,jdbcType=VARCHAR},
+        checkout_time = #{record.checkoutTime,jdbcType=TIMESTAMP},
+        task_end_time = #{record.taskEndTime,jdbcType=TIMESTAMP},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+        create_id = #{record.createId,jdbcType=VARCHAR},
+        modify_id = #{record.modifyId,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -405,3 +406,4 @@
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
 </mapper>
+

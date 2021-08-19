@@ -23,6 +23,11 @@ public class RankingResp {
         this.myRanking = myRanking;
         this.rankingList = rankingList;
     }
+
+    public RankingResp(List<RankingInfo> rankingList) {
+        this.rankingList = rankingList;
+    }
+
     public RankingResp() {
     }
 

@@ -51,6 +51,10 @@ public interface EhrEndPoint {
     @GET("/api/ehr/getOrgByCode.action")
     Call<JSONObject> getOrgByCode(@Query("code") String code, @Query("setId") String setId);
 
+    //查询所有员工信息
+    @GET("/api/ehr/getEmpList")
+    Call<JSONObject> getEmpList();
+
     @GET("/api/ehr/getEmpList.action")
     Call<JSONObject> getEmpList(@QueryMap Map<String, Object> empListReqMap);
 

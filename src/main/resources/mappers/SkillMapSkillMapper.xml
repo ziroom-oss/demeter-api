@@ -21,8 +21,6 @@
             AND skill_map_id = #{mapId, jdbcType=INTEGER}
         </if>
     </select>
-
-
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT
         <include refid="Base_Column_List"/>

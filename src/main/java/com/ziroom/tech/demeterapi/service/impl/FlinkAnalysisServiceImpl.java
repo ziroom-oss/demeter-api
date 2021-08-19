@@ -1150,11 +1150,12 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
     }
 
 
-    //部門
-//    @Override
-//    public List<RankingResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq) {
-//        List<RankingResp> projectIndiactorInfos = flinkAnalysisComponent.getdeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
-//        return projectIndiactorInfos;
-//    }
+    //
+    // 部門
+    @Override
+    public List<RankingResp> getDeptProjectIndiactorInfo(RankingReq rankingReq) {
+        List<RankingResp> projectIndiactorInfos = flinkAnalysisComponent.getDeptProjectIndiactorInfo(rankingReq.getStartTime(), rankingReq.getEndTime(), rankingReq.getUid(), rankingReq.getUids());
+        return projectIndiactorInfos;
+    }
 }
 

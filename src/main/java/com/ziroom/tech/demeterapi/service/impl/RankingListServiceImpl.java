@@ -13,9 +13,12 @@ import com.ziroom.tech.demeterapi.service.RankingListService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.*;
 
 
@@ -110,8 +113,6 @@ public class RankingListServiceImpl implements RankingListService {
         return new RankingResp[]{skillPoint, skill, skillPointHot, skillHot};
     }
 
-
-
     @Override
     public List<RankingResp> getAllDeptSkillmap(RankingReq rankingReq){
 
@@ -137,16 +138,18 @@ public class RankingListServiceImpl implements RankingListService {
     public List<RankingInfo> getDeptSkillPoint(RankingReq rankingReq) {
 
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
-        demeterTaskUserExample.createCriteria()
+        demeterTaskUserExample
+                .createCriteria()
                 .andTaskIdIn(getTaskIds(rankingReq.getSearchSkillMap()))
                 .andCheckResultEqualTo(1)//已认证的
                 .andCreateTimeBetween(rankingReq.getStartTime(), rankingReq.getEndTime());//时间条件
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
 
         //获取receiverUids，去ehr批量查询出部门中心
-        List<String> receiverUids = demeterTaskUsers.stream().map((demeterTaskUser) -> {
-            return demeterTaskUser.getReceiverUid();
-        }).distinct().collect(Collectors.toList());
+        List<String> receiverUids = demeterTaskUsers.stream()
+                .map((demeterTaskUser) -> {
+                    return Optional.ofNullable("-").orElse(demeterTaskUser.getReceiverUid());
+                }).distinct().collect(Collectors.toList());
 
         /*
          * String： receiver_Uid
@@ -155,42 +158,44 @@ public class RankingListServiceImpl implements RankingListService {
          * 2131309    10
          * 2131310    20
          */
-        Map<String, Long> groupReceiverUid = demeterTaskUsers.stream().collect(groupingBy(DemeterTaskUser::getReceiverUid, counting()));
+        if(demeterTaskUsers != null){
+            Map<String, Long> groupReceiverUid = demeterTaskUsers.stream()
+                                                    .collect(groupingBy(DemeterTaskUser::getReceiverUid, counting()));
 
-        //查询员工和部门信息   将receiverUids和部门名称对应
-        DemeterUserInfoExample demeterUserInfoExample = new DemeterUserInfoExample();
-        demeterUserInfoExample.createCriteria()
-                .andUserCodeIn(receiverUids);
-
-        //	肖江		104615	智能平台研发部
-        List<DemeterUserInfo> demeterUserInfos = demeterUserInfoDao.selectByExample(demeterUserInfoExample);
-        //用户名       用户系统码    部门名      部门编码      总数
-        //username    usercode    deptname  deptcode      sumall
-        List<UserJoinDept> userJoinDepts = demeterUserInfos.stream().map((demeterUserInfo -> {
-            UserJoinDept userJoinDept = new UserJoinDept();
-            String userCode = demeterUserInfo.getUserCode();
-            userJoinDept.setReceiverUid(userCode);
-            userJoinDept.setEmpName(demeterUserInfo.getName());
-            userJoinDept.setDeptCode(demeterUserInfo.getDeptCode());
-            userJoinDept.setDeptName(demeterUserInfo.getDeptName());
-            //每个人认领地技能数量
-            if (groupReceiverUid.containsKey(demeterUserInfo.getUserCode())) {
-                userJoinDept.setSumAll(groupReceiverUid.get(userCode));
-            }
-            return userJoinDept;
-        })).collect(Collectors.toList());
-        //部门关联个人认领技能数量
-        /*
-         * deptname    skillpointsum
-         */
-        List<RankingInfo> deptRankingResp = userJoinDepts.stream()
-                .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
-                //按数量排序
-                .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
-                    return new RankingInfo(e.getKey(), e.getValue().toString());
-                }).collect(toList());
-        // Map<String, List<Long>> deptJoinSkillPointNum = userJoinDepts.stream().collect(groupingBy(UserJoinDept::getDeptName, mapping(UserJoinDept::getSumall, toList())));
-        return deptRankingResp;
+            //查询员工和部门信息   将receiverUids和部门名称对应
+            DemeterUserInfoExample demeterUserInfoExample = new DemeterUserInfoExample();
+            demeterUserInfoExample.createCriteria()
+                    .andUserCodeIn(receiverUids); // Optional.ofNullable("-").orElse(receiverUids)
+                //	肖江		104615	智能平台研发部
+            List<DemeterUserInfo> demeterUserInfos = demeterUserInfoDao.selectByExample(demeterUserInfoExample);
+                //用户名       用户系统码    部门名      部门编码      总数
+                //username    usercode    deptname  deptcode      sumall
+            List<UserJoinDept> userJoinDepts = demeterUserInfos.stream().map((demeterUserInfo -> {
+                    UserJoinDept userJoinDept = new UserJoinDept();
+                    String userCode = demeterUserInfo.getUserCode();
+                    userJoinDept.setReceiverUid(userCode);
+                    userJoinDept.setEmpName(demeterUserInfo.getName());
+                    userJoinDept.setDeptCode(demeterUserInfo.getDeptCode());
+                    userJoinDept.setDeptName(demeterUserInfo.getDeptName());
+                    //每个人认领地技能数量
+                    if (groupReceiverUid.containsKey(demeterUserInfo.getUserCode())) {
+                        userJoinDept.setSumAll(groupReceiverUid.get(userCode));
+                    }
+                    return userJoinDept;
+                })).collect(Collectors.toList());
+                //部门关联个人认领技能数量
+                /*
+                 * deptname    skillpointsum
+                 */
+                List<RankingInfo> deptRankingResp = userJoinDepts.stream()
+                        .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
+                        //按数量排序
+                        .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
+                            return new RankingInfo(e.getKey(), e.getValue().toString());
+                        }).collect(toList());
+                return deptRankingResp;
+        }
+        return new ArrayList<>();
     }
 
 
@@ -238,7 +243,7 @@ public class RankingListServiceImpl implements RankingListService {
 
         //获取receiverUids，去ehr批量查询出部门中心
         List<String> receiverUids = demeterTaskUsers2.stream().map((demeterTaskUser2) -> {
-            return demeterTaskUser2.getReceiverUid();
+            return Optional.ofNullable("-").orElse(demeterTaskUser2.getReceiverUid());
         }).distinct().collect(Collectors.toList());
 
         /*
@@ -248,6 +253,7 @@ public class RankingListServiceImpl implements RankingListService {
          * 2131309    10
          * 2131310    20
          */
+        if(demeterTaskUsers != null){
         Map<String, Long> groupReceiverUid = demeterTaskUsers2.stream().collect(groupingBy(DemeterTaskUser::getReceiverUid, counting()));
 
         //查询员工和部门信息   将receiverUid和部门名称对应
@@ -255,36 +261,38 @@ public class RankingListServiceImpl implements RankingListService {
         demeterUserInfoExample.createCriteria()
                 .andUserCodeIn(receiverUids);
 
-        //	肖江		104615	智能平台研发部
-        List<DemeterUserInfo> demeterUserInfos = demeterUserInfoDao.selectByExample(demeterUserInfoExample);
-        //用户名       用户系统码    部门名      部门编码      总数
-        //username    usercode    deptname  deptcode      sumall
+            //	肖江		104615	智能平台研发部
+            List<DemeterUserInfo> demeterUserInfos = demeterUserInfoDao.selectByExample(demeterUserInfoExample);
+            //用户名       用户系统码    部门名      部门编码      总数
+            //username    usercode    deptname  deptcode      sumall
 
-        List<UserJoinDept> userJoinDepts = demeterUserInfos.stream().map((demeterUserInfo -> {
-            UserJoinDept userJoinDept = new UserJoinDept();
-            String userCode = demeterUserInfo.getUserCode();
-            userJoinDept.setReceiverUid(userCode);
-            userJoinDept.setEmpName(demeterUserInfo.getName());
-            userJoinDept.setDeptCode(demeterUserInfo.getDeptCode());
-            userJoinDept.setDeptName(demeterUserInfo.getDeptName());
-            //每个人认领地技能数量
-            if (groupReceiverUid.containsKey(demeterUserInfo.getUserCode())) {
-                userJoinDept.setSumAll(groupReceiverUid.get(userCode));
-            }
-            return userJoinDept;
-        })).collect(Collectors.toList());
-        //部门关联个人认领技能数量
-        /*
-         * deptname    skillpointsum
-         */
-        List<RankingInfo> deptRankingResp = userJoinDepts.stream()
-                .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
-                //按数量排序
-                .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
-                    return new RankingInfo(e.getKey(), e.getValue().toString());
-                }).collect(toList());
+            List<UserJoinDept> userJoinDepts = demeterUserInfos.stream().map((demeterUserInfo -> {
+                UserJoinDept userJoinDept = new UserJoinDept();
+                String userCode = demeterUserInfo.getUserCode();
+                userJoinDept.setReceiverUid(userCode);
+                userJoinDept.setEmpName(demeterUserInfo.getName());
+                userJoinDept.setDeptCode(demeterUserInfo.getDeptCode());
+                userJoinDept.setDeptName(demeterUserInfo.getDeptName());
+                //每个人认领地技能数量
+                if (groupReceiverUid.containsKey(demeterUserInfo.getUserCode())) {
+                    userJoinDept.setSumAll(groupReceiverUid.get(userCode));
+                }
+                return userJoinDept;
+            })).collect(Collectors.toList());
+            //部门关联个人认领技能数量
+            /*
+             * deptname    skillpointsum
+             */
+            List<RankingInfo> deptRankingResp = userJoinDepts.stream()
+                    .collect(groupingBy(UserJoinDept::getDeptName, summingLong(UserJoinDept::getSumAll)))
+                    //按数量排序
+                    .entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).map(e -> {
+                        return new RankingInfo(e.getKey(), e.getValue().toString());
+                    }).collect(toList());
+            return deptRankingResp;
+        }
 
-        return deptRankingResp;
+        return new ArrayList<>();
     }
 
 

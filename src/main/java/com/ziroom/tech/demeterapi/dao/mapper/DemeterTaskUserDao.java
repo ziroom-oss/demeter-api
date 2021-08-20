@@ -60,3 +60,4 @@ public interface DemeterTaskUserDao {
 
     public int updateByPrimaryKey(DemeterTaskUser record);
 }
+

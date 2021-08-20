@@ -271,9 +271,9 @@ public class SkillPointServiceImpl implements SkillPointService {
          */
         Map<String, List<DemeterRole>> roleMap =
                 roleService.queryRoleByUid(Lists.newArrayList(OperatorContext.getOperator()));
-        if (roleMap.size() < 1) {
-            return PageListResp.emptyList();
-        }
+//        if (roleMap.size() < 1) {
+//            return PageListResp.emptyList();
+//        }
 
         demeterTaskUsers.forEach(taskUser -> {
             ReceiveQueryResp resp = new ReceiveQueryResp();

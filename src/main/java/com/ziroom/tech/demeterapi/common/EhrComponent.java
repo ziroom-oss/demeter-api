@@ -13,6 +13,7 @@ import com.ziroom.tech.demeterapi.config.RecordLogger;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrOrgListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.*;
+import com.ziroom.tech.demeterapi.po.dto.resp.rankings.DeptRankingResp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -157,7 +158,8 @@ public class EhrComponent {
      * @return
      */
     public List<EhrDeptResp> getDeptsInfoByUid(List<String> receiverUids){
-
+        //获取部门列表
+        //ehrEndPoint.getOrgList();
         return null;
     }
 
@@ -189,12 +191,8 @@ public class EhrComponent {
         }).orElseGet(Sets::newHashSet);
     }
 
-    //    public UserDetailResp getUserDetailBysimple(String query){
-//        UserDetailResp userDetailResp = new UserDetailResp();
-//        Call<JSONObject> response = ehrApiEndPoint.getUserDetailBySimple(query);
-//
-//
-//    }
+
+
     /**
      * 模糊查询用户
      *

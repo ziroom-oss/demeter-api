@@ -26,6 +26,6 @@ public interface FlinkAnalysisService {
 
     List<RankingResp> getAllIndividualProjectIndiactorInfo(RankingReq rankingReq);
 
-//    List<RankingResp> getAlldeptProjectIndiactorInfo(RankingReq rankingReq);
+    List<RankingResp> getDeptProjectIndiactorInfo(RankingReq rankingReq);
 
 }

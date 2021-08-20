@@ -5,14 +5,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 @Data
 @ApiModel("排名列表")
 public class InfoRanking implements Serializable {
 
-    @ApiModelProperty("姓名")
+    @ApiModelProperty("名称")
     private String uid;
+    private String departmentName;
     @ApiModelProperty("数量")
     private String count;
 

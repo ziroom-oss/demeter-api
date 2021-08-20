@@ -700,6 +700,7 @@ public class TaskServiceImpl implements TaskService {
                     resp.setTaskType(TaskType.SKILL.getCode());
                     resp.setTaskTypeName(TaskType.SKILL.getDesc());
                     resp.setTaskReward(skill.getSkillReward());
+                    resp.setCreateTime(taskUser.getCreateTime());
 
 
                     // 从 taskUserExtend 表查询学习清单编号，获得学习清单实例从而查出 assigner 的身份
@@ -722,15 +723,14 @@ public class TaskServiceImpl implements TaskService {
                                 resp.setAssignerName(userDetailResp.getUserName());
                             }
                         }
-
-                        resp.setReceiver(taskUser.getReceiverUid());
-                        resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
-                        resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
-                        resp.setTaskFlowStatus(taskUser.getTaskStatus());
-                        resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
-                        respList.add(resp);
                     }
 
+                    resp.setReceiver(taskUser.getReceiverUid());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
+                    resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                    resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                    resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                    respList.add(resp);
                     break;
                 case ASSIGN:
                     DemeterAssignTask assign = assignTaskMap.get(taskId);

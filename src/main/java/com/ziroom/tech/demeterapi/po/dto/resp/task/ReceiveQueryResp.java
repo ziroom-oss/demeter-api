@@ -12,6 +12,8 @@ public class ReceiveQueryResp {
 
     private Long id;
 
+    private Long taskUserId;
+
     private String taskNo;
 
     private String taskName;

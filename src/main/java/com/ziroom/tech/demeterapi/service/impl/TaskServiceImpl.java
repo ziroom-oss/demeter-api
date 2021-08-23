@@ -1331,7 +1331,7 @@ public class TaskServiceImpl implements TaskService {
                 return Resp.error();
             }
             try {
-                this.acceptSkillTask(id);
+                this.acceptSkillTask(id, SkillTaskFlowStatus.ONGOING.getCode());
             } catch (BusinessException exception) {
                 log.error(exception.getMessage());
                 return Resp.error(exception.getMessage());
@@ -1369,7 +1369,7 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
-    private void createTaskOutcome(Long id, Integer type) {
+    public void createTaskOutcome(Long id, Integer type) {
         TaskFinishOutcome taskFinishOutcome = TaskFinishOutcome.builder()
                 .createId(OperatorContext.getOperator())
                 .createTime(new Date())
@@ -1410,7 +1410,7 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    private void acceptSkillTask(Long taskId) {
+    public void acceptSkillTask(Long taskId, Integer status) {
         // 技能类任务无法指派，所以如果DemeterTaskUser有了任务分配记录，说明该任务已被接收。
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
         demeterTaskUserExample.createCriteria()
@@ -1433,7 +1433,7 @@ public class TaskServiceImpl implements TaskService {
                 .modifyTime(new Date())
                 .createTime(new Date())
                 .modifyId(OperatorContext.getOperator())
-                .taskStatus(SkillTaskFlowStatus.ONGOING.getCode())
+                .taskStatus(status)
                 .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
                 .createId(OperatorContext.getOperator())
                 .taskType(TaskType.SKILL.getCode())
@@ -2138,7 +2138,7 @@ public class TaskServiceImpl implements TaskService {
      * 检查技能任务是否禁用
      * @param id id
      */
-    private void checkSkillForbidden(Long id) {
+    public void checkSkillForbidden(Long id) {
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
         if (demeterSkillTask.getTaskStatus().equals(SkillTaskStatus.FORBIDDEN.getCode())) {
             throw new BusinessException("技能任务：" + demeterSkillTask.getTaskName() + " 已被发布者禁用，无法继续操作");

@@ -45,4 +45,11 @@ public interface SkillPointService {
      * @return
      */
     PageListResp<ReceiveQueryResp> getSkillPointsCheckList(CheckSkillReq checkSkillReq);
+
+    /**
+     * 快速认证
+     * @param id
+     * @return
+     */
+    Resp<Object> quickAuthReq(Long id);
 }

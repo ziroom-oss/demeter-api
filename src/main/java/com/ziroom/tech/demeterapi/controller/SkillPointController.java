@@ -7,6 +7,7 @@ import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.CheckSkillReq;
+import com.ziroom.tech.demeterapi.po.dto.req.skill.QuickAuthReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiveQueryResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
@@ -83,5 +84,11 @@ public class SkillPointController {
     @PostMapping("/batchQuery")
     public Resp<List<DemeterTaskUser>> batchQuerySkillPoints(@RequestBody BatchQueryReq batchQueryReq) {
         return Resp.success(skillPointService.batchQuerySkillPoints(batchQueryReq));
+    }
+
+    @PostMapping("/q/a")
+    public Resp qa(@RequestBody QuickAuthReq quickAuthReq) {
+        skillPointService.quickAuthReq(quickAuthReq.getId());
+        return Resp.success();
     }
 }

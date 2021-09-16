@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 // 声明需要被私有云登陆拦截的 url
                 .antMatchers("/**/*")
-                .authenticated();
+                .permitAll();
 
         http.authenticationProvider(zCloudSSOAuthenticationProvider())
                 .csrf().disable()

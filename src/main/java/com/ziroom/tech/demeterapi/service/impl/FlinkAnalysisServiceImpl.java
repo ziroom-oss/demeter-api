@@ -1149,8 +1149,6 @@ public class FlinkAnalysisServiceImpl implements FlinkAnalysisService {
         return projectIndiactorInfos;
     }
 
-
-    //
     // 部門
     @Override
     public List<RankingResp> getDeptProjectIndiactorInfo(RankingReq rankingReq) {

@@ -89,11 +89,19 @@
         </if>
     </select>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        SELECT 
+        SELECT
         <include refid="Base_Column_List"/>
         FROM demeter_core_data
         WHERE id = #{id,jdbcType=BIGINT}
     </select>
+
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM demeter_core_data
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM demeter_core_data
         WHERE id = #{id,jdbcType=BIGINT}
@@ -102,9 +110,9 @@
         <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO demeter_core_data (core_name, core_data, core_type, department_code, create_user, create_time, update_time, 
+        INSERT INTO demeter_core_data (core_name, core_data, core_type, department_code, create_user, create_time, update_time,
             core_sys_name)
-        VALUES (#{coreName,jdbcType=VARCHAR}, #{coreData,jdbcType=VARCHAR}, #{coreType,jdbcType=VARCHAR}, #{departmentCode,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+        VALUES (#{coreName,jdbcType=VARCHAR}, #{coreData,jdbcType=VARCHAR}, #{coreType,jdbcType=VARCHAR}, #{departmentCode,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
             #{coreSysName,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData">

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -59,137 +58,176 @@ public class MonthReportServiceImpl implements MonthReportService {
     }
 
     //获取筛选条件下所有系统数据 可存缓存
-    private List<DemeterCoreData> getAllSysData(DemeterCoreDataReq demeterCoreDataReq){
+    private List<DemeterCoreData> getAllSysData(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq){
 
         DemeterCoreDataReq coreDataReq = this.handleDataFilter(demeterCoreDataReq);
         DemeterCoreDataExample demeterCoreDataExample = new DemeterCoreDataExample();
         demeterCoreDataExample.createCriteria()
                 .andCoreTypeEqualTo("1")
                 .andDepartmentCodeEqualTo(coreDataReq.getDepartmentCode())
+                .andCoreNameEqualTo(coreNameReq)
                 .andCreateTimeBetween(DateUtil.parse(coreDataReq.getCreateTimeStart()), DateUtil.parse(coreDataReq.getCreateTimeEnd()));
         List<DemeterCoreData> demeterCoreDatas = demeterCoreDataDao.selectByExample(demeterCoreDataExample);
         return demeterCoreDatas;
     }
 
     //获取筛选条件下所有非系统数据 可存缓存
-    private List<DemeterCoreData> getAllUnSysData(DemeterCoreDataReq demeterCoreDataReq){
+    private List<DemeterCoreData> getAllUnSysData(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq){
         DemeterCoreDataReq coreDataReq = this.handleDataFilter(demeterCoreDataReq);
         DemeterCoreDataExample demeterCoreDataExample = new DemeterCoreDataExample();
         demeterCoreDataExample.createCriteria()
                 .andCoreTypeNotEqualTo("1")
                 .andDepartmentCodeEqualTo(coreDataReq.getDepartmentCode())
+                .andCoreNameEqualTo(coreNameReq)
                 .andCreateTimeBetween(DateUtil.parse(coreDataReq.getCreateTimeStart()), DateUtil.parse(coreDataReq.getCreateTimeEnd()));
         List<DemeterCoreData> demeterCoreDatas = demeterCoreDataDao.selectByExample(demeterCoreDataExample);
         return demeterCoreDatas;
     }
 
-    //处理逻辑相似
-    private Map<String, DemeterCoreDataResp> assembData(DemeterCoreDataReq demeterCoreDataReq, List<DemeterCoreData> coreDataList){
+    //环比筛选
+    private DemeterCoreData getHbData(String departCode, String coreNameReq, DateTime hbDateTime, String coreType){
 
-        Map<String, DemeterCoreDataResp> assembDataMap = new HashMap<>();
+        DateTime hbDateBegain = DateUtil.beginOfMonth(hbDateTime);
+        DateTime hbDateEnd = DateUtil.endOfMonth(hbDateTime);
+
+        DemeterCoreDataExample demeterCoreDataExample = new DemeterCoreDataExample();
+        demeterCoreDataExample.createCriteria()
+                .andCoreTypeEqualTo(coreType)
+                .andDepartmentCodeEqualTo(departCode)
+                .andCoreNameEqualTo(coreNameReq)
+                .andCreateTimeBetween(hbDateBegain, hbDateEnd);
+        List<DemeterCoreData> demeterCoreDatas = demeterCoreDataDao.selectByExample(demeterCoreDataExample);
+
+        return demeterCoreDatas.size() <= 0 ? null : demeterCoreDatas.get(0);
+    }
+
+    //处理逻辑相似
+    private DemeterCoreDataResp assembData(DemeterCoreDataReq demeterCoreDataReq, List<DemeterCoreData> coreDataList, DemeterCoreData hbCoreData){
+
         //同比时间
         DateTime tbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -1);
-        //环比时间
-        DateTime hbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -12);
-        //SLA  、、、 2021 01   慢sql数量  、、、 2021 01
-        //SLA  、、、 2021 02   慢sql数量  、、、 2021 02
-        //SLA  、、、 2021 03   慢sql数量  、、、 2021 03
+
+        //SLA  、、、 2021 01
+        //SLA  、、、 2021 02
+        //SLA  、、、 2021 03
         //SLA  、、、 2021 04
-        //SLA  、、、 2021 05   慢sql数量  、、、 2021 03
-        Map<String, List<DemeterCoreData>> demeterCoreMap = coreDataList.stream().collect(groupingBy(DemeterCoreData::getCoreName));
+        //SLA  、、、 2021 05
+        //Map<String, List<DemeterCoreData>> demeterCoreMap = coreDataList.stream().collect(groupingBy(DemeterCoreData::getCoreName));
         //coreNameStr为名称
-        demeterCoreMap.forEach((coreNameStr, demeterCoreDatas) -> {
-            DemeterCoreDataResp coreDataResp = new DemeterCoreDataResp();
-            List<String> foldLine = new ArrayList<>();
+      //  demeterCoreMap.forEach((coreNameStr, demeterCoreDatas) -> {
+        DemeterCoreDataResp coreDataResp = new DemeterCoreDataResp();
 
-            BigDecimal tbData = new BigDecimal(0);
-            BigDecimal hbData = new BigDecimal(0);
-            BigDecimal curData = new BigDecimal(0);
-
-            demeterCoreDatas.stream().forEach(demeterCoreData -> {
+        String tbDateTimeStr = DateUtil.format(tbDateTime, "yyyy-MM");
+       // String hbDateTimeStr = DateUtil.format(hbCoreData.getCreateTime(), "yyyy-MM");
+        String curCreateStr = DateUtil.format(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), "yyyy-MM");
+        List<String> foldLine = new ArrayList<>();
+        coreDataList.stream().forEach(demeterCoreData -> {
 
                 String createTimeStr = DateUtil.format(demeterCoreData.getCreateTime(), "yyyy-MM");
-                String tbDateTimeStr = DateUtil.format(tbDateTime, "yyyy-MM");
-                String hbDateTimeStr = DateUtil.format(hbDateTime, "yyyy-MM");
-                String curCreateStr = DateUtil.format(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), "yyyy-MM");
+                BigDecimal coreData = demeterCoreData.getCoreData();
 
                 if (createTimeStr.equals(tbDateTimeStr)){// tbDateTime 同比时间
                     coreDataResp.setDemeterCoreDataLastMonth(demeterCoreData);
-                    tbData.add(demeterCoreData.getCoreData());
+                    coreDataResp.setTb(coreData);
+
                 }
-                if (createTimeStr.equals(hbDateTimeStr)){// hbDateTime 环比时间
-                    coreDataResp.setDemeterCoreDataLastYear(demeterCoreData);
-                    hbData.add(demeterCoreData.getCoreData());
-                }
+
                 if (createTimeStr.equals(curCreateStr)){//当前时间
                     coreDataResp.setDemeterCoreDataCurrent(demeterCoreData);
-                    curData.add(demeterCoreData.getCoreData());
+                    coreDataResp.setCur(coreData);
                 }
 
                 foldLine.add(demeterCoreData.getCoreData().toString());
             });
 
-          if (tbData.intValue() != 0){
+          if (coreDataResp.getTb() != null && coreDataResp.getTb().compareTo(BigDecimal.ZERO)!=0){
               //设置同比数据
-              BigDecimal tbRate = (curData.subtract(tbData)).divide(tbData, 5, BigDecimal.ROUND_UP);
-              coreDataResp.setTbRate(String.valueOf(tbRate.intValue()));
+              BigDecimal tbRate = (coreDataResp.getCur().subtract(coreDataResp.getTb())).divide(coreDataResp.getTb(), 5, BigDecimal.ROUND_UP);
+              coreDataResp.setTbRate(String.valueOf(tbRate));
           } else {
               coreDataResp.setTbRate("0");
           }
-            if(hbData.intValue() != 0){
+
+        if (hbCoreData != null) {
+            coreDataResp.setHb(hbCoreData.getCoreData());
+            if(coreDataResp.getHb() != null && coreDataResp.getHb().compareTo(BigDecimal.ZERO)!=0){
                 //设置环比数据
-                BigDecimal hbRate = (curData.subtract(hbData)).divide(hbData, 5, BigDecimal.ROUND_UP);
-                coreDataResp.setTbRate(String.valueOf(hbRate.intValue()));
+                BigDecimal hbRate = (coreDataResp.getCur().subtract(coreDataResp.getHb())).divide(coreDataResp.getHb(), 5, BigDecimal.ROUND_UP);
+                coreDataResp.setHbRate(String.valueOf(hbRate));
             } else {
                 coreDataResp.setHbRate("0");
             }
+            coreDataResp.setDemeterCoreDataLastYear(hbCoreData);
+        } else {
+            coreDataResp.setHbRate("0");
+            coreDataResp.setDemeterCoreDataLastYear(new DemeterCoreData());
+        }
             //设置曲线集合
-            coreDataResp.setFoldLine(foldLine);
+        coreDataResp.setFoldLine(foldLine);
 
-            assembDataMap.put(coreNameStr,coreDataResp);
-        });
-        return assembDataMap;
+
+   //     });
+        return coreDataResp;
     }
 
 
     @Override
-    public Map<String, DemeterCoreDataResp> getSLA(DemeterCoreDataReq demeterCoreDataReq) {
+    public DemeterCoreDataResp getSLA(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq) {
+        //环比时间
+        DateTime hbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -12);
+
         //所有筛选条件下的内部数据
-        //1月|2月|3月|4月|5月 同比环比通用
-        List<DemeterCoreData> allSysData = this.getAllSysData(demeterCoreDataReq);
-
-        Map<String, DemeterCoreDataResp> demeterCoreDataRespMap = assembData(demeterCoreDataReq, allSysData);
-        return demeterCoreDataRespMap;
+        //1月|2月|3月|4月|5月 同比
+        List<DemeterCoreData> allSysData = this.getAllSysData(demeterCoreDataReq, coreNameReq);
+        //环比时间
+        DemeterCoreData hbDemeterCoreData = this.getHbData(demeterCoreDataReq.getDepartmentCode(), coreNameReq, hbDateTime, "1");
+        DemeterCoreDataResp demeterCoreDataResp = assembData(demeterCoreDataReq, allSysData, hbDemeterCoreData);
+        return demeterCoreDataResp;
     }
 
     @Override
-    public Map<String, DemeterCoreDataResp> getBusSupport(DemeterCoreDataReq demeterCoreDataReq) {
+    public DemeterCoreDataResp getBusSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq) {
+        //环比时间
+        DateTime hbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -12);
+
         //业务支持
-        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq).stream().filter(demeterCoreData -> {
+        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq, coreNameReq).stream().filter(demeterCoreData -> {
             return demeterCoreData.getCoreType().equals("2");
         }).collect(Collectors.toList());
-        Map<String, DemeterCoreDataResp> demeterCoreDataRespMap = assembData(demeterCoreDataReq, coreDataList);
-        return demeterCoreDataRespMap;
+        DemeterCoreData hbDemeterCoreData = this.getHbData(demeterCoreDataReq.getDepartmentCode(), coreNameReq, hbDateTime, "2");
+        DemeterCoreDataResp demeterCoreDataResp = assembData(demeterCoreDataReq, coreDataList, hbDemeterCoreData);
+        demeterCoreDataResp.setDemeterCoreDataLastYear(hbDemeterCoreData);
+        return demeterCoreDataResp;
     }
 
     @Override
-    public Map<String, DemeterCoreDataResp> getDevEffiToll(DemeterCoreDataReq demeterCoreDataReq) {
+    public DemeterCoreDataResp getDevEffiToll(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq) {
+        //环比时间
+        DateTime hbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -12);
+
         //开发效能工具
-        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq).stream().filter(demeterCoreData -> {
+        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq, coreNameReq).stream().filter(demeterCoreData -> {
             return demeterCoreData.getCoreType().equals("3");
         }).collect(Collectors.toList());
-        Map<String, DemeterCoreDataResp> demeterCoreDataRespMap = assembData(demeterCoreDataReq, coreDataList);
-        return demeterCoreDataRespMap;
+        DemeterCoreData hbDemeterCoreData = this.getHbData(demeterCoreDataReq.getDepartmentCode(), coreNameReq, hbDateTime, "3");
+       DemeterCoreDataResp demeterCoreDataResp = assembData(demeterCoreDataReq, coreDataList, hbDemeterCoreData);
+        demeterCoreDataResp.setDemeterCoreDataLastYear(hbDemeterCoreData);
+        return demeterCoreDataResp;
     }
 
     @Override
-    public Map<String, DemeterCoreDataResp> getOapSupport(DemeterCoreDataReq demeterCoreDataReq) {
+    public DemeterCoreDataResp getOapSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq) {
+        //环比时间
+        DateTime hbDateTime = DateUtil.offsetMonth(DateUtil.parse(demeterCoreDataReq.getCreateTimeEnd()), -12);
+
         //运维支持数据
-        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq).stream().filter(demeterCoreData -> {
+        List<DemeterCoreData> coreDataList = this.getAllUnSysData(demeterCoreDataReq, coreNameReq).stream().filter(demeterCoreData -> {
             return demeterCoreData.getCoreType().equals("4");
         }).collect(Collectors.toList());
-        Map<String, DemeterCoreDataResp> demeterCoreDataRespMap = assembData(demeterCoreDataReq, coreDataList);
-        return demeterCoreDataRespMap;
+        DemeterCoreData hbDemeterCoreData = this.getHbData(demeterCoreDataReq.getDepartmentCode(), coreNameReq, hbDateTime, "4");
+        DemeterCoreDataResp demeterCoreDataResp = assembData(demeterCoreDataReq, coreDataList, hbDemeterCoreData);
+        demeterCoreDataResp.setDemeterCoreDataLastYear(hbDemeterCoreData);
+        return demeterCoreDataResp;
     }
 
 }

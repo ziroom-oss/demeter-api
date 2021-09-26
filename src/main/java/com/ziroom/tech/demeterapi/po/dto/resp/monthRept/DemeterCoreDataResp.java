@@ -4,19 +4,11 @@ import com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 public class DemeterCoreDataResp {
-
-    @ApiModelProperty(value = "当前数据")
-    private DemeterCoreData demeterCoreDataCurrent;
-
-    @ApiModelProperty(value = "同比数据")
-    private DemeterCoreData demeterCoreDataLastMonth;
-
-    @ApiModelProperty(value = "环比数据")
-    private DemeterCoreData demeterCoreDataLastYear;
 
     @ApiModelProperty(value = "同比率")
     private String tbRate;
@@ -24,8 +16,30 @@ public class DemeterCoreDataResp {
     @ApiModelProperty(value = "环比率")
     private String hbRate;
 
+
+    @ApiModelProperty(value = "同比")
+    private BigDecimal tb;
+
+    @ApiModelProperty(value = "环比")
+    private BigDecimal hb;
+
+    @ApiModelProperty(value = "当前")
+    private BigDecimal cur;
+
+
     @ApiModelProperty(value = "曲线提供的数据")
     private List<String> foldLine;
+
+    @ApiModelProperty(value = "当前数据")
+    private DemeterCoreData demeterCoreDataCurrent;
+
+
+    @ApiModelProperty(value = "同比数据")
+    private DemeterCoreData demeterCoreDataLastMonth;
+
+
+    @ApiModelProperty(value = "环比数据")
+    private DemeterCoreData demeterCoreDataLastYear;
 
     public DemeterCoreDataResp() {
 

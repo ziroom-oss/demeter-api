@@ -2,6 +2,7 @@ package com.ziroom.tech.demeterapi.utils;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -72,4 +73,16 @@ public class DateUtils {
 
     public static BiFunction<LocalDate, LocalDateTime, Stream<String>> QUARTERLYS_STREAM_BETWEEN_GIVEN = (begin, end) -> Stream.iterate(begin, d -> d.plus(1, QUARTER_YEARS))
             .limit(IsoFields.QUARTER_YEARS.between(begin, end)).map(GROUP_BY_QUARTERLY);
+
+
+    public static Date stringToDate(String strTime, String formatType) {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatType);
+        Date date = null;
+        try {
+            date = formatter.parse(strTime);
+        } catch (Exception e) {
+        }
+
+        return date;
+    }
 }

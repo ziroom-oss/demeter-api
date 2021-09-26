@@ -5,7 +5,7 @@
     <resultMap id="BaseResultMap" type="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="core_name" property="coreName" jdbcType="VARCHAR"/>
-        <result column="core_data" property="coreData" jdbcType="VARCHAR"/>
+        <result column="core_data" property="coreData" jdbcType="DECIMAL"/>
         <result column="core_type" property="coreType" jdbcType="VARCHAR"/>
         <result column="department_code" property="departmentCode" jdbcType="VARCHAR"/>
         <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
@@ -94,14 +94,6 @@
         FROM demeter_core_data
         WHERE id = #{id,jdbcType=BIGINT}
     </select>
-
-    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM demeter_core_data
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         DELETE FROM demeter_core_data
         WHERE id = #{id,jdbcType=BIGINT}
@@ -112,7 +104,7 @@
         </selectKey>
         INSERT INTO demeter_core_data (core_name, core_data, core_type, department_code, create_user, create_time, update_time,
             core_sys_name)
-        VALUES (#{coreName,jdbcType=VARCHAR}, #{coreData,jdbcType=VARCHAR}, #{coreType,jdbcType=VARCHAR}, #{departmentCode,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        VALUES (#{coreName,jdbcType=VARCHAR}, #{coreData,jdbcType=DECIMAL}, #{coreType,jdbcType=VARCHAR}, #{departmentCode,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
             #{coreSysName,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData">
@@ -151,7 +143,7 @@
                 #{coreName,jdbcType=VARCHAR},
             </if>
             <if test="coreData != null">
-                #{coreData,jdbcType=VARCHAR},
+                #{coreData,jdbcType=DECIMAL},
             </if>
             <if test="coreType != null">
                 #{coreType,jdbcType=VARCHAR},
@@ -173,12 +165,12 @@
             </if>
         </trim>
     </insert>
-    <SELECT id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreDataExample" resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreDataExample" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM demeter_core_data
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
-    </SELECT>
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         UPDATE demeter_core_data
         <set>
@@ -189,7 +181,7 @@
                 core_name = #{record.coreName,jdbcType=VARCHAR},
             </if>
             <if test="record.coreData != null">
-                core_data = #{record.coreData,jdbcType=VARCHAR},
+                core_data = #{record.coreData,jdbcType=DECIMAL},
             </if>
             <if test="record.coreType != null">
                 core_type = #{record.coreType,jdbcType=VARCHAR},
@@ -218,7 +210,7 @@
         UPDATE demeter_core_data
         SET id = #{record.id,jdbcType=BIGINT},
             core_name = #{record.coreName,jdbcType=VARCHAR},
-            core_data = #{record.coreData,jdbcType=VARCHAR},
+            core_data = #{record.coreData,jdbcType=DECIMAL},
             core_type = #{record.coreType,jdbcType=VARCHAR},
             department_code = #{record.departmentCode,jdbcType=VARCHAR},
             create_user = #{record.createUser,jdbcType=VARCHAR},
@@ -236,7 +228,7 @@
                 core_name = #{coreName,jdbcType=VARCHAR},
             </if>
             <if test="coreData != null">
-                core_data = #{coreData,jdbcType=VARCHAR},
+                core_data = #{coreData,jdbcType=DECIMAL},
             </if>
             <if test="coreType != null">
                 core_type = #{coreType,jdbcType=VARCHAR},
@@ -262,7 +254,7 @@
     <update id="updateByPrimaryKey" parameterType="com.ziroom.tech.demeterapi.dao.entity.DemeterCoreData">
         UPDATE demeter_core_data
         SET core_name = #{coreName,jdbcType=VARCHAR},
-            core_data = #{coreData,jdbcType=VARCHAR},
+            core_data = #{coreData,jdbcType=DECIMAL},
             core_type = #{coreType,jdbcType=VARCHAR},
             department_code = #{departmentCode,jdbcType=VARCHAR},
             create_user = #{createUser,jdbcType=VARCHAR},

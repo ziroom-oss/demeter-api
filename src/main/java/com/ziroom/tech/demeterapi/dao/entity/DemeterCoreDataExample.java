@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -293,62 +294,52 @@ protected abstract static class GeneratedCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataEqualTo(String value) {
+        public Criteria andCoreDataEqualTo(BigDecimal value) {
             addCriterion("core_data =", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataNotEqualTo(String value) {
+        public Criteria andCoreDataNotEqualTo(BigDecimal value) {
             addCriterion("core_data <>", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataGreaterThan(String value) {
+        public Criteria andCoreDataGreaterThan(BigDecimal value) {
             addCriterion("core_data >", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataGreaterThanOrEqualTo(String value) {
+        public Criteria andCoreDataGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("core_data >=", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataLessThan(String value) {
+        public Criteria andCoreDataLessThan(BigDecimal value) {
             addCriterion("core_data <", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataLessThanOrEqualTo(String value) {
+        public Criteria andCoreDataLessThanOrEqualTo(BigDecimal value) {
             addCriterion("core_data <=", value, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataLike(String value) {
-            addCriterion("core_data like", value, "coreData");
-            return (Criteria) this;
-        }
-
-        public Criteria andCoreDataNotLike(String value) {
-            addCriterion("core_data not like", value, "coreData");
-            return (Criteria) this;
-        }
-
-        public Criteria andCoreDataIn(List<String> values) {
+        public Criteria andCoreDataIn(List<BigDecimal> values) {
             addCriterion("core_data in", values, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataNotIn(List<String> values) {
+        public Criteria andCoreDataNotIn(List<BigDecimal> values) {
             addCriterion("core_data not in", values, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataBetween(String value1, String value2) {
+        public Criteria andCoreDataBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("core_data between", value1, value2, "coreData");
             return (Criteria) this;
         }
 
-        public Criteria andCoreDataNotBetween(String value1, String value2) {
+        public Criteria andCoreDataNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("core_data not between", value1, value2, "coreData");
             return (Criteria) this;
         }

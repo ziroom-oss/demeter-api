@@ -1,5 +1,6 @@
 package com.ziroom.tech.demeterapi.dao.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -31,7 +32,7 @@ public class DemeterCoreData {
 
     private String coreName;
 
-    private String coreData;
+    private BigDecimal coreData;
 
     private String coreType;
 
@@ -61,11 +62,11 @@ public class DemeterCoreData {
         this.coreName = coreName;
     }
 
-    public String getCoreData() {
+    public BigDecimal getCoreData() {
         return coreData;
     }
 
-    public void setCoreData(String coreData) {
+    public void setCoreData(BigDecimal coreData) {
         this.coreData = coreData;
     }
 

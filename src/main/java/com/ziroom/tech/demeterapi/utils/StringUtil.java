@@ -1,6 +1,5 @@
 package com.ziroom.tech.demeterapi.utils;
 
-import com.alibaba.nacos.api.utils.StringUtils;
 
 /**
  * @author lipp3

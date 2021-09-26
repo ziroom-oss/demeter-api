@@ -7,7 +7,6 @@ import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingInfo;
 import com.ziroom.tech.demeterapi.po.dto.resp.rankings.RankingResp;
 import com.ziroom.tech.demeterapi.service.FlinkAnalysisService;
 import com.ziroom.tech.demeterapi.service.RankingListService;
-import groovy.util.logging.Slf4j;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +21,6 @@ import java.util.List;
  * @author zhangxintong
  * 排行榜
  */
-@Slf4j
 @RestController
 @RequestMapping(value = "api/rankinglist")
 @LogHttpService

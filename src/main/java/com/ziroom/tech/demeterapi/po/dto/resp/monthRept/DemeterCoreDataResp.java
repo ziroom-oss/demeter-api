@@ -16,7 +16,6 @@ public class DemeterCoreDataResp {
     @ApiModelProperty(value = "环比率")
     private String hbRate;
 
-
     @ApiModelProperty(value = "同比")
     private BigDecimal tb;
 
@@ -25,7 +24,6 @@ public class DemeterCoreDataResp {
 
     @ApiModelProperty(value = "当前")
     private BigDecimal cur;
-
 
     @ApiModelProperty(value = "曲线提供的数据")
     private List<String> foldLine;

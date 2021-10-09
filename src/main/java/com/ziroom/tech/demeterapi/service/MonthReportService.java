@@ -9,15 +9,15 @@ import java.util.Map;
 public interface MonthReportService {
 
     //SLA
-    DemeterCoreDataResp getSLA(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
+    Map<String, DemeterCoreDataResp> getSLA(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
 
     //业务系统支持
-    DemeterCoreDataResp getBusSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
+    Map<String, DemeterCoreDataResp> getBusSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
 
     //开发效能
-    DemeterCoreDataResp getDevEffiToll(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
+    Map<String, DemeterCoreDataResp> getDevEffiToll(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
 
     //运维支持
-    DemeterCoreDataResp getOapSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
+    Map<String, DemeterCoreDataResp> getOapSupport(DemeterCoreDataReq demeterCoreDataReq, String coreNameReq);
 
 }

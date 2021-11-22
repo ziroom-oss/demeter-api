@@ -84,22 +84,13 @@ public class SkillPointServiceImpl implements SkillPointService {
     public Resp<Object> createSkillTask(SkillTaskReq skillTaskReq) {
         DemeterSkillTask entity = new DemeterSkillTask();
         BeanUtils.copyProperties(skillTaskReq, entity);
-        entity.setPublisher(OperatorContext.getOperator());
-        entity.setCreateId(OperatorContext.getOperator());
-        entity.setModifyId(OperatorContext.getOperator());
-        entity.setCreateTime(new Date());
-        entity.setUpdateTime(new Date());
+        entity.setPublisher(skillTaskReq.getPublisher());
+        entity.setCreateId(skillTaskReq.getPublisher());
+        entity.setModifyId(skillTaskReq.getPublisher());
         entity.setSkillId(skillTaskReq.getSkillTreeId());
         entity.setSkillLevel(skillTaskReq.getSkillLevel());
         entity.setCheckRole(skillTaskReq.getCheckRoles().stream().map(String::valueOf).collect(Collectors.joining(",")));
         List<String> taskFinishCondition = skillTaskReq.getTaskFinishCondition();
-        MultipartFile attachment = skillTaskReq.getAttachment();
-        if (Objects.nonNull(attachment)) {
-            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
-            entity.setAttachmentUrl(ziroomFile.getUrl());
-            entity.setAttachmentName(ziroomFile.getOriginal_filename());
-            entity.setAttachmentUuid(ziroomFile.getUuid());
-        }
         demeterSkillTaskDao.insertSelective(entity);
         if (CollectionUtils.isNotEmpty(taskFinishCondition)) {
             taskFinishCondition.forEach(condition -> {
@@ -107,11 +98,9 @@ public class SkillPointServiceImpl implements SkillPointService {
                     throw new BusinessException("任务条件内容不能为空");
                 }
                 TaskFinishCondition taskFinishEntity = TaskFinishCondition.builder()
-                        .modifyId(OperatorContext.getOperator())
-                        .createId(OperatorContext.getOperator())
+                        .modifyId(skillTaskReq.getPublisher())
+                        .createId(skillTaskReq.getPublisher())
                         .taskFinishContent(condition)
-                        .modifyTime(new Date())
-                        .createTime(new Date())
                         .taskType(TaskType.SKILL.getCode())
                         .taskId(entity.getId())
                         .build();
@@ -151,27 +140,10 @@ public class SkillPointServiceImpl implements SkillPointService {
         BeanUtils.copyProperties(skillTaskReq, entity);
         entity.setSkillId(skillTaskReq.getSkillTreeId());
         entity.setCheckRole(skillTaskReq.getCheckRoles().stream().map(String::valueOf).collect(Collectors.joining(",")));
-
-        DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(skillTaskReq.getId());
-
-        MultipartFile attachment = skillTaskReq.getAttachment();
-        if (Objects.nonNull(attachment)) {
-            // delete current file from ceph if exists
-            String attachmentUuid = demeterSkillTask.getAttachmentUuid();
-            if (Objects.nonNull(attachmentUuid)) {
-                storageComponent.deleteFile(attachmentUuid);
-            }
-
-            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
-            entity.setAttachmentUrl(ziroomFile.getUrl());
-            entity.setAttachmentName(ziroomFile.getOriginal_filename());
-            entity.setAttachmentUuid(ziroomFile.getUuid());
-        }
-        entity.setModifyId(OperatorContext.getOperator());
-        entity.setUpdateTime(new Date());
+        entity.setModifyId(skillTaskReq.getModifyId());
         demeterSkillTaskDao.updateByPrimaryKeySelective(entity);
         try {
-            updateTaskFinishCondition(skillTaskReq.getTaskFinishCondition(), skillTaskReq.getId(), TaskType.SKILL.getCode());
+            updateTaskFinishCondition(skillTaskReq.getModifyId(), skillTaskReq.getTaskFinishCondition(), skillTaskReq.getId(), TaskType.SKILL.getCode());
         } catch (BusinessException exception) {
             log.info("update task finish condition occur exception = {}", exception.getMessage());
             return Resp.error(exception.getMessage());
@@ -179,7 +151,7 @@ public class SkillPointServiceImpl implements SkillPointService {
         return Resp.success();
     }
 
-    private void updateTaskFinishCondition(List<String> newCondition, Long taskId, Integer taskType) {
+    private void updateTaskFinishCondition(String modfityId, List<String> newCondition, Long taskId, Integer taskType) {
         if (CollectionUtils.isNotEmpty(newCondition)) {
             // 原有任务完成条件全部删除
             TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
@@ -194,10 +166,8 @@ public class SkillPointServiceImpl implements SkillPointService {
                         .taskId(taskId)
                         .taskType(taskType)
                         .taskFinishContent(condition)
-                        .createTime(new Date())
-                        .modifyTime(new Date())
-                        .createId(OperatorContext.getOperator())
-                        .modifyId(OperatorContext.getOperator())
+                        .createId(modfityId)
+                        .modifyId(modfityId)
                         .build();
                 taskFinishConditionDao.insertSelective(entity);
             });

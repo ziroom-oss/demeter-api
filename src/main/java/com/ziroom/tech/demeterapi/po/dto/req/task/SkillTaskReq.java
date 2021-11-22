@@ -22,6 +22,16 @@ public class SkillTaskReq {
     @ApiModelProperty("主键")
     private Long id;
 
+    /**
+     * 任务发布者
+     */
+    private String publisher;
+
+    /**
+     * 任务修改人
+     */
+    private String modifyId;
+
     @ApiModelProperty("技能点名称")
     private String taskName;
 

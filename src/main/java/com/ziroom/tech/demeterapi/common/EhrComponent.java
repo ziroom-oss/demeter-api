@@ -109,7 +109,7 @@ public class EhrComponent {
     @RecordLogger
     @Cacheable(value = "caffeine", key = "#root.methodName + #root.args[0]")
     public List<EhrUserDetailResp> getEhrUserDetail(String uidString) {
-        log.info("EhrService.getEhrUserDetail params:{}", uidString);
+        log.info("OpenEhrService.getEhrUserDetail params:{}", uidString);
         List<String> strings = Arrays.asList(uidString.split(","));
         List<String> collect = strings.stream().map(this::addQuotationMark).collect(Collectors.toList());
         String userCodes = "[" +  String.join(",", collect) + "]";
@@ -118,7 +118,7 @@ public class EhrComponent {
         String failure = "failure";
         if (failure.equals(response.getString(STATUS_ATTRIBUTE))) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
-            log.error("EhrService.getEhrUserDetail has occurred error message: {}", errorMessage);
+            log.error("OpenEhrService.getEhrUserDetail has occurred error message: {}", errorMessage);
             return Lists.newArrayList();
         }
         JSONArray data = response.getJSONArray(DATA_ATTRIBUTE);
@@ -143,7 +143,7 @@ public class EhrComponent {
             ehrUserDetailResp.setJobCodeNew(ehrUser.getString("jobCodeNew"));
             userList.add(ehrUserDetailResp);
         }
-        log.info("EhrService.getEhrUserDetail request success result:{}", userList);
+        log.info("OpenEhrService.getEhrUserDetail request success result:{}", userList);
         return userList;
     }
 
@@ -267,7 +267,7 @@ public class EhrComponent {
         String success = "20000";
         if (!success.equals(response.getString(ERROR_CODE_ATTRIBUTE))) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
-            log.error("EhrService.getOrgList has occurred error message: {}", errorMessage);
+            log.error("OpenEhrService.getOrgList has occurred error message: {}", errorMessage);
             return Sets.newHashSet();
         }
         JSONArray data = response.getJSONArray(DATA_ATTRIBUTE);
@@ -280,7 +280,7 @@ public class EhrComponent {
             ehrDeptResp.setName(dept.getString("orgName"));
             deptSet.add(ehrDeptResp);
         }
-//        log.info("EhrService.getOrgList request success result:{}", deptSet);
+//        log.info("OpenEhrService.getOrgList request success result:{}", deptSet);
         return deptSet;
     }
 
@@ -323,7 +323,7 @@ public class EhrComponent {
         // 通过allOf方法实现异步执行后，同步搜集结果，这里没有超时控制
         CompletableFuture<Void> allFuture = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
         allFuture.thenApply(e -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList())).join();
-        log.info("EhrService.getAllThirdOrgList request success result:{}", result);
+        log.info("OpenEhrService.getAllThirdOrgList request success result:{}", result);
         return result;
     }
 
@@ -382,20 +382,20 @@ public class EhrComponent {
             setId = DEFAULT_SETID;
         }
         // 目前公司编码只支持总部Ta
-        log.info("EhrService.getOrgByCode params:{} {}", deptCode, setId);
+        log.info("OpenEhrService.getOrgByCode params:{} {}", deptCode, setId);
         Call<JSONObject> call = ehrEndPoint.getOrgByCode(deptCode, setId);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         String failure = "failure";
         if (failure.equals(response.getString(STATUS_ATTRIBUTE))) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
-            log.error("EhrService.getOrgByCode has occurred error message: {}", errorMessage);
+            log.error("OpenEhrService.getOrgByCode has occurred error message: {}", errorMessage);
             return null;
         }
         JSONObject data = response.getJSONObject(DATA_ATTRIBUTE);
         EhrDeptResp ehrDeptResp = new EhrDeptResp();
         ehrDeptResp.setName(data.getString("descrShort"));
         ehrDeptResp.setCode(data.getString("deptid"));
-        log.info("EhrService.getOrgByCode request success result:{}", ehrDeptResp);
+        log.info("OpenEhrService.getOrgByCode request success result:{}", ehrDeptResp);
         return ehrDeptResp;
     }
 
@@ -409,12 +409,12 @@ public class EhrComponent {
 //    @Cached(expire = 36000, cacheType = CacheType.BOTH)
     @RecordLogger
     public Set<EhrDeptResp> getChildOrgs(String parentId, String setId) {
-        log.info("EhrService.getChildOrgs params:{} {}", parentId, setId);
+        log.info("OpenEhrService.getChildOrgs params:{} {}", parentId, setId);
         Call<JSONObject> call = ehrEndPoint.getChildOrgs(parentId, setId);
         JSONObject response = RetrofitCallAdaptor.execute(call);
         if (response.getInteger(ERROR_CODE_ATTRIBUTE) != 0) {
             String errorMessage = response.getString(ERROR_MESSAGE_ATTRIBUTE);
-            log.error("EhrService.getChildOrgs has occurred error message: {}", errorMessage);
+            log.error("OpenEhrService.getChildOrgs has occurred error message: {}", errorMessage);
             return Sets.newHashSet();
         }
         JSONArray data = response.getJSONArray(DATA_ATTRIBUTE);
@@ -427,7 +427,7 @@ public class EhrComponent {
             ehrDeptResp.setName(dept.getString("name"));
             deptSet.add(ehrDeptResp);
         }
-        log.info("EhrService.getChildOrgs request success result:{}", deptSet);
+        log.info("OpenEhrService.getChildOrgs request success result:{}", deptSet);
         return deptSet;
     }
 
@@ -440,7 +440,7 @@ public class EhrComponent {
      * 传入的deptCodeList为空或者size为0，直接返回空集合
      */
     public Map<String, EhrDeptResp> getOrgByCodeList(List<String> deptCodeList, String setId) {
-        log.info("EhrService.getOrgByCodeList params:{} {}", deptCodeList, setId);
+        log.info("OpenEhrService.getOrgByCodeList params:{} {}", deptCodeList, setId);
         Map<String, EhrDeptResp> ehrDeptRespMap = new HashMap<>(deptCodeList.size());
         // 传入的deptCodeList为空或者size为0，直接返回空集合
         if (org.springframework.util.CollectionUtils.isEmpty(deptCodeList)) {
@@ -461,7 +461,7 @@ public class EhrComponent {
         // 通过allOf方法实现异步执行后，同步搜集结果，这里没有超时控制
         CompletableFuture<Void> allFuture = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
         allFuture.thenApply(e -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList())).join();
-        log.info("EhrService.getOrgByCodeList request success result:{}", ehrDeptRespMap);
+        log.info("OpenEhrService.getOrgByCodeList request success result:{}", ehrDeptRespMap);
         return ehrDeptRespMap;
     }
 

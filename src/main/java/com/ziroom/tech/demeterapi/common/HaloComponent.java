@@ -2,30 +2,21 @@ package com.ziroom.tech.demeterapi.common;
 
 import com.ziroom.tech.demeterapi.po.dto.req.halo.AuthReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
-import com.ziroom.tech.model.PermissionInfo;
-import com.ziroom.tech.model.UserUnfoldPermInfo;
-import com.ziroom.tech.service.HaloPermissionLoadService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 /**
- * halo
- *
- * @author huangqiaowei
- * @date 2021-02-02 11:00
+ * 权限管理
+ * 此处需要替换为自己的权限中心
+ * 根据情况分配权限 demeter-super-admin 为管理员权限 demeter-dept-admin为部门leader权限
+ * @author xuzeyu
  **/
 @Component
 @Slf4j
 public class HaloComponent {
 
-    @Resource
-    private HaloPermissionLoadService haloPermissionLoadService;
+    private List<String> managerList = Arrays.asList("60028724","60010370");
 
     /**
      * @param authReq
@@ -33,30 +24,8 @@ public class HaloComponent {
      */
     public AuthResp auth(AuthReq authReq) {
         AuthResp authResp = new AuthResp();
-        UserUnfoldPermInfo userUnfoldPermInfo = haloPermissionLoadService.getUserUnfoldPermInfo(authReq.getUserCode()
-                , authReq.getAppId());
-        List<PermissionInfo> permissionInfos = userUnfoldPermInfo.getPermissionInfos();
-        // 深度优先遍历
-        if (CollectionUtils.isNotEmpty(permissionInfos)) {
-            Stack<PermissionInfo> stack = new Stack<>();
-            permissionInfos.forEach(permissionInfo -> {
-                stack.push(permissionInfo);
-                while (!stack.empty()) {
-                    PermissionInfo pop = stack.pop();
-                    // 0 菜单 1 功能
-                    if (Objects.equals(pop.getType(), 0)) {
-                        authResp.getMenulist().add(pop.getUrl());
-                    } else {
-                        authResp.getFunctions().put(pop.getUrl(), "1");
-                    }
-                    if (CollectionUtils.isNotEmpty(pop.getChildrenList())) {
-                        pop.getChildrenList().forEach(stack::push);
-                    }
-                }
-            });
-        }
-        if (CollectionUtils.isNotEmpty(userUnfoldPermInfo.getRoles())) {
-            authResp.getRoles().addAll(userUnfoldPermInfo.getRoles());
+        if(managerList.contains(authReq.getUserCode())){
+            authResp.getRoles().addAll(Collections.singletonList("demeter-super-admin"));
         }
         return authResp;
     }

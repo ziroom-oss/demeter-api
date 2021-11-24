@@ -247,13 +247,6 @@ public interface TaskService {
      */
     Resp<Object> finishTaskCondition(Long conditionInfoId);
 
-    // TODO: 2021/5/6  test
-    /**
-     * 上传附件
-     * @param file 文件
-     * @return Resp
-     */
-    Resp<Object> uploadAttachment(MultipartFile file, Long taskId, Integer taskType);
 
     /**
      * 上传学习成果

@@ -2,46 +2,39 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.ziroom.tech.demeterapi.common.EhrComponent;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.PageListResp;
-import com.ziroom.tech.demeterapi.common.StorageComponent;
-import com.ziroom.tech.demeterapi.common.enums.CheckoutResult;
+import com.ziroom.tech.demeterapi.common.UserParamThreadLocal;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskConditionStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskIdPrefix;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.dao.entity.*;
-import com.ziroom.tech.demeterapi.dao.mapper.DemeterRoleDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
-import com.ziroom.tech.demeterapi.dao.mapper.RoleUserDao;
 import com.ziroom.tech.demeterapi.dao.mapper.TaskFinishConditionDao;
 import com.ziroom.tech.demeterapi.dao.mapper.TaskFinishConditionInfoDao;
 import com.ziroom.tech.demeterapi.dao.mapper.TaskFinishOutcomeDao;
+import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
+import com.ziroom.tech.demeterapi.open.model.ModelResult;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.CheckSkillReq;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiveQueryResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
-import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.SkillPointService;
-import com.ziroom.tech.demeterapi.service.TaskService;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,30 +46,29 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SkillPointServiceImpl implements SkillPointService {
 
-    @Resource
+    @Autowired
     private DemeterSkillTaskDao demeterSkillTaskDao;
-    @Resource
+
+    @Autowired
     private TaskFinishConditionDao taskFinishConditionDao;
-    @Resource
+
+    @Autowired
     private DemeterTaskUserDao demeterTaskUserDao;
-    @Resource
-    private StorageComponent storageComponent;
-    @Resource
-    private RoleUserDao roleUserDao;
-    @Resource
-    private DemeterRoleDao demeterRoleDao;
-    @Resource
+
+    @Autowired
+    private TaskFinishConditionInfoDao taskFinishConditionInfoDao;
+
+    @Autowired
+    private TaskFinishOutcomeDao taskFinishOutcomeDao;
+
+    @Autowired
     private RoleService roleService;
-    @Resource
-    private EhrComponent ehrComponent;
+
+    @Autowired
+    private EhrServiceClient ehrServiceClient;
+
     @Resource
     private TaskServiceImpl taskService;
-    @Resource
-    private MessageService messageService;
-    @Resource
-    private TaskFinishConditionInfoDao taskFinishConditionInfoDao;
-    @Resource
-    private TaskFinishOutcomeDao taskFinishOutcomeDao;
 
 
     @Override
@@ -237,10 +229,7 @@ public class SkillPointServiceImpl implements SkillPointService {
                 skillTaskExampleCriteria.andTaskNameLike(nameOrNo);
             }
         }
-//        Integer pointLevel = checkSkillReq.getSkillPointLevel();
-//        if (Objects.nonNull(pointLevel)) {
-//            skillTaskExampleCriteria.andSkillLevelEqualTo(pointLevel);
-//        }
+
         List<DemeterSkillTask> demeterSkillTasks = new ArrayList<>(16);
         if (CollectionUtils.isNotEmpty(taskIds)) {
             skillTaskExampleCriteria.andIdIn(taskIds);
@@ -249,17 +238,20 @@ public class SkillPointServiceImpl implements SkillPointService {
 
         Map<Long, DemeterSkillTask> skillTaskMap = demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function
                 .identity()));
-        Set<String> userId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
-        Set<String> skillPublisher = demeterSkillTasks.stream().map(DemeterSkillTask::getPublisher).collect(Collectors.toSet());
+
+        List<String> userId = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
+        List<String> skillPublisher = demeterSkillTasks.stream().map(DemeterSkillTask::getPublisher).collect(Collectors.toList());
         userId.addAll(skillPublisher);
-        Set<UserResp> userDetail = ehrComponent.getUserDetail(userId);
-        Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+        ModelResult<List<UserDetailResp>> userDetailModelResult = ehrServiceClient.getUserDetail(userId);
+        List<UserDetailResp> userDetail = userDetailModelResult.getResult();
+        Map<String, UserDetailResp> userMap = userDetail.stream().collect(Collectors.toMap(UserDetailResp::getUserCode, Function.identity()));
 
         /**
-         * 查询当前登录人的角色
+         * 查询当前登录人的角色  //当前登录人 Todo
          */
         Map<String, List<DemeterRole>> roleMap =
-                roleService.queryRoleByUid(Lists.newArrayList(OperatorContext.getOperator()));
+                roleService.queryRoleByUid(Lists.newArrayList("60028724"));
+
         if (roleMap.size() < 1) {
             return PageListResp.emptyList();
         }
@@ -268,7 +260,7 @@ public class SkillPointServiceImpl implements SkillPointService {
             ReceiveQueryResp resp = new ReceiveQueryResp();
             DemeterSkillTask skill = skillTaskMap.get(taskUser.getTaskId());
             List<Long> roles = Arrays.stream(skill.getCheckRole().split(",")).map(Long::parseLong).collect(Collectors.toList());
-            List<Long> demeterRoles = roleMap.get(OperatorContext.getOperator()).stream().map(DemeterRole::getId).collect(Collectors.toList());
+            List<Long> demeterRoles = roleMap.get("60028724").stream().map(DemeterRole::getId).collect(Collectors.toList());
             if (!hasIntersection(roles, demeterRoles).isEmpty()) {
                 BeanUtils.copyProperties(skill, resp);
                 resp.setTaskUserId(taskUser.getId());
@@ -277,8 +269,8 @@ public class SkillPointServiceImpl implements SkillPointService {
                 resp.setTaskTypeName(TaskType.SKILL.getDesc());
                 resp.setTaskReward(skill.getSkillReward());
                 resp.setReceiver(taskUser.getReceiverUid());
-                resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
-                resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getUserName());
+                resp.setPublisherName(userMap.get(skill.getPublisher()).getUserName());
                 resp.setTaskFlowStatus(taskUser.getTaskStatus());
                 resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
                 resp.setSubmitCheckTime(taskUser.getModifyTime());
@@ -316,6 +308,7 @@ public class SkillPointServiceImpl implements SkillPointService {
 
     @Override
     public Resp<Object> quickAuthReq(Long id) {
+        String userId = UserParamThreadLocal.get().getUserId();
         taskService.checkSkillForbidden(id);
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
         if (Objects.isNull(demeterSkillTask)) {
@@ -327,7 +320,11 @@ public class SkillPointServiceImpl implements SkillPointService {
             log.error(exception.getMessage());
             return Resp.error(exception.getMessage());
         }
-        messageService.acceptNotice(id, TaskType.SKILL.getCode(), demeterSkillTask.getPublisher());
+
+
+        //消息发送 TODO
+        //messageService.acceptNotice(id, TaskType.SKILL.getCode(), demeterSkillTask.getPublisher());
+
         TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
         taskFinishConditionExample.createCriteria()
                 .andTaskIdEqualTo(id)
@@ -340,24 +337,22 @@ public class SkillPointServiceImpl implements SkillPointService {
                         .taskType(TaskType.SKILL.getCode())
                         .taskConditionStatus(TaskConditionStatus.FINISHED.getCode())
                         .taskFinishConditionId(condition.getId())
-                        .createId(OperatorContext.getOperator())
-                        .modifyId(OperatorContext.getOperator())
-                        .createTime(new Date())
-                        .modifyTime(new Date())
-                        .uid(OperatorContext.getOperator())
+                        .createId(userId)
+                        .modifyId(userId)
+                        .uid(userId)
                         .build();
                 taskFinishConditionInfoDao.insertSelective(info);
             });
         }
         TaskFinishOutcome taskFinishOutcome = TaskFinishOutcome.builder()
-                .createId(OperatorContext.getOperator())
+                .createId(userId)
                 .createTime(new Date())
                 .taskId(id)
                 .fileAddress("https://www.ziroom.com")
                 .fileName("快速认证技能.jpg")
                 .taskType(TaskType.SKILL.getCode())
-                .modifyId(OperatorContext.getOperator())
-                .receiverUid(OperatorContext.getOperator())
+                .modifyId(userId)
+                .receiverUid(userId)
                 .modifyTime(new Date())
                 .build();
         taskFinishOutcomeDao.insertSelective(taskFinishOutcome);

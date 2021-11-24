@@ -7,8 +7,7 @@ import java.util.Optional;
 /**
  * 获取当前登陆人
  *
- * @author huangqiaowei
- * @date 2019-09-27 16:54
+ * @author xuzeyu
  **/
 public class OperatorContext {
 

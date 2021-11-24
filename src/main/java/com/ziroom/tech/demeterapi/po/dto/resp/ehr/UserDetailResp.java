@@ -2,7 +2,10 @@ package com.ziroom.tech.demeterapi.po.dto.resp.ehr;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户详情
@@ -12,6 +15,7 @@ import lombok.Data;
  **/
 @Data
 @Api("用户详情")
+@NoArgsConstructor
 public class UserDetailResp {
 
     private String userCode;
@@ -51,4 +55,12 @@ public class UserDetailResp {
     private String effdt;
 
     private String treePath;
+
+    public UserDetailResp(String userCode, String userName, String email, String dept, String deptCode) {
+        this.userCode = userCode;
+        this.userName = userName;
+        this.dept = dept;
+        this.deptCode = deptCode;
+        this.email = email;
+    }
 }

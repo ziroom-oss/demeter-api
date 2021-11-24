@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.UserParamThreadLocal;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
@@ -34,14 +35,15 @@ import java.util.List;
 @Service
 @Slf4j
 public class MapServiceImpl implements MapService {
+
     @Resource
     private SkillMapDao skillMapDao;
+
     @Resource
     private DemeterTaskUserDao demeterTaskUserDao;
+
     @Resource
     private DemeterSkillTaskDao demeterSkillTaskDao;
-    @Resource
-    private SkillMapSkillDao skillMapSkillDao;
 
     @Resource
     private SkillMapSkillBkDao skillMapSkillBkDao;
@@ -92,9 +94,6 @@ public class MapServiceImpl implements MapService {
 
         LinkedHashMap<Integer, List<DemeterSkillTask>> skillIdMap = demeterSkillTasks.stream()
                 .collect(Collectors.groupingBy(DemeterSkillTask::getSkillId, LinkedHashMap::new, Collectors.toList()));
-
-        Map<Long, DemeterSkillTask> skillTaskMap =
-                demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function.identity()));
 
         AtomicInteger skillCount = new AtomicInteger();
         skillIdMap.forEach((k, v) -> {

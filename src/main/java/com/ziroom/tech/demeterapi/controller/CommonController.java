@@ -22,8 +22,6 @@ public class CommonController {
     @Resource
     private HaloComponent haloComponent;
 
-    //////////////////////////  halo ////////////////////////
-
     @GetMapping("auth/v1")
     public Resp<AuthResp> getCurrentAuth() {
         AuthReq authReq = new AuthReq();

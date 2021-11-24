@@ -1,23 +1,18 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
-import com.ziroom.tech.demeterapi.common.EhrComponent;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
-import com.ziroom.tech.demeterapi.common.PageListResp;
-import com.ziroom.tech.demeterapi.common.StorageComponent;
+import com.ziroom.tech.demeterapi.common.*;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.core.SkillNode;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
+import com.ziroom.tech.demeterapi.file.model.FileModel;
 import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
-import com.ziroom.tech.demeterapi.open.ehr.service.OpenEhrService;
 import com.ziroom.tech.demeterapi.open.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrUserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
@@ -30,14 +25,17 @@ import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
+
+import java.io.IOException;
 import java.time.ZoneId;
+
+import com.ziroom.tech.demeterapi.file.FileService;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
-import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,19 +77,15 @@ public class TaskServiceImpl implements TaskService {
     private TaskFinishConditionInfoDao taskFinishConditionInfoDao;
     @Resource
     private TaskFinishOutcomeDao taskFinishOutcomeDao;
-    @Resource
-    private EhrComponent ehrComponent;
-    
+
     @Autowired
     private EhrServiceClient ehrServiceClient;
-    
-    @Resource
-    private StorageComponent storageComponent;
-    @Resource
-    private SkillTreeDao skillTreeDao;
 
     @Resource
     private HaloService haloService;
+    
+    @Resource
+    private SkillTreeDao skillTreeDao;
 
     @Resource
     private MessageService messageService;
@@ -100,7 +94,7 @@ public class TaskServiceImpl implements TaskService {
     private RoleService roleService;
 
     @Autowired
-    private OpenEhrService openEhrService;
+    private FileService fileService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -111,18 +105,18 @@ public class TaskServiceImpl implements TaskService {
         entity.setPublisher(OperatorContext.getOperator());
         MultipartFile attachment = assignTaskReq.getAttachment();
         if (Objects.nonNull(attachment)) {
-            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
-            entity.setAttachmentUrl(ziroomFile.getUrl());
-            entity.setAttachmentName(ziroomFile.getOriginal_filename());
+            try {
+                FileModel fileModel = fileService.saveFile(attachment);
+                entity.setAttachmentUrl(fileModel.getUrl());
+                entity.setAttachmentName(fileModel.getFileName());
+            } catch (IOException e) {
+                log.error("[TaskService] fileService save exception", e);
+                throw new BusinessException("文件上传失败");
+            }
         }
         entity.setCreateId(OperatorContext.getOperator());
         entity.setModifyId(OperatorContext.getOperator());
-        entity.setCreateTime(new Date());
-        entity.setUpdateTime(new Date());
         demeterAssignTaskDao.insertSelective(entity);
-
-        // DemeterTaskUser
-        // batchInsert?
 
         List<String> taskReceiver = assignTaskReq.getTaskReceiver();
         String taskReceiverString = String.join(",", taskReceiver);
@@ -136,14 +130,14 @@ public class TaskServiceImpl implements TaskService {
                         .taskId(entity.getId())
                         .taskType(TaskType.ASSIGN.getCode())
                         .taskFinishContent(condition)
-                        .createTime(new Date())
-                        .modifyTime(new Date())
                         .createId(OperatorContext.getOperator())
                         .modifyId(OperatorContext.getOperator())
                         .build();
                 taskFinishConditionDao.insertSelective(taskFinishCondition);
             });
         }
+
+        //消息发送 Todo
         messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
         return Resp.success();
     }
@@ -165,7 +159,6 @@ public class TaskServiceImpl implements TaskService {
                             .id(demeterTaskUser.getId())
                             .taskStatus(AssignTaskFlowStatus.UNCLAIMED.getCode())
                             .modifyId(OperatorContext.getOperator())
-                            .modifyTime(new Date())
                             .build();
                     demeterTaskUserDao.updateByPrimaryKeySelective(update);
                 } else {
@@ -179,8 +172,6 @@ public class TaskServiceImpl implements TaskService {
                             .taskEndTime(task.getTaskEndTime())
                             .createId(OperatorContext.getOperator())
                             .modifyId(OperatorContext.getOperator())
-                            .createTime(new Date())
-                            .modifyTime(new Date())
                             .build();
                     demeterTaskUserDao.insertSelective(demeterTaskUser);
                 }
@@ -209,7 +200,6 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success(resp);
     }
 
-    // todo test
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> updateAssignTask(AssignTaskReq assignTaskReq) {
@@ -225,10 +215,6 @@ public class TaskServiceImpl implements TaskService {
                     throw new BusinessException("该指派任务已被认领，不可编辑");
                 }
             } else if (TaskType.SKILL.getCode().equals(x.getTaskType())) {
-//                if (!x.getTaskStatus().equals(SkillTaskFlowStatus.UNFORBIDDEN.getCode()) ||
-//                        !x.getTaskStatus().equals(SkillTaskFlowStatus.FORBIDDEN.getCode())) {
-//                }
-                // DemeterTaskUser表中出现技能类任务表示任务已被认领
                 throw new BusinessException("该技能任务已被认领，不可编辑");
             }
         });
@@ -236,14 +222,17 @@ public class TaskServiceImpl implements TaskService {
         DemeterAssignTask entity = new DemeterAssignTask();
         BeanUtils.copyProperties(assignTaskReq, entity);
         entity.setModifyId(OperatorContext.getOperator());
-        entity.setUpdateTime(new Date());
-        entity.setModifyId(OperatorContext.getOperator());
 
         MultipartFile attachment = assignTaskReq.getAttachment();
         if (Objects.nonNull(attachment)) {
-            ZiroomFile ziroomFile = storageComponent.uploadFile(attachment);
-            entity.setAttachmentUrl(ziroomFile.getUrl());
-            entity.setAttachmentName(ziroomFile.getOriginal_filename());
+            try {
+                FileModel fileModel = fileService.saveFile(attachment);
+                entity.setAttachmentUrl(fileModel.getUrl());
+                entity.setAttachmentName(fileModel.getFileName());
+            } catch (IOException e) {
+                log.error("[TaskService] fileService save exception", e);
+                throw new BusinessException("文件上传失败");
+            }
         }
 
         demeterAssignTaskDao.updateByPrimaryKeySelective(entity);
@@ -278,7 +267,6 @@ public class TaskServiceImpl implements TaskService {
                     DemeterSkillTask update = new DemeterSkillTask();
                     update.setId(taskId);
                     update.setTaskStatus(SkillTaskStatus.UNFORBIDDEN.getCode());
-                    update.setUpdateTime(new Date());
                     update.setModifyId(OperatorContext.getOperator());
                     demeterSkillTaskDao.updateByPrimaryKeySelective(update);
                     break;
@@ -291,7 +279,6 @@ public class TaskServiceImpl implements TaskService {
                     updateForbidden.setId(taskId);
                     updateForbidden.setTaskStatus(SkillTaskStatus.FORBIDDEN.getCode());
                     updateForbidden.setModifyId(OperatorContext.getOperator());
-                    updateForbidden.setUpdateTime(new Date());
                     demeterSkillTaskDao.updateByPrimaryKeySelective(updateForbidden);
                     break;
                 default:
@@ -309,7 +296,6 @@ public class TaskServiceImpl implements TaskService {
                 DemeterAssignTask update = new DemeterAssignTask();
                 update.setId(taskId);
                 update.setTaskStatus(AssignTaskStatus.ONGOING.getCode());
-                update.setUpdateTime(new Date());
                 update.setModifyId(OperatorContext.getOperator());
                 demeterAssignTaskDao.updateByPrimaryKeySelective(update);
             } else if (taskStatus.equals(AssignTaskStatus.CLOSED.getCode())) {
@@ -334,7 +320,6 @@ public class TaskServiceImpl implements TaskService {
                 DemeterAssignTask update = new DemeterAssignTask();
                 update.setId(taskId);
                 update.setTaskStatus(AssignTaskStatus.CLOSED.getCode());
-                update.setUpdateTime(new Date());
                 update.setModifyId(OperatorContext.getOperator());
                 demeterAssignTaskDao.updateByPrimaryKeySelective(update);
             }
@@ -369,8 +354,6 @@ public class TaskServiceImpl implements TaskService {
                         .taskEndTime(assignTaskReq.getTaskEndTime())
                         .createId(OperatorContext.getOperator())
                         .modifyId(OperatorContext.getOperator())
-                        .createTime(new Date())
-                        .modifyTime(new Date())
                         .build();
                 demeterTaskUserDao.insertSelective(demeterTaskUser);
             });
@@ -392,8 +375,6 @@ public class TaskServiceImpl implements TaskService {
                         .taskId(taskId)
                         .taskType(taskType)
                         .taskFinishContent(condition)
-                        .createTime(new Date())
-                        .modifyTime(new Date())
                         .createId(OperatorContext.getOperator())
                         .modifyId(OperatorContext.getOperator())
                         .build();
@@ -425,7 +406,6 @@ public class TaskServiceImpl implements TaskService {
                 }
                 break;
             case DEPT:
-
                 List<String> currentDeptUsers = this.getCurrentDeptUsers();
                 if (StringUtils.isNotEmpty(publisher)) {
                     if (currentDeptUsers.contains(publisher)) {
@@ -440,9 +420,6 @@ public class TaskServiceImpl implements TaskService {
                 }
                 break;
             case PLAIN:
-                if (StringUtils.isNotEmpty(publisher) && !publisher.equals(OperatorContext.getOperator())) {
-                    return ModelResultUtil.success(PageListResp.emptyList());
-                }
                 assignTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
                 skillTaskExampleCriteria.andPublisherEqualTo(OperatorContext.getOperator());
             default:
@@ -513,11 +490,11 @@ public class TaskServiceImpl implements TaskService {
         if (CollectionUtils.isNotEmpty(skillTasks)) {
             List<String> publisherList = skillTasks.stream()
                     .map(DemeterSkillTask::getPublisher).collect(Collectors.toList());
-            ModelResult<List<UserResp>> userInfoModelResult = openEhrService.getUserDetail(publisherList);
+            ModelResult<List<UserDetailResp>> userInfoModelResult = ehrServiceClient.getUserDetail(publisherList);
             if(!userInfoModelResult.isSuccess()){
                 return ModelResultUtil.error("-1","查询用户信息失败");
             }
-            Map<String, UserResp> userRespMap = userInfoModelResult.getResult().stream().filter(distinctByKey(UserResp::getCode)).collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
+            Map<String, UserDetailResp> userRespMap = userInfoModelResult.getResult().stream().collect(Collectors.toMap(UserDetailResp::getUserCode, (Function.identity())));
             skillTasks.forEach(task -> {
                 List<String> receiverList = this.getReceiverListFromSkillPointId(task.getId());
                 SkillTree skillTree = skillTreeDao.selectByPrimaryKey(task.getSkillId());
@@ -537,20 +514,20 @@ public class TaskServiceImpl implements TaskService {
                         .skillTreeName(skillTree.getName())
                         .growthValue(task.getSkillReward())
                         .publisher(task.getPublisher())
-                        .publisherName(userRespMap.get(task.getPublisher()).getName())
+                        .publisherName(userRespMap.get(task.getPublisher()).getUserName())
                         .build();
                 respList.add(releaseQueryResp);
             });
         }
 
         if (CollectionUtils.isNotEmpty(assignTasks)) {
-            List<String> publisherList = skillTasks.stream()
-                    .map(DemeterSkillTask::getPublisher).collect(Collectors.toList());
-            ModelResult<List<UserResp>> userInfoModelResult = openEhrService.getUserDetail(publisherList);
+            List<String> publisherList = assignTasks.stream()
+                    .map(DemeterAssignTask::getPublisher).collect(Collectors.toList());
+            ModelResult<List<UserDetailResp>> userInfoModelResult = ehrServiceClient.getUserDetail(publisherList);
             if(!userInfoModelResult.isSuccess()){
                 return ModelResultUtil.error("-1","查询用户信息失败");
             }
-            Map<String, UserResp> userRespMap = userInfoModelResult.getResult().stream().filter(distinctByKey(UserResp::getCode)).collect(Collectors.toMap(UserResp::getCode, (Function.identity())));
+            Map<String, UserDetailResp> userRespMap = userInfoModelResult.getResult().stream().collect(Collectors.toMap(UserDetailResp::getUserCode, (Function.identity())));
             assignTasks.forEach(task -> {
                 List<String> receiverNameList = getReceiverListFromTaskUserEntity(task);
                 ReleaseQueryResp releaseQueryResp = ReleaseQueryResp.builder()
@@ -565,7 +542,7 @@ public class TaskServiceImpl implements TaskService {
                         .taskCreateTime(task.getCreateTime())
                         .growthValue(task.getTaskReward())
                         .publisher(task.getPublisher())
-                        .publisherName(userRespMap.get(task.getPublisher()).getName())
+                        .publisherName(userRespMap.get(task.getPublisher()).getUserName())
                         .build();
                 respList.add(releaseQueryResp);
             });
@@ -591,12 +568,6 @@ public class TaskServiceImpl implements TaskService {
         DemeterAssignTaskExample.Criteria assignTaskExampleCriteria = assignTaskExample.createCriteria();
         DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample(); //员工任务表
         DemeterTaskUserExample.Criteria demeterTaskUserCriteria = demeterTaskUserExample.createCriteria();
-
-        DemeterTaskUserExtendExample taskUserExtendExample = new DemeterTaskUserExtendExample();//员工任务扩展
-        DemeterTaskUserExtendExample.Criteria taskUserExtendCriteria = taskUserExtendExample.createCriteria();
-        DemeterUserLearnManifestExample userLearnManifestExample = new DemeterUserLearnManifestExample();//员工学习清单
-        DemeterUserLearnManifestExample.Criteria userLearnManifestCriteria = userLearnManifestExample.createCriteria();
-
 
         CurrentRole currentRole = this.getCurrentRole();//当前登录人角色
         String receiverCode = taskListQueryReq.getSystemCode();//获取发布人或接收人系统号
@@ -685,8 +656,9 @@ public class TaskServiceImpl implements TaskService {
         receiverId.addAll(assignPublisher);
 
         //ehr系统获取用户信息UserResp:code、name、email
-        Set<UserResp> userDetail = ehrComponent.getUserDetail(receiverId);
-        Map<String, UserResp> userMap = userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+        ArrayList<String> receiveList = new ArrayList<>(receiverId);
+        ModelResult<List<UserDetailResp>> userInfoModelResult = ehrServiceClient.getUserDetail(receiveList);
+        Map<String, UserDetailResp> userMap = userInfoModelResult.getResult().stream().collect(Collectors.toMap(UserDetailResp::getUserCode, Function.identity()));
 
         Map<Long, DemeterSkillTask> skillTaskMap = demeterSkillTasks.stream().collect(Collectors.toMap(DemeterSkillTask::getId, Function.identity()));
         Map<Long, DemeterAssignTask> assignTaskMap = demeterAssignTasks.stream().collect(Collectors.toMap(DemeterAssignTask::getId, Function.identity()));
@@ -722,16 +694,16 @@ public class TaskServiceImpl implements TaskService {
 
                         if (Objects.nonNull(assignerUid)) {
                             resp.setAssigner(assignerUid);
-                            UserDetailResp userDetailResp = ehrComponent.getUserDetail(assignerUid);
-                            if (Objects.nonNull(userDetailResp)) {
-                                resp.setAssignerName(userDetailResp.getUserName());
+                            ModelResult<UserDetailResp> userDetailModelResult = ehrServiceClient.getUserInfo(assignerUid);
+                            if (userInfoModelResult.isSuccess()) {
+                                resp.setAssignerName(userDetailModelResult.getResult().getUserName());
                             }
                         }
                     }
 
                     resp.setReceiver(taskUser.getReceiverUid());
-                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
-                    resp.setPublisherName(userMap.get(skill.getPublisher()).getName());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getUserName());
+                    resp.setPublisherName(userMap.get(skill.getPublisher()).getUserName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
                     resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
                     respList.add(resp);
@@ -746,10 +718,10 @@ public class TaskServiceImpl implements TaskService {
                     resp.setNeedAcceptance(assign.getNeedAcceptance());
 
                     resp.setAssigner(taskUser.getReceiverUid());
-                    resp.setAssignerName(userMap.get(taskUser.getReceiverUid()).getName());
+                    resp.setAssignerName(userMap.get(taskUser.getReceiverUid()).getUserName());
 
-                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getName());
-                    resp.setPublisherName(userMap.get(assign.getPublisher()).getName());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getUserName());
+                    resp.setPublisherName(userMap.get(assign.getPublisher()).getUserName());
                     resp.setTaskFlowStatus(taskUser.getTaskStatus());
                     resp.setTaskFlowStatusName(AssignTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
                     respList.add(resp);
@@ -784,7 +756,6 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     @Override
     public Resp createSkillLearnManifest(CreateSkillLearnManifestReq req) {
-
         // 1.【demeter_user_learn_manifest】创建学习清单
         DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
                 .assignerUid(OperatorContext.getOperator())
@@ -814,6 +785,13 @@ public class TaskServiceImpl implements TaskService {
             }
             // 2.2 demeter_task_user 添加技能任务
             DemeterTaskUser taskUser = this.createTaskUser(skillId, learnerUid);
+
+            //添加认证标准
+            this.createTaskOutcome(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+
+            //此处新增任务完成条件
+            this.createTaskFinishCondition(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+
             long taskUserId = taskUser.getId();
             // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
             this.createSkillTaskIntoManifest(skillId, manifestId, taskUserId);
@@ -856,8 +834,6 @@ public class TaskServiceImpl implements TaskService {
                     .receiverUid(learnerUid)
                     .taskId(taskId)
                     .parentId(demeterSkillTask != null ? demeterSkillTask.getSkillId() : 0)
-                    .createTime(new Date())
-                    .modifyTime(new Date())
                     .createId(OperatorContext.getOperator())
                     .modifyId(OperatorContext.getOperator())
                     .build();
@@ -1000,7 +976,8 @@ public class TaskServiceImpl implements TaskService {
 
             // uid 查询分配者的姓名
             if (StringUtils.isNotEmpty(manifest.getAssignerUid())) { //分配者不为空
-                UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getAssignerUid());
+                ModelResult<UserDetailResp> userInfoModelResult = ehrServiceClient.getUserInfo(manifest.getAssignerUid());
+                UserDetailResp userDetail = userInfoModelResult.getResult();
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setAssignerName(userDetail.getUserName());
                 }
@@ -1010,7 +987,8 @@ public class TaskServiceImpl implements TaskService {
 
             // 查询学习者的姓名
             if(StringUtils.isNotEmpty(manifest.getLearnerUid())){
-                UserDetailResp userDetail = ehrComponent.getUserDetail(manifest.getLearnerUid());
+                ModelResult<UserDetailResp> userDetailResult = ehrServiceClient.getUserInfo(manifest.getLearnerUid());
+                UserDetailResp userDetail = userDetailResult.getResult();
                 if (Objects.nonNull(userDetail)) {
                     skillLearnManifestResp.setLearnerName(userDetail.getUserName());
                 }
@@ -1090,8 +1068,10 @@ public class TaskServiceImpl implements TaskService {
                 DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodStart().toInstant().atZone(ZoneId.systemDefault())) + " 至 " +
                         DateUtils.FORMATTER_YYYY_MM_DD.format(manifest.getLearnPeriodEnd().toInstant().atZone(ZoneId.systemDefault())));
         //根据人物uid查出姓名
-        detailResp.setAssignerName(ehrComponent.getUserDetail(detailResp.getAssignerUid()).getUserName());
-        detailResp.setLearnerName(ehrComponent.getUserDetail(detailResp.getLearnerUid()).getUserName());
+        ModelResult<UserDetailResp> userInfoModelResult = ehrServiceClient.getUserInfo(detailResp.getAssignerUid());
+        ModelResult<UserDetailResp> userInfoModelResult1 = ehrServiceClient.getUserInfo(detailResp.getLearnerUid());
+        detailResp.setAssignerName(userInfoModelResult.getResult().getUserName());
+        detailResp.setLearnerName(userInfoModelResult1.getResult().getUserName());
 //        detailResp.setSkillTree(getManifestSkillGrape(manifestId).getSkillTree());
         //1.根据manifestId获取所有demeter_task_user_extend
         DemeterTaskUserExtendExample extendExample = new DemeterTaskUserExtendExample();
@@ -1237,19 +1217,22 @@ public class TaskServiceImpl implements TaskService {
 
 
     private CurrentRole getCurrentRole() {
-        return CurrentRole.DEPT;
+        AuthResp permission = haloService.getAuth();
+        List<String> roles = permission.getRoles();
+        if (roles.contains(CurrentRole.SUPER.getCode())) {
+            return CurrentRole.SUPER;
+        } else if (roles.contains(CurrentRole.DEPT.getCode())) {
+            return CurrentRole.DEPT;
+        } else {
+            return CurrentRole.PLAIN;
+        }
     }
 
     private List<String> getCurrentDeptUsers() {
-        List<EhrUserDetailResp> ehrUserDetail = ehrComponent.getEhrUserDetail(OperatorContext.getOperator());
-        EhrUserDetailResp ehrUserDetailResp;
-        if (CollectionUtils.isNotEmpty(ehrUserDetail)) {
-            ehrUserDetailResp = ehrUserDetail.get(0);
-        } else {
-            throw new BusinessException("ehr查询用户失败，uid=" + OperatorContext.getOperator());
-        }
-        Set<EhrUserResp> users = ehrComponent.getUsers(ehrUserDetailResp.getDeptCode(), null);
-        return users.stream().map(EhrUserResp::getUserCode).collect(Collectors.toList());
+        String deptCode = UserParamThreadLocal.get().getDeptCode();
+        ModelResult<List<UserDetailResp>> usersByDeptModelResult = ehrServiceClient.getUsersByDept(deptCode);
+        List<UserDetailResp> users = usersByDeptModelResult.getResult();
+        return users.stream().map(UserDetailResp::getUserCode).collect(Collectors.toList());
     }
 
     @Override
@@ -1276,16 +1259,18 @@ public class TaskServiceImpl implements TaskService {
         Set<String> uidSet = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toSet());
         List<String> receiverNameList = Lists.newLinkedList();
         if (CollectionUtils.isNotEmpty(uidSet)) {
-            Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
+            ModelResult<List<UserDetailResp>> userDetailModelResult = ehrServiceClient.getUserDetail(new ArrayList<>(uidSet));
+            List<UserDetailResp> userDetail = userDetailModelResult.getResult();
             if (CollectionUtils.isNotEmpty(userDetail)) {
-                receiverNameList = userDetail.stream().map(UserResp::getName).collect(Collectors.toList());
+                receiverNameList = userDetail.stream().map(UserDetailResp::getUserName).collect(Collectors.toList());
             }
         }
         return receiverNameList;
     }
 
     private String getNameFromUid(String id) {
-        UserDetailResp userDetail = ehrComponent.getUserDetail(id);
+        ModelResult<UserDetailResp> userInfoModelResult = ehrServiceClient.getUserInfo(id);
+        UserDetailResp userDetail = userInfoModelResult.getResult();
         if (Objects.nonNull(userDetail)) {
             return userDetail.getUserName();
         } else {
@@ -1319,6 +1304,7 @@ public class TaskServiceImpl implements TaskService {
             }
             this.acceptAssignTask(id);
             this.createTaskOutcome(id, type);
+            //消息发送 Todo
             messageService.acceptNotice(id, type, demeterAssignTask.getPublisher());
         } else if (TaskType.SKILL.getCode().equals(type)) {
             checkSkillForbidden(id);
@@ -1334,6 +1320,7 @@ public class TaskServiceImpl implements TaskService {
             }
             // 技能类任务必须认证
             this.createTaskOutcome(id, type);
+            //消息发送 Todo
             messageService.acceptNotice(id, type, demeterSkillTask.getPublisher());
         }
 
@@ -1353,8 +1340,6 @@ public class TaskServiceImpl implements TaskService {
                         .taskFinishConditionId(condition.getId())
                         .createId(OperatorContext.getOperator())
                         .modifyId(OperatorContext.getOperator())
-                        .createTime(new Date())
-                        .modifyTime(new Date())
                         .uid(OperatorContext.getOperator())
                         .build();
                 taskFinishConditionInfoDao.insertSelective(info);
@@ -1365,17 +1350,46 @@ public class TaskServiceImpl implements TaskService {
         return Resp.success();
     }
 
+    private void createTaskFinishCondition(Long taskId, Integer type, String receiverId){
+        TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
+        taskFinishConditionExample.createCriteria()
+                .andTaskIdEqualTo(taskId)
+                .andTaskTypeEqualTo(type);
+        List<TaskFinishCondition> taskFinishConditions = taskFinishConditionDao.selectByExample(taskFinishConditionExample);
+        if (CollectionUtils.isNotEmpty(taskFinishConditions)) {
+            taskFinishConditions.forEach(condition -> {
+                TaskFinishConditionInfo info = TaskFinishConditionInfo.builder()
+                        .taskId(taskId)
+                        .taskType(type)
+                        .taskConditionStatus(TaskConditionStatus.UNFINISHED.getCode())
+                        .taskFinishConditionId(condition.getId())
+                        .createId(OperatorContext.getOperator())
+                        .modifyId(OperatorContext.getOperator())
+                        .uid(receiverId)
+                        .build();
+                taskFinishConditionInfoDao.insertSelective(info);
+            });
+        }
+    }
+
+    public void createTaskOutcome(Long id, Integer type, String receiverId) {
+        TaskFinishOutcome taskFinishOutcome = TaskFinishOutcome.builder()
+                .createId(OperatorContext.getOperator())
+                .taskId(id)
+                .taskType(TaskType.getByCode(type).getCode())
+                .modifyId(OperatorContext.getOperator())
+                .receiverUid(receiverId)
+                .build();
+        taskFinishOutcomeDao.insertSelective(taskFinishOutcome);
+    }
+
     public void createTaskOutcome(Long id, Integer type) {
         TaskFinishOutcome taskFinishOutcome = TaskFinishOutcome.builder()
                 .createId(OperatorContext.getOperator())
-                .createTime(new Date())
                 .taskId(id)
-//                .fileAddress("https://www.ziroom.com")
-//                .fileName("文件上传功能待做.jpg")
                 .taskType(TaskType.getByCode(type).getCode())
                 .modifyId(OperatorContext.getOperator())
                 .receiverUid(OperatorContext.getOperator())
-                .modifyTime(new Date())
                 .build();
         taskFinishOutcomeDao.insertSelective(taskFinishOutcome);
     }
@@ -1398,7 +1412,6 @@ public class TaskServiceImpl implements TaskService {
 
             }
             demeterTaskUser.setModifyId(OperatorContext.getOperator());
-            demeterTaskUser.setModifyTime(new Date());
             demeterTaskUserDao.updateByPrimaryKeySelective(demeterTaskUser);
         } else {
             log.error("重复认领任务 = {}", demeterTaskUsers);
@@ -1426,8 +1439,6 @@ public class TaskServiceImpl implements TaskService {
             demeterSkillTask  = demeterSkillTasks.get(0);
         }
         DemeterTaskUser entity = DemeterTaskUser.builder()
-                .modifyTime(new Date())
-                .createTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .taskStatus(status)
                 .checkResult(CheckoutResult.NEED_CHECKOUT.getCode())
@@ -1457,11 +1468,11 @@ public class TaskServiceImpl implements TaskService {
                 .id(demeterTaskUser.getId())
                 .taskStatus(AssignTaskFlowStatus.REJECTED.getCode())
                 .rejectReason(rejectTaskReq.getReason())
-                .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(entity);
         // 拒绝原因处理
+        //消息发送 Todo
         messageService.rejectTaskNotice(rejectTaskReq.getTaskId());
         return Resp.success();
     }
@@ -1516,7 +1527,9 @@ public class TaskServiceImpl implements TaskService {
             taskProgressResp.setCheckoutOpinion(taskUser.getCheckOpinion());
             taskProgressResp.setCheckoutResult(CheckoutResult.getByCode(taskUser.getCheckResult()).getDesc());
             taskProgressResp.setReceiverUid(taskUser.getReceiverUid());
-            UserDetailResp userDetail = ehrComponent.getUserDetail(taskUser.getReceiverUid());
+
+            ModelResult<UserDetailResp> userInfoModelResult = ehrServiceClient.getUserInfo(taskUser.getReceiverUid());
+            UserDetailResp userDetail = userInfoModelResult.getResult();
             if (Objects.nonNull(userDetail)) {
                 taskProgressResp.setReceiverName(userDetail.getUserName());
             }
@@ -1566,17 +1579,18 @@ public class TaskServiceImpl implements TaskService {
                 demeterAuthHistoryDao.selectByExample(demeterAuthHistoryExample);
         Set<String> uidSet =
                 demeterAuthHistories.stream().map(DemeterAuthHistory::getAuthUser).collect(Collectors.toSet());
-        Set<UserResp> userDetail = ehrComponent.getUserDetail(uidSet);
-        Map<String, UserResp> userMap =
-                userDetail.stream().collect(Collectors.toMap(UserResp::getCode, Function.identity()));
+        ModelResult<List<UserDetailResp>> userDetail1ModelResult = ehrServiceClient.getUserDetail(new ArrayList<>(uidSet));
+        List<UserDetailResp> userDetail = userDetail1ModelResult.getResult();
+        Map<String, UserDetailResp> userMap =
+                userDetail.stream().collect(Collectors.toMap(UserDetailResp::getUserCode, Function.identity()));
         if (CollectionUtils.isNotEmpty(demeterAuthHistories)) {
             List<AuthHistoryResp> authHistories = new ArrayList<>(16);
             demeterAuthHistories.forEach(history -> {
                 AuthHistoryResp resp = new AuthHistoryResp();
                 BeanUtils.copyProperties(history, resp);
                 resp.setAuthResultName(CheckoutResult.getByCode(history.getAuthResult()).getDesc());
-                Optional<UserResp> userResp = Optional.ofNullable(userMap.get(history.getAuthUser()));
-                resp.setAuthUserName(userResp.map(UserResp::getName).orElse("Unknown"));
+                Optional<UserDetailResp> userResp = Optional.ofNullable(userMap.get(history.getAuthUser()));
+                resp.setAuthUserName(userResp.map(UserDetailResp::getUserName).orElse("Unknown"));
                 authHistories.add(resp);
             });
             taskProgressResp.setTaskAuthHistoryList(authHistories);
@@ -1609,7 +1623,6 @@ public class TaskServiceImpl implements TaskService {
                 .checkoutTime(new Date())
                 .checkOpinion(checkTaskReq.getAcceptanceOpinion())
                 .checkResult(CheckoutResult.getByCode(checkTaskReq.getResult()).getCode())
-                .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(updateTaskUser);
@@ -1621,11 +1634,10 @@ public class TaskServiceImpl implements TaskService {
                 .authUser(OperatorContext.getOperator())
                 .createId(OperatorContext.getOperator())
                 .modifyId(OperatorContext.getOperator())
-                .createTime(new Date())
-                .modifyTime(new Date())
                 .build();
         demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
 
+        //消息发送 Todo
         messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();
     }
@@ -1665,6 +1677,7 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskIdEqualTo(taskId)
                     .andTaskTypeEqualTo(taskType)
                     .andReceiverUidEqualTo(OperatorContext.getOperator());
+            //消息发送 Todo
             messageService.startCheckoutNotice(taskId, TaskType.SKILL.getCode());
         } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
             demeterTaskUserExampleCriteria
@@ -1672,6 +1685,7 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskTypeEqualTo(taskType)
                     .andReceiverUidEqualTo(OperatorContext.getOperator())
                     .andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
+            //消息发送 Todo
             messageService.startCheckoutNotice(taskId, TaskType.ASSIGN.getCode());
         }
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
@@ -1705,7 +1719,6 @@ public class TaskServiceImpl implements TaskService {
         DemeterTaskUser update = DemeterTaskUser.builder()
                 .taskStatus(AssignTaskFlowStatus.FINISHED.getCode())
                 .modifyId(OperatorContext.getOperator())
-                .modifyTime(new Date())
                 .build();
         demeterTaskUserDao.updateByExampleSelective(update, updateExample);
         return Resp.success();
@@ -1822,7 +1835,8 @@ public class TaskServiceImpl implements TaskService {
                 for (DemeterUserLearnManifest entity : demeterUserLearnManifests) {
                     LearnManifestVo vo = new LearnManifestVo();
                     BeanUtils.copyProperties(entity, vo);
-                    UserDetailResp userDetail = ehrComponent.getUserDetail(entity.getAssignerUid());
+                    ModelResult<UserDetailResp> userInfoModelResult = ehrServiceClient.getUserInfo(entity.getAssignerUid());
+                    UserDetailResp userDetail = userInfoModelResult.getResult();
                     if (userDetail != null) {
                         vo.setAssignerName(userDetail.getUserName());
                     }
@@ -1845,6 +1859,8 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskIdEqualTo(taskId)
                 .andTaskTypeEqualTo(taskType)
                 .andUidEqualTo(OperatorContext.getOperator());
+
+        //Todo 此处无数据 检查 为啥没新增数据
         List<TaskFinishConditionInfo> taskFinishConditionInfos = taskFinishConditionInfoDao.selectByExample(taskFinishConditionInfoExample);
         List<TaskFinishConditionInfoResp> taskFinishConditionInfoRespList = new ArrayList<>();
         taskFinishConditionInfos.forEach(taskFinishConditionInfo -> {
@@ -1955,10 +1971,10 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskTypeEqualTo(TaskType.ASSIGN.getCode());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         List<String> uidList = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
-        ModelResult<List<UserResp>> userDetailModelResult = ehrServiceClient.getUserDetail(uidList);
-        List<UserResp> userDetail = userDetailModelResult.getResult();
+        ModelResult<List<UserDetailResp>> userDetailModelResult = ehrServiceClient.getUserDetail(uidList);
+        List<UserDetailResp> userDetail = userDetailModelResult.getResult();
         if (CollectionUtils.isNotEmpty(userDetail)) {
-            detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
+            detailResp.setReceiverName(userDetail.stream().map(UserDetailResp::getUserName).collect(Collectors.joining(",")));
         }
         detailResp.setTaskNo(TaskIdPrefix.ASSIGN_PREFIX.getDesc() + demeterAssignTask.getId());
         detailResp.setTaskType(TaskType.ASSIGN.getCode());
@@ -1983,10 +1999,10 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskTypeEqualTo(TaskType.SKILL.getCode());
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
         List<String> uidList = demeterTaskUsers.stream().map(DemeterTaskUser::getReceiverUid).collect(Collectors.toList());
-        ModelResult<List<UserResp>> userDetailModelResult = ehrServiceClient.getUserDetail(uidList);
-        List<UserResp> userDetail = userDetailModelResult.getResult();
+        ModelResult<List<UserDetailResp>> userDetailModelResult = ehrServiceClient.getUserDetail(uidList);
+        List<UserDetailResp> userDetail = userDetailModelResult.getResult();
         if (CollectionUtils.isNotEmpty(userDetail)) {
-            detailResp.setReceiverName(userDetail.stream().map(UserResp::getName).collect(Collectors.joining(",")));
+            detailResp.setReceiverName(userDetail.stream().map(UserDetailResp::getUserName).collect(Collectors.joining(",")));
         }
         detailResp.setTaskType(TaskType.SKILL.getCode());
         detailResp.setTaskTypeName(TaskType.SKILL.getDesc());
@@ -2007,10 +2023,10 @@ public class TaskServiceImpl implements TaskService {
             if (CollectionUtils.isNotEmpty(roleUsers)) {
                 List<String> roleUserList = roleUsers.stream().map(RoleUser::getSystemCode).collect(Collectors.toList());
                 detailResp.setCheckRoleUserList(roleUserList);
-                ModelResult<List<UserResp>> userRespSetModelResult = ehrServiceClient.getUserDetail(roleUserList);
-                List<UserResp> userRespList = userRespSetModelResult.getResult();
+                ModelResult<List<UserDetailResp>> userRespSetModelResult = ehrServiceClient.getUserDetail(roleUserList);
+                List<UserDetailResp> userRespList = userRespSetModelResult.getResult();
                 if (CollectionUtils.isNotEmpty(userRespList)) {
-                    detailResp.setCheckRoleUserNameList(userRespList.stream().map(UserResp::getName).collect(Collectors.toList()));
+                    detailResp.setCheckRoleUserNameList(userRespList.stream().map(UserDetailResp::getUserName).collect(Collectors.toList()));
                 }
             }
         }
@@ -2036,7 +2052,6 @@ public class TaskServiceImpl implements TaskService {
         TaskFinishConditionInfo conditionInfo = TaskFinishConditionInfo.builder()
                 .id(conditionInfoId)
                 .taskConditionStatus(TaskConditionStatus.FINISHED.getCode())
-                .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
         taskFinishConditionInfoDao.updateByPrimaryKeySelective(conditionInfo);
@@ -2058,30 +2073,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @Deprecated
-    public Resp<Object> uploadAttachment(MultipartFile multipartFile, Long taskId, Integer taskType) {
-        ZiroomFile ziroomFile = storageComponent.uploadFile(multipartFile);
-        if (TaskType.SKILL.getCode().equals(taskType)) {
-            DemeterSkillTask demeterSkillTask = new DemeterSkillTask();
-            demeterSkillTask.setId(taskId);
-            demeterSkillTask.setAttachmentUrl(ziroomFile.getUrl());
-            demeterSkillTask.setAttachmentName(ziroomFile.getOriginal_filename());
-            demeterSkillTask.setUpdateTime(new Date());
-            demeterSkillTask.setModifyId(OperatorContext.getOperator());
-            demeterSkillTaskDao.updateByPrimaryKeySelective(demeterSkillTask);
-        } else if (TaskType.ASSIGN.getCode().equals(taskType)) {
-            DemeterAssignTask demeterAssignTask = new DemeterAssignTask();
-            demeterAssignTask.setId(taskId);
-            demeterAssignTask.setAttachmentUrl(ziroomFile.getUrl());
-            demeterAssignTask.setAttachmentName(ziroomFile.getOriginal_filename());
-            demeterAssignTask.setModifyId(OperatorContext.getOperator());
-            demeterAssignTask.setUpdateTime(new Date());
-            demeterAssignTaskDao.updateByPrimaryKeySelective(demeterAssignTask);
-        }
-        return Resp.success();
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq) {
         Long taskId = uploadOutcomeReq.getTaskId();
@@ -2089,7 +2080,14 @@ public class TaskServiceImpl implements TaskService {
         if (TaskType.SKILL.getCode().equals(taskType)) {
             checkSkillForbidden(taskId);
         }
-        ZiroomFile ziroomFile = storageComponent.uploadFile(uploadOutcomeReq.getMultipartFile());
+        FileModel fileModel;
+        try {
+            fileModel = fileService.saveFile(uploadOutcomeReq.getMultipartFile());
+        } catch (IOException e) {
+            log.error("[TaskService] fileService save exception", e);
+            throw new BusinessException("文件上传失败");
+        }
+
         TaskFinishOutcomeExample taskFinishOutcomeExample = new TaskFinishOutcomeExample();
         taskFinishOutcomeExample.createCriteria()
                 .andReceiverUidEqualTo(OperatorContext.getOperator())
@@ -2102,8 +2100,8 @@ public class TaskServiceImpl implements TaskService {
         TaskFinishOutcome taskFinishOutcome = taskFinishOutcomes.get(0);
         TaskFinishOutcome update = TaskFinishOutcome.builder()
                 .id(taskFinishOutcome.getId())
-                .fileAddress(ziroomFile.getUrl())
-                .fileName(ziroomFile.getOriginal_filename())
+                .fileAddress(fileModel.getUrl())
+                .fileName(fileModel.getFileName())
                 .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
@@ -2125,7 +2123,6 @@ public class TaskServiceImpl implements TaskService {
                 .andTaskEndTimeLessThan(new Date());
         DemeterTaskUser updated = DemeterTaskUser.builder()
                 .taskStatus(AssignTaskFlowStatus.UNFINISHED.getCode())
-                .modifyTime(new Date())
                 .modifyId(OperatorContext.getOperator())
                 .build();
         demeterTaskUserDao.updateByExampleSelective(updated, demeterTaskUserExample);

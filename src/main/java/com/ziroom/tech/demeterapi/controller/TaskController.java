@@ -7,6 +7,7 @@ import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
+import com.ziroom.tech.demeterapi.file.FileService;
 import com.ziroom.tech.demeterapi.open.model.ModelResponse;
 import com.ziroom.tech.demeterapi.open.model.ModelResponseUtil;
 import com.ziroom.tech.demeterapi.open.model.ModelResult;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,9 @@ import java.util.List;
 
     @Resource
     private TaskService taskService;
+
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("get/assign")
     @ApiOperation(value = "查看指派类任务", httpMethod = "POST")
@@ -276,6 +281,17 @@ import java.util.List;
     @ApiOperation(value = "上传学习成果", httpMethod = "POST")
     public Resp<Object> uploadLearningOutcome(UploadOutcomeReq uploadOutcomeReq) {
         return taskService.uploadLearningOutcome(uploadOutcomeReq);
+    }
+
+    @GetMapping(value = "/get/outcome")
+    public Object getLearningOutcome(String path) {
+        try {
+            byte[] file = fileService.getFile(path);
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Resp.success();
     }
 
     @PostMapping("/graph/search")

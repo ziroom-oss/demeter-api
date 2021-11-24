@@ -72,7 +72,6 @@ public class SkillPointController {
 
     @PostMapping("/query")
     public Resp<Object> querySkillPoint(@RequestParam List<Integer> skillTreeId) {
-       // Map<Integer, List<DemeterSkillTask>> integerListMap = skillPointService.querySkillPointFromTreeId(skillTreeId);
         return Resp.success(skillPointService.querySkillPointFromTreeId(skillTreeId));
     }
 

@@ -1,10 +1,9 @@
 package com.ziroom.tech.demeterapi.open.ehr.client.service;
 
 import com.google.common.collect.Lists;
-import com.ziroom.tech.demeterapi.open.model.ModelResult;
-import com.ziroom.tech.demeterapi.open.utils.ModelResultUtil;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

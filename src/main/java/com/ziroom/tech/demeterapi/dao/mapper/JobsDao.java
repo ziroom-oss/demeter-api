@@ -6,12 +6,12 @@ import java.util.List;
 
 import com.ziroom.tech.demeterapi.po.dto.req.jobs.JobsCreateReq;
 import com.ziroom.tech.demeterapi.po.dto.req.jobs.JobsModReq;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
 
-@SuppressWarnings("UnnecessaryInterfaceModifier")
-@Repository
+@Mapper
 public interface JobsDao {
 
     /**

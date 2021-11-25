@@ -3,11 +3,10 @@ package com.ziroom.tech.demeterapi.service;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
-import com.ziroom.tech.demeterapi.open.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

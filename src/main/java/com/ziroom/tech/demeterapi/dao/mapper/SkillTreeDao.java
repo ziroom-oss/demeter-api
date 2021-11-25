@@ -4,10 +4,11 @@ import com.ziroom.tech.demeterapi.dao.entity.SkillTree;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Mapper
 public interface SkillTreeDao {
 
     public Map<Integer, String> getSkillsName(@Param("parentIds") List<Long> parentIds);

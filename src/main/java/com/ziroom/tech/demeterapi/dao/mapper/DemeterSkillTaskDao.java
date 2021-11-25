@@ -6,34 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.ziroom.tech.demeterapi.dao.entity.ForTaskName;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
 
-/**
- * <pre>
- * ━━━━━━神兽出没━━━━━━
- * 　　　┏┓　　　┏┓
- * 　　┏┛┻━━━┛┻┓
- * 　　┃　　　　　　　┃
- * 　　┃　　　━　　　┃
- * 　　┃　┳┛　┗┳　┃
- * 　　┃　　　　　　　┃
- * 　　┃　　　┻　　　┃
- * 　　┃　　　　　　　┃
- * 　　┗━┓　　　┏━┛
- * 　　　　┃　　　┃神兽保佑, 永无BUG!
- * 　　　　┃　　　┃Code is far away from bug with the animal protecting
- * 　　　　┃　　　┗━━━┓
- * 　　　　┃　　　　　　　┣┓
- * 　　　　┃　　　　　　　┏┛
- * 　　　　┗┓┓┏━┳┓┏┛
- * 　　　　　┃┫┫　┃┫┫
- * 　　　　　┗┻┛　┗┻┛
- * ━━━━━━感觉萌萌哒━━━━━━
- * </pre>
- */
-@Repository
+@Mapper
 public interface DemeterSkillTaskDao {
 
     public List<ForTaskName> getTasksName(@Param("taskIds") List<Long> taskIds);

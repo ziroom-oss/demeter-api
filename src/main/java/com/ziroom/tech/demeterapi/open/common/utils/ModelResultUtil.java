@@ -1,6 +1,6 @@
-package com.ziroom.tech.demeterapi.open.utils;
+package com.ziroom.tech.demeterapi.open.common.utils;
 
-import com.ziroom.tech.demeterapi.open.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;

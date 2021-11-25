@@ -3,12 +3,13 @@ package com.ziroom.tech.demeterapi.dao.mapper;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterPosition;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterPositionExample;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
 
-@SuppressWarnings("UnnecessaryInterfaceModifier")
-@Repository
+@Mapper
 public interface DemeterPositionDao {
 
     public int countByExample(DemeterPositionExample example);

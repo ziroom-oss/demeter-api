@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.open.enums;
+package com.ziroom.tech.demeterapi.open.common.enums;
 
 /**
  * web层响应枚举

@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.open.model;
+package com.ziroom.tech.demeterapi.open.common.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

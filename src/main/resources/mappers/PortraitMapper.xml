@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ziroom.tech.demeterapi.open.portrait.common.dao.PortraitMapper">
+    <sql id="Base_Column_List">
+        id, contributor, contributor_email, level, dev_equivalent, insertions, deletions, project_num, demand_num, bug_num, devlop_value, doc_coverage, test_coverage,
+        fun_impact, publish_num, compile_num, online_num, rollback_num, restart_num, vacation, work_hours, devlop_hours, work_saturability, department_code, department_name,
+        create_time, moditiy_time
+    </sql>
+
+    <select id="getPortraitPerson" resultType="com.ziroom.tech.demeterapi.open.portrait.common.entity.PersonDevlopReportEntity" parameterType="com.ziroom.tech.demeterapi.open.portrait.person.param.PortraitPersonReqParam">
+        select
+        <include refid="Base_Column_List"/>
+        FROM demeter_ca_person_devlop_report
+        where contributor = #{personReqParam.uid} and create_time between #{personReqParam.startTime} and #{personReqParam.endTime}
+    </select>
+
+</mapper>

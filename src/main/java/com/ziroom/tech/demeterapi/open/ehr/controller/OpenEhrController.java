@@ -1,17 +1,16 @@
 package com.ziroom.tech.demeterapi.open.ehr.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResponse;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.common.utils.ModelResponseUtil;
 import com.ziroom.tech.demeterapi.open.ehr.converter.EhrConverter;
 import com.ziroom.tech.demeterapi.open.ehr.dto.EhrDepartmentInfoDto;
 import com.ziroom.tech.demeterapi.open.ehr.dto.EhrUserInfoDto;
 import com.ziroom.tech.demeterapi.open.ehr.service.OpenEhrService;
 import com.ziroom.tech.demeterapi.open.ehr.vo.EhrDepartmentInfoVO;
 import com.ziroom.tech.demeterapi.open.ehr.vo.EhrUserInfoVO;
-import com.ziroom.tech.demeterapi.open.model.ModelResponse;
-import com.ziroom.tech.demeterapi.open.model.ModelResponseUtil;
-import com.ziroom.tech.demeterapi.open.model.ModelResult;
-import com.ziroom.tech.demeterapi.open.utils.ModelResultUtil;
-import com.ziroom.tech.demeterapi.po.dto.resp.enums.TechRanksEnum;
+import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

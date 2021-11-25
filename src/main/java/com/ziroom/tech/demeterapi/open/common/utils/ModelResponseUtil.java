@@ -1,6 +1,7 @@
-package com.ziroom.tech.demeterapi.open.model;
+package com.ziroom.tech.demeterapi.open.common.utils;
 
-import com.ziroom.tech.demeterapi.open.enums.ResponseEnum;
+import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResponse;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;

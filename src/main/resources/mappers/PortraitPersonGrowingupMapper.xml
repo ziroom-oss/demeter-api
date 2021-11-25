@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ziroom.tech.demeterapi.open.portrait.person.dao.PortraitPersonGrowingupMapper">
+    <sql id="Base_Column_List">
+        id, contributor, contributor_email, department_code, department_name, type, title, core_name, core_data, create_time, moditiy_time
+    </sql>
+
+    <select id="getUserGrowingupInfo" resultType="com.ziroom.tech.demeterapi.open.portrait.person.entity.PortraitPersonGrowingupEntity">
+        select
+        <include refid="Base_Column_List"/>
+        FROM demeter_open_person_growingup
+        <if test="contributor != null and contributor !=''">
+            contributor = #{contributor}
+        </if>
+        <if test="date != null and date !=''">
+            DATE_FORMAT(create_time,'%Y-%m') = #{date}
+        </if>
+    </select>
+
+</mapper>

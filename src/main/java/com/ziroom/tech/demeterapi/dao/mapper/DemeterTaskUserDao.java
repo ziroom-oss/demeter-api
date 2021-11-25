@@ -5,34 +5,12 @@ import com.ziroom.tech.demeterapi.dao.entity.*;
 import java.util.List;
 
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
 
-/**
- * <pre>
- * ━━━━━━神兽出没━━━━━━
- * 　　　┏┓　　　┏┓
- * 　　┏┛┻━━━┛┻┓
- * 　　┃　　　　　　　┃
- * 　　┃　　　━　　　┃
- * 　　┃　┳┛　┗┳　┃
- * 　　┃　　　　　　　┃
- * 　　┃　　　┻　　　┃
- * 　　┃　　　　　　　┃
- * 　　┗━┓　　　┏━┛
- * 　　　　┃　　　┃神兽保佑, 永无BUG!
- * 　　　　┃　　　┃Code is far away from bug with the animal protecting
- * 　　　　┃　　　┗━━━┓
- * 　　　　┃　　　　　　　┣┓
- * 　　　　┃　　　　　　　┏┛
- * 　　　　┗┓┓┏━┳┓┏┛
- * 　　　　　┃┫┫　┃┫┫
- * 　　　　　┗┻┛　┗┻┛
- * ━━━━━━感觉萌萌哒━━━━━━
- * </pre>
- */
-@Repository
+@Mapper
 public interface DemeterTaskUserDao {
 
     public List<ForRankingPASSED> getSkillPointPASSED(@Param("rankingReq") RankingReq rankingReq, @Param("taskIds") List<Long> taskIds); //已认证技能点

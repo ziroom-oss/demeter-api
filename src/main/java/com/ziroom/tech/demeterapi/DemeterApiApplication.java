@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @RetrofitServiceScan("com.ziroom.tech.demeterapi")
-@MapperScan("com.ziroom.tech.demeterapi.dao.mapper")
 @EnableSpringGelfLog
 public class DemeterApiApplication {
 

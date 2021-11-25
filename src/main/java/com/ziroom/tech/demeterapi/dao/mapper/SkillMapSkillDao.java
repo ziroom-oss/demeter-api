@@ -4,11 +4,13 @@ import com.ziroom.tech.demeterapi.dao.entity.SkillMapSkill;
 
 import com.ziroom.tech.demeterapi.po.dto.req.MapSkill.MapSkillListReq;
 import io.swagger.models.auth.In;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-@Repository
+
+@Mapper
 public interface SkillMapSkillDao {
 
     /**

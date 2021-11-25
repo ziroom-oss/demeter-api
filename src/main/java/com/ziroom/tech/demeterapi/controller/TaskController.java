@@ -1,6 +1,5 @@
 package com.ziroom.tech.demeterapi.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
@@ -8,9 +7,7 @@ import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.file.FileService;
-import com.ziroom.tech.demeterapi.open.model.ModelResponse;
-import com.ziroom.tech.demeterapi.open.model.ModelResponseUtil;
-import com.ziroom.tech.demeterapi.open.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;

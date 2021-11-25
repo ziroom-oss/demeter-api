@@ -5,11 +5,12 @@ import com.ziroom.tech.demeterapi.dao.entity.SkillMap;
 import java.util.List;
 
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.stereotype.Repository;
-@SuppressWarnings("UnnecessaryInterfaceModifier")
-@Repository
+
+@Mapper
 public interface SkillMapDao {
 
     /**

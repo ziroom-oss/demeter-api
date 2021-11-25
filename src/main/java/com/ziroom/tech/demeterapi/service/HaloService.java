@@ -9,7 +9,6 @@ public interface HaloService {
 
     /**
      * 获取当前登录用户权限
-     * @return 权限
      */
     AuthResp getAuth();
 }

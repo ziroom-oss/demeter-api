@@ -14,9 +14,7 @@ import com.ziroom.tech.demeterapi.open.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.storage.ZiroomFile;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.po.vo.LearnManifestVo;
 import com.ziroom.tech.demeterapi.service.HaloService;
@@ -25,21 +23,17 @@ import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
 import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
-
 import java.io.IOException;
 import java.time.ZoneId;
-
 import com.ziroom.tech.demeterapi.file.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
@@ -137,7 +131,6 @@ public class TaskServiceImpl implements TaskService {
             });
         }
 
-        //消息发送 Todo
         messageService.sendAssignTaskCreated(entity.getId(), OperatorContext.getOperator(), taskReceiverString);
         return Resp.success();
     }
@@ -623,6 +616,16 @@ public class TaskServiceImpl implements TaskService {
                     }
                 default:
             }
+        } else {
+            demeterTaskUserCriteria.andTaskTypeEqualTo(TaskType.SKILL.getCode());
+            if (taskStatus != null && SkillTaskFlowStatus.isValid(taskStatus)) {
+                if (taskStatus.equals(SkillTaskFlowStatus.ALL.getCode())) {
+                    demeterTaskUserCriteria.andTaskStatusIn(SkillTaskFlowStatus.getAllTaskType().stream()
+                            .map(SkillTaskFlowStatus::getCode).collect(Collectors.toList()));
+                } else {
+                    demeterTaskUserCriteria.andTaskStatusEqualTo(taskStatus);
+                }
+            }
         }
 
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);//员工任务表
@@ -695,7 +698,7 @@ public class TaskServiceImpl implements TaskService {
                         if (Objects.nonNull(assignerUid)) {
                             resp.setAssigner(assignerUid);
                             ModelResult<UserDetailResp> userDetailModelResult = ehrServiceClient.getUserInfo(assignerUid);
-                            if (userInfoModelResult.isSuccess()) {
+                            if (userDetailModelResult.isSuccess()) {
                                 resp.setAssignerName(userDetailModelResult.getResult().getUserName());
                             }
                         }
@@ -1304,7 +1307,6 @@ public class TaskServiceImpl implements TaskService {
             }
             this.acceptAssignTask(id);
             this.createTaskOutcome(id, type);
-            //消息发送 Todo
             messageService.acceptNotice(id, type, demeterAssignTask.getPublisher());
         } else if (TaskType.SKILL.getCode().equals(type)) {
             checkSkillForbidden(id);
@@ -1320,7 +1322,6 @@ public class TaskServiceImpl implements TaskService {
             }
             // 技能类任务必须认证
             this.createTaskOutcome(id, type);
-            //消息发送 Todo
             messageService.acceptNotice(id, type, demeterSkillTask.getPublisher());
         }
 
@@ -1472,7 +1473,6 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         demeterTaskUserDao.updateByPrimaryKeySelective(entity);
         // 拒绝原因处理
-        //消息发送 Todo
         messageService.rejectTaskNotice(rejectTaskReq.getTaskId());
         return Resp.success();
     }
@@ -1637,7 +1637,6 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         demeterAuthHistoryDao.insertSelective(demeterAuthHistory);
 
-        //消息发送 Todo
         messageService.checkoutResultNotice(checkTaskReq.getTaskId(), checkTaskReq.getTaskType(), checkTaskReq.getReceiverUid(), checkTaskReq.getResult());
         return Resp.success();
     }
@@ -1677,7 +1676,6 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskIdEqualTo(taskId)
                     .andTaskTypeEqualTo(taskType)
                     .andReceiverUidEqualTo(OperatorContext.getOperator());
-            //消息发送 Todo
             messageService.startCheckoutNotice(taskId, TaskType.SKILL.getCode());
         } else if (taskType.equals(TaskType.ASSIGN.getCode())) {
             demeterTaskUserExampleCriteria
@@ -1685,7 +1683,6 @@ public class TaskServiceImpl implements TaskService {
                     .andTaskTypeEqualTo(taskType)
                     .andReceiverUidEqualTo(OperatorContext.getOperator())
                     .andTaskStatusNotEqualTo(AssignTaskFlowStatus.REJECTED.getCode());
-            //消息发送 Todo
             messageService.startCheckoutNotice(taskId, TaskType.ASSIGN.getCode());
         }
         List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);

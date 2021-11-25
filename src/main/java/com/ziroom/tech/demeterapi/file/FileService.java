@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 
 /**
+ * 文件中心 此处需要替换为自己的文件中心
  * @author xuzyeu
  */
 @Slf4j

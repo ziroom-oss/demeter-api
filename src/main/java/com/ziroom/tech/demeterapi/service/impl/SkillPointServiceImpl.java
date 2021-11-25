@@ -259,23 +259,26 @@ public class SkillPointServiceImpl implements SkillPointService {
         demeterTaskUsers.forEach(taskUser -> {
             ReceiveQueryResp resp = new ReceiveQueryResp();
             DemeterSkillTask skill = skillTaskMap.get(taskUser.getTaskId());
-            List<Long> roles = Arrays.stream(skill.getCheckRole().split(",")).map(Long::parseLong).collect(Collectors.toList());
-            List<Long> demeterRoles = roleMap.get("60028724").stream().map(DemeterRole::getId).collect(Collectors.toList());
-            if (!hasIntersection(roles, demeterRoles).isEmpty()) {
-                BeanUtils.copyProperties(skill, resp);
-                resp.setTaskUserId(taskUser.getId());
-                resp.setTaskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + skill.getId());
-                resp.setTaskType(TaskType.SKILL.getCode());
-                resp.setTaskTypeName(TaskType.SKILL.getDesc());
-                resp.setTaskReward(skill.getSkillReward());
-                resp.setReceiver(taskUser.getReceiverUid());
-                resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getUserName());
-                resp.setPublisherName(userMap.get(skill.getPublisher()).getUserName());
-                resp.setTaskFlowStatus(taskUser.getTaskStatus());
-                resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
-                resp.setSubmitCheckTime(taskUser.getModifyTime());
-                respList.add(resp);
+            if(Objects.nonNull(skill)){
+                List<Long> roles = Arrays.stream(skill.getCheckRole().split(",")).map(Long::parseLong).collect(Collectors.toList());
+                List<Long> demeterRoles = roleMap.get("60028724").stream().map(DemeterRole::getId).collect(Collectors.toList());
+                if (!hasIntersection(roles, demeterRoles).isEmpty()) {
+                    BeanUtils.copyProperties(skill, resp);
+                    resp.setTaskUserId(taskUser.getId());
+                    resp.setTaskNo(TaskIdPrefix.SKILL_PREFIX.getDesc() + skill.getId());
+                    resp.setTaskType(TaskType.SKILL.getCode());
+                    resp.setTaskTypeName(TaskType.SKILL.getDesc());
+                    resp.setTaskReward(skill.getSkillReward());
+                    resp.setReceiver(taskUser.getReceiverUid());
+                    resp.setReceiverName(userMap.get(taskUser.getReceiverUid()).getUserName());
+                    resp.setPublisherName(userMap.get(skill.getPublisher()).getUserName());
+                    resp.setTaskFlowStatus(taskUser.getTaskStatus());
+                    resp.setTaskFlowStatusName(SkillTaskFlowStatus.getByCode(taskUser.getTaskStatus()).getDesc());
+                    resp.setSubmitCheckTime(taskUser.getModifyTime());
+                    respList.add(resp);
+                }
             }
+
         });
 
         respList.sort(Comparator.comparing(ReceiveQueryResp::getTaskFlowStatus).thenComparing(ReceiveQueryResp::getSubmitCheckTime, Comparator.reverseOrder()));

@@ -19,8 +19,7 @@ public class HaloComponent {
     private List<String> managerList = Arrays.asList("60028724","60010370");
 
     /**
-     * @param authReq
-     * @return
+     * 获取用户的权限
      */
     public AuthResp auth(AuthReq authReq) {
         AuthResp authResp = new AuthResp();

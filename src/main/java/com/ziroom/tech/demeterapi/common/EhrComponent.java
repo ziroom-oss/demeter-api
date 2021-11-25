@@ -10,6 +10,8 @@ import com.ziroom.tech.demeterapi.common.api.EhrApiEndPoint;
 import com.ziroom.tech.demeterapi.common.api.EhrEndPoint;
 import com.ziroom.tech.demeterapi.common.utils.RetrofitCallAdaptor;
 import com.ziroom.tech.demeterapi.config.RecordLogger;
+import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
+import com.ziroom.tech.demeterapi.open.model.ModelResult;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrEmpListReq;
 import com.ziroom.tech.demeterapi.po.dto.req.ehr.EhrOrgListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.*;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
@@ -65,6 +68,9 @@ public class EhrComponent {
 
     @Resource
     private EhrApiEndPoint ehrApiEndPoint;
+
+    @Autowired
+    private EhrServiceClient ehrServiceClient;
 
     /**
      * 通过部门编码获取部门下的人员列表
@@ -195,29 +201,26 @@ public class EhrComponent {
 
     /**
      * 模糊查询用户
-     *
-     * @param ehrEmpListReq req
-     * @return 结果
      */
     public List<UserResp> getEmpList(EhrEmpListReq ehrEmpListReq) {
+        String empCodeNameAdcode = ehrEmpListReq.getEmpCodeNameAdcode();
+        ModelResult<List<UserDetailResp>> modelResult = ehrServiceClient.getAllUsers(empCodeNameAdcode);
+        if(!modelResult.isSuccess()){
+            log.error("查询员工信息失败");
+            return new ArrayList<>();
+        }
+        List<UserDetailResp> userDetailRespList = modelResult.getResult();
         List<UserResp> resp = Lists.newArrayList();
-        Map<String, Object> empReqMap = initReqMap(ehrEmpListReq);
-        Call<JSONObject> response = ehrEndPoint.getEmpList(empReqMap);
-
-        Optional.ofNullable(RetrofitCallAdaptor.execute(response)).ifPresent(respData -> {
-            if (Objects.equals(respData.getString(ERROR_CODE_ATTRIBUTE), "20000")) {
-                JSONArray data = respData.getJSONArray(DATA_ATTRIBUTE);
-                data.stream().map(o -> JSONObject.parseObject(JSON.toJSONString(o))).forEach(jsonObject -> {
-                    UserResp ehrUserResp = new UserResp();
-                    ehrUserResp.setName(jsonObject.getString("fullName"));
-                    ehrUserResp.setCode(jsonObject.getString("empCode"));
-                    ehrUserResp.setEmail(jsonObject.getString("email"));
-                    resp.add(ehrUserResp);
-                });
-            }
-        });
+        for(UserDetailResp userDetailResp : userDetailRespList){
+            UserResp ehrUserResp = new UserResp();
+            ehrUserResp.setName(userDetailResp.getUserName());
+            ehrUserResp.setCode(userDetailResp.getUserCode());
+            ehrUserResp.setEmail(userDetailResp.getEmail());
+            resp.add(ehrUserResp);
+        }
         return resp;
     }
+
 
     /**
      * 查询用户详情

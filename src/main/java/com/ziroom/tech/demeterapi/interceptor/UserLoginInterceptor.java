@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.config;
+package com.ziroom.tech.demeterapi.interceptor;
 
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author daijiankun
  */
-public class DemeterInterceptor implements HandlerInterceptor {
+public class UserLoginInterceptor implements HandlerInterceptor {
 
     private static final List<String> swaggerUrl = Lists.newArrayList("/doc.html", "/swagger-resources");
 

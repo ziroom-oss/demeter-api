@@ -24,6 +24,7 @@ import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.ReceiveQueryResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.SkillDetailResp;
+import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.SkillPointService;
 import java.util.function.Function;
@@ -68,6 +69,9 @@ public class SkillPointServiceImpl implements SkillPointService {
 
     @Resource
     private TaskServiceImpl taskService;
+
+    @Resource
+    private MessageService messageService;
 
 
     @Override
@@ -324,8 +328,8 @@ public class SkillPointServiceImpl implements SkillPointService {
         }
 
 
-        //消息发送 TODO
-        //messageService.acceptNotice(id, TaskType.SKILL.getCode(), demeterSkillTask.getPublisher());
+        //消息发送
+        messageService.acceptNotice(id, TaskType.SKILL.getCode(), demeterSkillTask.getPublisher());
 
         TaskFinishConditionExample taskFinishConditionExample = new TaskFinishConditionExample();
         taskFinishConditionExample.createCriteria()

@@ -9,6 +9,7 @@ import com.ziroom.tech.demeterapi.open.portrait.person.param.PortraitPersonReqPa
 import java.util.List;
 
 /**
+ * 个人画像
  * @author xuzeyu
  */
 public interface PortraitPersonService {

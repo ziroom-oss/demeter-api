@@ -1,8 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
-import com.ziroom.tech.demeterapi.core.SkillTree;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillLearnPath;
-import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.po.dto.req.task.SkillTaskUserExtend;
 import lombok.Data;
 

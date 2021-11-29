@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.*;
 import com.ziroom.tech.demeterapi.common.enums.*;
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
-import com.ziroom.tech.demeterapi.core.SkillNode;
+import com.ziroom.tech.demeterapi.po.model.SkillNode;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
 import com.ziroom.tech.demeterapi.file.model.FileModel;
@@ -14,10 +14,10 @@ import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.task.*;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.po.dto.resp.halo.AuthResp;
+import com.ziroom.tech.demeterapi.open.auth.model.AuthModelResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.task.*;
 import com.ziroom.tech.demeterapi.po.vo.LearnManifestVo;
-import com.ziroom.tech.demeterapi.service.HaloService;
+import com.ziroom.tech.demeterapi.open.auth.service.AuthService;
 import com.ziroom.tech.demeterapi.service.MessageService;
 import com.ziroom.tech.demeterapi.service.RoleService;
 import com.ziroom.tech.demeterapi.service.TaskService;
@@ -25,7 +25,7 @@ import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
 import java.io.IOException;
 import java.time.ZoneId;
-import com.ziroom.tech.demeterapi.file.FileService;
+import com.ziroom.tech.demeterapi.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
     private EhrServiceClient ehrServiceClient;
 
     @Resource
-    private HaloService haloService;
+    private AuthService authService;
     
     @Resource
     private SkillTreeDao skillTreeDao;
@@ -1220,7 +1220,11 @@ public class TaskServiceImpl implements TaskService {
 
 
     private CurrentRole getCurrentRole() {
-        AuthResp permission = haloService.getAuth();
+        ModelResult<AuthModelResp> authModelModelResult = authService.getAuth();
+        if(!authModelModelResult.isSuccess()){
+            throw new BusinessException("用户权限认证失败");
+        }
+        AuthModelResp permission = authModelModelResult.getResult();
         List<String> roles = permission.getRoles();
         if (roles.contains(CurrentRole.SUPER.getCode())) {
             return CurrentRole.SUPER;

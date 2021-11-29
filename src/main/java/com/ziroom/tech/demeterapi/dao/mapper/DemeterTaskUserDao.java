@@ -1,14 +1,10 @@
 package com.ziroom.tech.demeterapi.dao.mapper;
 
 import com.ziroom.tech.demeterapi.dao.entity.*;
-
 import java.util.List;
-
 import com.ziroom.tech.demeterapi.po.dto.req.ranking.RankingReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-import org.springframework.stereotype.Repository;
 
 @Mapper
 public interface DemeterTaskUserDao {

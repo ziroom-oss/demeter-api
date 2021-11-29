@@ -1,6 +1,6 @@
 package com.ziroom.tech.demeterapi.po.dto.resp.task;
 
-import com.ziroom.tech.demeterapi.core.SkillTree;
+import com.ziroom.tech.demeterapi.po.model.SkillTree;
 import lombok.Data;
 
 /**

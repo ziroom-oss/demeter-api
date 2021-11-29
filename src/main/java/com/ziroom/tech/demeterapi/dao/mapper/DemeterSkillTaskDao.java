@@ -26,6 +26,8 @@ public interface DemeterSkillTaskDao {
 
     public List<DemeterSkillTask> selectByExample(DemeterSkillTaskExample example);
 
+    public List<DemeterSkillTask> selectByTaskIds(@Param("taskIdList")List<Long> taskIdList);
+
     public DemeterSkillTask selectByPrimaryKey(Long id);
 
     public int updateByExampleSelective(@Param("record") DemeterSkillTask record, @Param("example") DemeterSkillTaskExample example);

@@ -1,6 +1,5 @@
 package com.ziroom.tech.demeterapi.controller;
 
-import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterRole;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.role.RoleQueryReq;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("api/role")
-@LogHttpService
 public class RoleController {
 
     @Resource

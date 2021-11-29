@@ -1,8 +1,6 @@
 package com.ziroom.tech.demeterapi.controller;
 
-import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.common.PageListResp;
-import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.skill.BatchQueryReq;
@@ -15,16 +13,13 @@ import com.ziroom.tech.demeterapi.service.SkillPointService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author daijiankun
@@ -32,7 +27,6 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "api/skill")
-@LogHttpService
 public class SkillPointController {
 
     @Resource

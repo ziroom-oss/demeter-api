@@ -1,6 +1,12 @@
 package com.ziroom.tech.demeterapi.open.portrait.person.service.impl;
 
 import com.google.common.collect.Lists;
+import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
+import com.ziroom.tech.demeterapi.common.enums.TaskType;
+import com.ziroom.tech.demeterapi.dao.entity.*;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
+import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
 import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.DateUtil;
@@ -9,6 +15,7 @@ import com.ziroom.tech.demeterapi.open.portrait.person.dao.PortraitPersonGrowing
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitDevlopReportDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonGrowingupDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonProjectDto;
+import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonSkillDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.entity.PortraitPersonGrowingupEntity;
 import com.ziroom.tech.demeterapi.open.portrait.person.param.PortraitPersonReqParam;
 import com.ziroom.tech.demeterapi.open.portrait.person.service.PortraitPersonService;
@@ -16,9 +23,7 @@ import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +34,12 @@ public class PortraitPersonServiceImpl implements PortraitPersonService {
 
     @Autowired
     private PortraitMapper portraitMapper;
+
+    @Autowired
+    private DemeterSkillTaskDao demeterSkillTaskDao;
+
+    @Autowired
+    private DemeterTaskUserDao demeterTaskUserDao;
 
     @Autowired
     private PortraitPersonGrowingupMapper portraitPersonGrowingupMapper;
@@ -100,5 +111,29 @@ public class PortraitPersonServiceImpl implements PortraitPersonService {
          */
         List<PortraitPersonProjectDto> portraitPersonProjectDtos = Lists.newArrayList();
         return ModelResultUtil.success(portraitPersonProjectDtos);
+    }
+
+    /**
+     * 个人技能完成情况画像
+     */
+    public ModelResult<PortraitPersonSkillDto> getPortraitPersonSkillInfo(String uid) {
+        PortraitPersonSkillDto portraitPersonSkillDto = new PortraitPersonSkillDto();
+        DemeterTaskUserExample demeterTaskUserExample = new DemeterTaskUserExample();
+        demeterTaskUserExample.createCriteria()
+                .andTaskTypeEqualTo(TaskType.SKILL.getCode())
+                .andReceiverUidEqualTo(uid)
+                .andTaskStatusEqualTo(SkillTaskFlowStatus.PASS.getCode());
+        List<DemeterTaskUser> demeterTaskUsers = demeterTaskUserDao.selectByExample(demeterTaskUserExample);
+        if(CollectionUtils.isNotEmpty(demeterTaskUsers)){
+            portraitPersonSkillDto.setSkillPointNum(demeterTaskUsers.size());
+            List<Long> taskIds = demeterTaskUsers.stream().map(DemeterTaskUser::getTaskId).collect(Collectors.toList());
+            List<DemeterSkillTask> demeterSkillTasks = demeterSkillTaskDao.selectByTaskIds(taskIds);
+            Map<Integer, List<DemeterSkillTask>> skillRelTaskMap = demeterSkillTasks.stream().collect(Collectors.groupingBy(DemeterSkillTask::getSkillId, Collectors.toList()));
+            if(Objects.nonNull(skillRelTaskMap)){
+                portraitPersonSkillDto.setSkillNum(skillRelTaskMap.size());
+            }
+        }
+        return ModelResultUtil.success(portraitPersonSkillDto);
+
     }
 }

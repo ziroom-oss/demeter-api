@@ -1,6 +1,5 @@
 package com.ziroom.tech.demeterapi.controller;
 
-import com.ziroom.gelflog.spring.logger.LogHttpService;
 import com.ziroom.tech.demeterapi.dao.entity.SkillTree;
 import com.ziroom.tech.demeterapi.po.dto.Resp;
 import com.ziroom.tech.demeterapi.po.dto.req.Tree.SkillTreeCreateReq;
@@ -24,7 +23,6 @@ import java.util.Optional;
 @Api("技能树")
 @Slf4j
 @RequestMapping("/api/tree")
-@LogHttpService
 public class TreeController {
     @Resource
     private TreeService treeService;

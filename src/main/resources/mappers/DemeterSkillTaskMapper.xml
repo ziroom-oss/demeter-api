@@ -106,6 +106,20 @@
             order by ${orderByClause}
         </if>
     </select>
+
+    <select id="selectByTaskIds" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM demeter_skill_task where 1=1
+        <if test="taskIdList != null">
+            and id in (
+            <foreach collection="taskIdList" item="item" index="index" open="" close="" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT 
         <include refid="Base_Column_List"/>

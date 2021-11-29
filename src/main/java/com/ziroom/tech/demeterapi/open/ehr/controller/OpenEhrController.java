@@ -48,20 +48,4 @@ public class OpenEhrController {
         return ModelResponseUtil.ok(personUserInfoVO);
     }
 
-    /**
-     * 获取部门列表
-     */
-    @RequestMapping(value = "/departmentList", method = RequestMethod.GET)
-    public ModelResponse<List<EhrDepartmentInfoVO>> getDepartmentList() {
-        //获取部门列表
-        ModelResult<List<EhrDepartmentInfoDto>> modelResult = openEhrService.getDepartmentList();
-        if(!ModelResultUtil.isSuccess(modelResult)){
-            log.warn("[EhrController] openEhrService.getDepartmentList result is {}", JSON.toJSONString(modelResult));
-            return ModelResponseUtil.error(modelResult.getResultCode(), modelResult.getResultMessage());
-        }
-        List<EhrDepartmentInfoDto> departmentInfoDtoList = modelResult.getResult();
-        List<EhrDepartmentInfoVO> departmentInfoVOS = departmentInfoDtoList.stream().map(EhrConverter.EhrDepartmentInfoConverter()).collect(Collectors.toList());
-        return ModelResponseUtil.ok(departmentInfoVOS);
-    }
-
 }

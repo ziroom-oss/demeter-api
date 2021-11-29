@@ -18,49 +18,77 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDetailResp {
 
+    /**
+     * 用户code 唯一标识
+     */
     private String userCode;
 
+    /**
+     * 用户名
+     */
     private String userName;
 
-    @ApiModelProperty("职务 P:主职")
+    /**
+     * 职务
+     */
     private String job;
 
-    @ApiModelProperty("职务 ID")
+    /**
+     * 职务 ID
+     */
     private String jobId;
 
-    @ApiModelProperty("部门")
+    /**
+     * 部门
+     */
     private String dept;
 
-    @ApiModelProperty("部门code")
+    /**
+     * 部门code
+     */
     private String deptCode;
 
-    @ApiModelProperty("组")
-    private String group;
-
-    @ApiModelProperty("电话")
-    private String phone;
-
-    @ApiModelProperty("邮箱")
-    private String email;
-
-    private String highestEducation;
-
-    private String levelName;
-
-    private String photo;
-
     /**
-     * 转正日期？
+     * 部门路径
      */
-    private String effdt;
-
     private String treePath;
 
-    public UserDetailResp(String userCode, String userName, String email, String dept, String deptCode) {
+    /**
+     * 组
+     */
+    private String group;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 最高学历
+     */
+    private String highestEducation;
+
+    /**
+     * 职级
+     */
+    private String levelName;
+
+    /**
+     * 照片地址
+     */
+    private String photo;
+
+    public UserDetailResp(String userCode, String userName, String email, String dept, String deptCode, String treePath) {
         this.userCode = userCode;
         this.userName = userName;
         this.dept = dept;
         this.deptCode = deptCode;
         this.email = email;
+        this.treePath = treePath;
     }
 }

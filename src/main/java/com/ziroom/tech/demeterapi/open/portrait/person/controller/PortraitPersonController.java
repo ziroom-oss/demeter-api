@@ -9,12 +9,16 @@ import com.ziroom.tech.demeterapi.open.portrait.person.converter.PortraitPersonC
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitDevlopReportDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonGrowingupDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonProjectDto;
+import com.ziroom.tech.demeterapi.open.portrait.person.dto.PortraitPersonSkillDto;
 import com.ziroom.tech.demeterapi.open.portrait.person.param.PortraitPersonReqParam;
 import com.ziroom.tech.demeterapi.open.portrait.person.service.PortraitPersonService;
 import com.ziroom.tech.demeterapi.open.portrait.person.vo.PortraitDevlopRespVO;
 import com.ziroom.tech.demeterapi.open.portrait.person.vo.PortraitPersonGrowingupRespVO;
 import com.ziroom.tech.demeterapi.open.portrait.person.vo.PortraitPersonProjectRespVO;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
+import com.ziroom.tech.demeterapi.po.dto.req.portrayal.DailyTaskReq;
+import com.ziroom.tech.demeterapi.po.dto.resp.portrait.DailyTaskResp;
+import com.ziroom.tech.demeterapi.service.PortraitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +37,9 @@ public class PortraitPersonController extends BaseController {
 
     @Resource(name = "test")
     private PortraitPersonService portraitPersonService;
+
+    @Resource
+    private PortraitService portraitService;
 
     /**
      * 个人成长指标信息展现(默认获取当前月最新指标展示,可自行修改)
@@ -92,6 +99,28 @@ public class PortraitPersonController extends BaseController {
         PortraitDevlopReportDto teamDevlopPortrait = teamDevlopPortraitModelResult.getResult();
         PortraitDevlopRespVO portraitDevlopRespVO = PortraitPersonConverter.PortraitPersonDevlopConverter().apply(teamDevlopPortrait);
         return ModelResponseUtil.ok(portraitDevlopRespVO);
+    }
+
+    /**
+     * 获取员工技能认证画像
+     */
+    @RequestMapping(value = "task", method = RequestMethod.POST)
+    public ModelResponse<DailyTaskResp> getDailyTaskInfo(@RequestBody DailyTaskReq dailyTaskReq) {
+        DailyTaskResp dailyTaskInfo = portraitService.getDailyTaskInfo(dailyTaskReq);
+        return ModelResponseUtil.ok(dailyTaskInfo);
+    }
+
+    /**
+     * 获取员工技能认证情况
+     */
+    @RequestMapping(value = "portraitPersonSkillInfo", method = RequestMethod.GET)
+    public ModelResponse<PortraitPersonSkillDto> getPortraitPersonSkillInfo(@RequestParam String uid) {
+        ModelResult<PortraitPersonSkillDto> portraitPersonSkillInfoModelResult = portraitPersonService.getPortraitPersonSkillInfo(uid);
+        if(!ModelResultUtil.isSuccess(portraitPersonSkillInfoModelResult)){
+            log.warn("[PortraitPersonController] portraitPersonService.getPortraitPersonSkillInfo result is {}", JSON.toJSONString(portraitPersonSkillInfoModelResult));
+            return ModelResponseUtil.error(portraitPersonSkillInfoModelResult.getResultCode(), portraitPersonSkillInfoModelResult.getResultMessage());
+        }
+        return ModelResponseUtil.ok(portraitPersonSkillInfoModelResult.getResult());
     }
 
 }

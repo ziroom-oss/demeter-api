@@ -33,8 +33,8 @@ import java.util.Optional;
  * @author: xuzeyu
  */
 @Slf4j
-@Component
-@ConditionalOnExpression("!'${spring.profiles.active}'.equals('test')")
+@Component("handlerInterceptor")
+@ConditionalOnExpression("!'${spring.profiles.active}'.equals('dev')")
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private RedisFacade redisFacade;

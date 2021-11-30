@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <property name="LOG_DIR" value="/logs"/>
+    <property name="LOG_DIR" value="/app/logs"/>
     <property name="LOG_NAME" value="demeter"/>
 
     <appender name="service_info"

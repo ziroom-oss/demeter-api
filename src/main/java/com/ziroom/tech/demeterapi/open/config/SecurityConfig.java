@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.config;
+package com.ziroom.tech.demeterapi.open.config;
 
 import com.ziroom.tech.demeterapi.open.interceptor.UserLoginInterceptor;
 import com.ziroom.zcloud.sso.ZCloudSSOAuthenticationProvider;

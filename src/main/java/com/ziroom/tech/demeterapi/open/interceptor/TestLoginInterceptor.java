@@ -21,12 +21,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 测试时生效的 登录拦截器
+ * 演示版本生效的 登录拦截器
  * @author: xuzeyu
  */
 @Slf4j
 @Component("handlerInterceptor")
-@ConditionalOnExpression("'${spring.profiles.active}'.equals('test')")
+@ConditionalOnExpression("'${spring.profiles.active}'.equals('dev')")
 public class TestLoginInterceptor implements HandlerInterceptor {
 
     @Override

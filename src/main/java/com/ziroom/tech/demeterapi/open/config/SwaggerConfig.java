@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.config;
+package com.ziroom.tech.demeterapi.open.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +11,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * @author libingsi
- * @date 2021/9/16 14:01
+ * @author xuzeyu
  */
 @Configuration
 @EnableSwagger2
@@ -31,9 +30,9 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 //标题
-                .title("自如员工成长平台swagger文档")
+                .title("员工成长平台swagger文档")
                 //简介
-                .description("我们的目标是星辰大海")
+                .description("360员工成长")
                 //服务条款
                 .termsOfServiceUrl("")
                 .version("2.0")

@@ -1,6 +1,6 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;

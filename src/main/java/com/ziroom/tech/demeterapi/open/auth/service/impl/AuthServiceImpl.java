@@ -1,7 +1,7 @@
 package com.ziroom.tech.demeterapi.open.auth.service.impl;
 
 import com.ziroom.tech.demeterapi.open.auth.client.AuthServiceClient;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.open.auth.param.AuthReqParam;

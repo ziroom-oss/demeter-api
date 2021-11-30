@@ -2,7 +2,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.CheckoutResult;
 import com.ziroom.tech.demeterapi.common.enums.TaskIdPrefix;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;

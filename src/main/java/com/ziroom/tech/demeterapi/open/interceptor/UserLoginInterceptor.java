@@ -1,7 +1,7 @@
 package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.google.common.collect.Lists;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;

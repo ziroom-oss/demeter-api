@@ -1,20 +1,17 @@
 package com.ziroom.tech.demeterapi.open.ehr.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResponse;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResponseUtil;
 import com.ziroom.tech.demeterapi.open.ehr.converter.EhrConverter;
-import com.ziroom.tech.demeterapi.open.ehr.dto.EhrDepartmentInfoDto;
 import com.ziroom.tech.demeterapi.open.ehr.dto.EhrUserInfoDto;
 import com.ziroom.tech.demeterapi.open.ehr.service.OpenEhrService;
-import com.ziroom.tech.demeterapi.open.ehr.vo.EhrDepartmentInfoVO;
 import com.ziroom.tech.demeterapi.open.ehr.vo.EhrUserInfoVO;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
 import com.ziroom.tech.demeterapi.open.login.converter.LoginConverter;
 import com.ziroom.tech.demeterapi.open.login.dto.UserInfoDto;
-import com.ziroom.tech.demeterapi.open.login.service.LoginService;
 import com.ziroom.tech.demeterapi.open.login.vo.UserInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author xuzeyu

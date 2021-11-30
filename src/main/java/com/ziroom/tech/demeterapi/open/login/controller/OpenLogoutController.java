@@ -1,6 +1,6 @@
 package com.ziroom.tech.demeterapi.open.login.controller;
 
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.facade.CookieFacade;
 import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;

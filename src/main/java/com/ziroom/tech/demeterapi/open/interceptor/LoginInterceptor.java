@@ -1,7 +1,7 @@
 package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
 import com.ziroom.tech.demeterapi.open.common.constant.ContentTypeEnum;
 import com.ziroom.tech.demeterapi.open.common.constant.RedisConstants;

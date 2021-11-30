@@ -2,7 +2,7 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.common.PageListResp;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskConditionStatus;

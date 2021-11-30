@@ -1,9 +1,7 @@
 package com.ziroom.tech.demeterapi.open.portrait.person.service.impl;
 
 import com.google.common.collect.Lists;
-import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
-import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUser;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterTaskUserExample;

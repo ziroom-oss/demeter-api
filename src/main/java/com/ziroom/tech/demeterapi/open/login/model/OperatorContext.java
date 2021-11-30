@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.common;
+package com.ziroom.tech.demeterapi.open.login.model;
 
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.zcloud.sso.ZCloudUserInfo;

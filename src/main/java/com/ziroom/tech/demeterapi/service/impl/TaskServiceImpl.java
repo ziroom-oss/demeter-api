@@ -7,7 +7,7 @@ import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.po.model.SkillNode;
 import com.ziroom.tech.demeterapi.dao.entity.*;
 import com.ziroom.tech.demeterapi.dao.mapper.*;
-import com.ziroom.tech.demeterapi.file.model.FileModel;
+import com.ziroom.tech.demeterapi.open.file.model.FileModel;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
@@ -25,7 +25,7 @@ import com.ziroom.tech.demeterapi.utils.DateUtils;
 import com.ziroom.tech.demeterapi.utils.StringUtil;
 import java.io.IOException;
 import java.time.ZoneId;
-import com.ziroom.tech.demeterapi.file.service.FileService;
+import com.ziroom.tech.demeterapi.open.file.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1236,7 +1236,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private List<String> getCurrentDeptUsers() {
-        String deptCode = UserParamThreadLocal.get().getDeptCode();
+        String deptCode = OperatorContext.get().getDeptCode();
         ModelResult<List<UserDetailResp>> usersByDeptModelResult = ehrServiceClient.getUsersByDept(deptCode);
         List<UserDetailResp> users = usersByDeptModelResult.getResult();
         return users.stream().map(UserDetailResp::getUserCode).collect(Collectors.toList());

@@ -1,7 +1,6 @@
 package com.ziroom.tech.demeterapi.service.impl;
 
 import com.ziroom.tech.demeterapi.common.OperatorContext;
-import com.ziroom.tech.demeterapi.common.UserParamThreadLocal;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskType;
 import com.ziroom.tech.demeterapi.dao.entity.DemeterSkillTask;
@@ -15,7 +14,6 @@ import com.ziroom.tech.demeterapi.dao.mapper.DemeterSkillTaskDao;
 import com.ziroom.tech.demeterapi.dao.mapper.DemeterTaskUserDao;
 import com.ziroom.tech.demeterapi.dao.mapper.SkillMapDao;
 import com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillBkDao;
-import com.ziroom.tech.demeterapi.dao.mapper.SkillMapSkillDao;
 import com.ziroom.tech.demeterapi.po.dto.req.Map.SkillMapListReq;
 import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryData;
 import com.ziroom.tech.demeterapi.po.dto.resp.map.SummaryMapResp;
@@ -24,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

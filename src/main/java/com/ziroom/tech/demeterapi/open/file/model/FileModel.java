@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.file.model;
+package com.ziroom.tech.demeterapi.open.file.model;
 
 import lombok.Data;
 

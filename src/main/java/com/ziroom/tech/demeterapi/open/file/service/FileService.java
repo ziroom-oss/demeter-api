@@ -1,11 +1,9 @@
-package com.ziroom.tech.demeterapi.file.service;
+package com.ziroom.tech.demeterapi.open.file.service;
 
-import com.ziroom.tech.demeterapi.file.model.FileModel;
+import com.ziroom.tech.demeterapi.open.file.model.FileModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;

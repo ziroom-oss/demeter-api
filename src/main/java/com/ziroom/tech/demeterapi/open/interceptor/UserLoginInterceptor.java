@@ -1,8 +1,7 @@
-package com.ziroom.tech.demeterapi.interceptor;
+package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.google.common.collect.Lists;
 import com.ziroom.tech.demeterapi.common.OperatorContext;
-import com.ziroom.tech.demeterapi.common.UserParamThreadLocal;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -44,6 +43,6 @@ public class UserLoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        UserParamThreadLocal.remove();
+        OperatorContext.remove();
     }
 }

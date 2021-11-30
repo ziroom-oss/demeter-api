@@ -2,8 +2,8 @@ package com.ziroom.tech.demeterapi.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ziroom.tech.demeterapi.common.OperatorContext;
 import com.ziroom.tech.demeterapi.common.PageListResp;
-import com.ziroom.tech.demeterapi.common.UserParamThreadLocal;
 import com.ziroom.tech.demeterapi.common.enums.SkillTaskFlowStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskConditionStatus;
 import com.ziroom.tech.demeterapi.common.enums.TaskIdPrefix;
@@ -314,7 +314,7 @@ public class SkillPointServiceImpl implements SkillPointService {
 
     @Override
     public Resp<Object> quickAuthReq(Long id) {
-        String userId = UserParamThreadLocal.get().getUserId();
+        String userId = OperatorContext.getOperator();
         taskService.checkSkillForbidden(id);
         DemeterSkillTask demeterSkillTask = demeterSkillTaskDao.selectByPrimaryKey(id);
         if (Objects.isNull(demeterSkillTask)) {

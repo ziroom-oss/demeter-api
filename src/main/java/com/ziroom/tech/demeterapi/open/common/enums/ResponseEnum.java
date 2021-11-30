@@ -71,6 +71,20 @@ public enum ResponseEnum {
      */
     RESPONSE_HTTPEXCEPTION_CODE("50003", "服务异常，请稍后重试"),
 
+    /**
+     * 账号或密码错误
+     */
+    FRONT_LOGIN_USER_PASSWORD_WRONG("20701", "账号或密码错误"),
+
+    FRONT_NO_LOGIN("20715", "请登录后访问"),
+
+    FRONT_LOGIN_USER_TOKEN_EXPIRE("NO_LOGIN", "token 过期"),
+
+    PERMISSION_DENIED("50003", "请登录后访问"),
+
+    FRONT_LOGIN_USER_TOKEN_WRONG("20703", "token 错误"),
+
+    FRONT_LOGIN_USER_TOKEN_SIG_WRONG("20704", "token 非平台签发"),
 
     PARAM_CHECK_COMMON_ERROR("6000", "通用参数检查错误");
 

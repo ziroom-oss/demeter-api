@@ -1,8 +1,10 @@
 package com.ziroom.tech.demeterapi.open.ehr.client.service;
 
 import com.google.common.collect.Lists;
+import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
+import com.ziroom.tech.demeterapi.open.login.param.LogInUserParam;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.EhrDeptResp;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import org.apache.commons.collections4.CollectionUtils;
@@ -99,6 +101,17 @@ public class EhrServiceClient {
         put("李元芳", new UserDetailResp("60050001","李元芳","liyf1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
     }};
 
+    Map<String, UserDetailResp> userLoginMap = new HashMap<String, UserDetailResp>(){{
+        put("yangty1", new UserDetailResp("60010370","杨天佑","yangty1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("xuzy5", new UserDetailResp("60033587","徐泽宇","xuzy5@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("daijk", new UserDetailResp("60028724","代建坤","daijk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("daijr", new UserDetailResp("60022930","戴锦如","daijr@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("liangrk", new UserDetailResp("60007423","梁仁凯","liangrk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("zhangxt3", new UserDetailResp("60034198","章鑫童","zhangxt3@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("dirj1", new UserDetailResp("60050000","狄仁杰","dirj1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
+        put("liyf1", new UserDetailResp("60050001","李元芳","liyf1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
+    }};
+
 
     /**
      * 根据用户系统号查询用户名称
@@ -125,7 +138,18 @@ public class EhrServiceClient {
     }
 
     /**
-     * 查询用户信息
+     * 登录专属 根据登录名/密码查询
+     */
+    public ModelResult<UserDetailResp> getUserInfoByLogin(LogInUserParam loginParam){
+        UserDetailResp userDetailResp = userMap.get(loginParam.getLoginName());
+        if(Objects.isNull(userDetailResp)){
+          ModelResultUtil.error(ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getCode(),ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getMessage());
+        }
+        return ModelResultUtil.success(userDetailResp);
+    }
+
+    /**
+     * 根据用户唯一标识code查询用户信息
      */
     public ModelResult<UserDetailResp> getUserInfo(String userCode){
         UserDetailResp userDetailResp = userMap.get(userCode);

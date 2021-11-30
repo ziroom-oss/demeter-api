@@ -8,15 +8,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户详情
- *
- * @author huangqiaowei
- * @date 2020-07-01 19:41
+ * 用户信息
+ * @author xuzeyu
  **/
 @Data
 @Api("用户详情")
 @NoArgsConstructor
 public class UserDetailResp {
+
+    /**
+     * 用户登录账号
+     */
+    private String loginCode;
+
+    /**
+     * 用户登录密码
+     */
+    private String password;
 
     /**
      * 用户code 唯一标识

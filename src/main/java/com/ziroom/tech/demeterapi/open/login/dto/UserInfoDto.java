@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * 用户详情
- *
  * @author xuzeyu
  **/
 @Data

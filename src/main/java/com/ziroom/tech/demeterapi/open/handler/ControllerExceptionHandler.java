@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.handler;
+package com.ziroom.tech.demeterapi.open.handler;
 
 import com.ziroom.tech.demeterapi.common.exception.BusinessException;
 import com.ziroom.tech.demeterapi.po.dto.Resp;

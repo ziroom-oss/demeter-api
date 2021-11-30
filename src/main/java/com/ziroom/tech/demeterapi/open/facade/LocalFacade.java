@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.facade;
+package com.ziroom.tech.demeterapi.open.facade;
 
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * 用户登录信息缓存 key=token, value=用户信息
- * author: xuzeyu
+ * @author: xuzeyu
  */
 @Slf4j
 public class LocalFacade {

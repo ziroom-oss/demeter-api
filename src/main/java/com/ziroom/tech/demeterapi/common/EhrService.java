@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
+ * 旧版用户服务 和 OpenEhrService 同属用户服务 后期会将此部分转移至 OpenEhrService
  * @author xuzeyu
  **/
 @Slf4j

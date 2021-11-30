@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <property name="LOG_DIR" value="/logs"/>
+    <property name="LOG_NAME" value="demeter"/>
+
+    <appender name="service_info"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_NAME}_info.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_DIR}/${LOG_NAME}_info.%d{yyyy-MM-dd}.log.zip
+            </FileNamePattern>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] [%tid] %-5level %logger{50} - %msg%n
+                </pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="service_error"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <file>${LOG_DIR}/${LOG_NAME}_error.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_DIR}/${LOG_NAME}_error.%d{yyyy-MM-dd}.log.zip
+            </FileNamePattern>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] [%tid] %-5level %logger{50} - %msg%n
+                </pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <logger name="com.ziroom" level="INFO">
+        <appender-ref ref="service_info"/>
+    </logger>
+
+    <logger name="root" level="INFO">
+        <appender-ref ref="service_error"/>
+    </logger>
+
+</configuration>
+

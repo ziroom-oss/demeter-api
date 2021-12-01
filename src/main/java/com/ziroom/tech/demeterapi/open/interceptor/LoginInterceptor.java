@@ -55,7 +55,6 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
         String jwtToken = request.getHeader(SystemConstants.AUTHORIZATION);
-        //String jwtToken = getJwtToken(request);
         if (jwtToken == null || StringUtils.isBlank(jwtToken.trim())) {
             String contentType = request.getContentType();
             if (contentType != null && contentType.startsWith(ContentTypeEnum.TEXT_HTML.value)) {

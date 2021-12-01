@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
+ * 演示版本-登出
  * @author: xuzeyu
  */
 @Slf4j

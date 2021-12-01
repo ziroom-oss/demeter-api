@@ -4,17 +4,23 @@ import com.ziroom.tech.demeterapi.open.common.constant.RedisConstants;
 import com.ziroom.tech.demeterapi.open.common.model.SopUserRedisStoreModel;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: xuzeyu
  */
 @Slf4j
 @Component
+@ConditionalOnExpression("!'${spring.profiles.active}'.equals('test')")
 public class RedisFacade {
 
-//    @Autowired
-//    private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 保持 Session 过期 30 分钟
@@ -23,7 +29,7 @@ public class RedisFacade {
         SopUserRedisStoreModel sopUserRedisStoreModel = getSopUserRedisStoreModel(userDetailResp);
         sopUserRedisStoreModel.setRenewTimes(0L);
         sopUserRedisStoreModel.setRenewTimeStamp(System.currentTimeMillis());
-        //redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + userDetailResp.getUserCode(), sopUserRedisStoreModel, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + userDetailResp.getUserCode(), sopUserRedisStoreModel, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE, TimeUnit.SECONDS);
     }
 
 
@@ -33,7 +39,7 @@ public class RedisFacade {
      * @param user
      */
     public void updateRedisStoreUser(SopUserRedisStoreModel user) {
-        //redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + user.getUserCode(), user, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE,TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + user.getUserCode(), user, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE,TimeUnit.SECONDS);
     }
 
 
@@ -41,9 +47,8 @@ public class RedisFacade {
      * 获取 当前用户信息
      */
     public SopUserRedisStoreModel getCurrentUser(String userCode) {
-        //String key = RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + userCode;
-        //return key == null ? null : redisTemplate.opsForValue().get(key);
-        return null;
+        String key = RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + userCode;
+        return key == null ? null : (SopUserRedisStoreModel)redisTemplate.opsForValue().get(key);
     }
 
     /**
@@ -52,7 +57,7 @@ public class RedisFacade {
     public void renew(SopUserRedisStoreModel user) {
         user.setRenewTimeStamp(System.currentTimeMillis());
         user.setRenewTimes(user.getRenewTimes() + 1);
-        //redisTemplate.opsForValue().set(RedisConstats.KEY.DEMETER_FRONT_LOGIN_STRING + user.getUserCode(), user, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE,TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + user.getUserCode(), user, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE,TimeUnit.SECONDS);
     }
 
     /**
@@ -60,7 +65,7 @@ public class RedisFacade {
      */
     public void deleteRedisStoreUser(String userCode) {
         String key = RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + userCode;
-        //redisTemplate.delete(key);
+        redisTemplate.delete(key);
     }
 
     private SopUserRedisStoreModel getSopUserRedisStoreModel(UserDetailResp user) {

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 用户登录信息缓存 key=userCode, value=用户信息
+ * 演示版本-用户登录信息缓存 key=userCode, value=用户信息
  * @author: xuzeyu
  */
 @Slf4j

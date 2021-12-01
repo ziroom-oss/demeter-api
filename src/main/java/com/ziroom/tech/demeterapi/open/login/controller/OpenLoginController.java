@@ -57,8 +57,6 @@ public class OpenLoginController {
                                                        HttpSession session, HttpServletResponse response) {
         // 统一登录模块
         ModelResult<LoginResultVo> loginResultVoWebModelResult = commonLoginHandle(loginParam);
-        // 写 jwt 相关的 cookie
-        //cookieFacade.addJWTCookie(response, loginResultVoWebModelResult.getResult());
         return ModelResponseUtil.ok(loginResultVoWebModelResult.getResult());
     }
 

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * 登录
+ * 演示版本-登录
  * @author xuzeyu
  */
 @RestController

@@ -35,8 +35,6 @@ public class RedisFacade {
 
     /**
      * 更新缓存
-     *
-     * @param user
      */
     public void updateRedisStoreUser(SopUserRedisStoreModel user) {
         redisTemplate.opsForValue().set(RedisConstants.KEY.DEMETER_FRONT_LOGIN_STRING + user.getUserCode(), user, RedisConstants.DEMETER_FRONT_LOGIN_EXPIRE,TimeUnit.SECONDS);

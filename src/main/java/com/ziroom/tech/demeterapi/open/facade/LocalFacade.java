@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 用户登录信息缓存 key=token, value=用户信息
+ * 用户登录信息缓存 key=userCode, value=用户信息
  * @author: xuzeyu
  */
 @Slf4j
@@ -14,17 +14,17 @@ public class LocalFacade {
 
     private static Map<String, UserDetailResp> loginInfos = new HashMap<>();
 
-    public static void saveLoginInfo(String token, UserDetailResp userDetailResp) {
-        loginInfos.put(token, userDetailResp);
+    public static void saveLoginInfo(String userCode, UserDetailResp userDetailResp) {
+        loginInfos.put(userCode, userDetailResp);
     }
 
-    public static UserDetailResp getLoginInfo(String token){
-        return loginInfos.get(token);
+    public static UserDetailResp getLoginInfo(String userCode){
+        return loginInfos.get(userCode);
     }
 
-    private static void delete(String token) {
-        if(loginInfos.containsKey(token)){
-            loginInfos.remove(token);
+    public static void delete(String userCode) {
+        if(loginInfos.containsKey(userCode)){
+            loginInfos.remove(userCode);
         }
     }
 

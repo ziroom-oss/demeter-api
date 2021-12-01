@@ -19,6 +19,7 @@ import com.ziroom.tech.demeterapi.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -36,6 +37,7 @@ import java.util.Objects;
 @RestController
 @Slf4j
 @RequestMapping("open/api/login")
+@ConditionalOnExpression("!'${spring.profiles.active}'.equals('test')")
 public class OpenLoginController {
 
     @Resource(name = "testOpenEhrService")
@@ -103,9 +105,10 @@ public class OpenLoginController {
             String sopWebJWT = JwtUtils.createDemeterJWT(JSON.toJSONString(new JwtSubjectModel(userDetailResp.getUserCode(), System.currentTimeMillis())));
 
             // 存Redis
+            userDetailResp.setLoginCode(loginParam.getLoginName());
             redisFacade.saveJwt(userDetailResp);
 
-            LoginResultVo loginResultVo = new LoginResultVo(sopWebJWT, userDetailResp.getUserCode());
+            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), sopWebJWT);
             return ModelResultUtil.success(loginResultVo);
         }catch (Exception e){
             log.error("[OpenLoginController] OpenLoginController.commonLoginHandle exception", e);

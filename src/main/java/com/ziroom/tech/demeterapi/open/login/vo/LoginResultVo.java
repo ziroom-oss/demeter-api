@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class LoginResultVo implements Serializable {
 
     /**
-     * 用户名
+     * 用户code
      */
     private String uid;
 

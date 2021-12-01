@@ -141,7 +141,7 @@ public class EhrServiceClient {
      * 登录专属 根据登录名/密码查询
      */
     public ModelResult<UserDetailResp> getUserInfoByLogin(LogInUserParam loginParam){
-        UserDetailResp userDetailResp = userMap.get(loginParam.getLoginName());
+        UserDetailResp userDetailResp = userLoginMap.get(loginParam.getLoginName());
         if(Objects.isNull(userDetailResp)){
           ModelResultUtil.error(ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getCode(),ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getMessage());
         }

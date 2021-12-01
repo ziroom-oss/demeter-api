@@ -1,17 +1,24 @@
 package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
+import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
+import com.ziroom.tech.demeterapi.open.login.model.JwtSubjectModel;
 import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.common.constant.ContentTypeEnum;
 import com.ziroom.tech.demeterapi.open.common.constant.SystemConstants;
 import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;
 import com.ziroom.tech.demeterapi.open.facade.LocalFacade;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
+import com.ziroom.tech.demeterapi.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,8 +32,8 @@ import java.util.Objects;
  * @author: xuzeyu
  */
 @Slf4j
-@Component("handlerInterceptor")
-@ConditionalOnExpression("'${spring.profiles.active}'.equals('dev')")
+@Component("loginHandlerInterceptor")
+@ConditionalOnExpression("'${spring.profiles.active}'.equals('test')")
 public class TestLoginInterceptor implements HandlerInterceptor {
 
     @Override
@@ -50,16 +57,32 @@ public class TestLoginInterceptor implements HandlerInterceptor {
             }
             return false;
         }
-        UserDetailResp loginInfo = LocalFacade.getLoginInfo(jwtToken);
+        //解析token
+        ModelResult<JwtSubjectModel> jwtSubjectModelModelResult = JwtUtils.parseJWT(jwtToken);
+        if (!jwtSubjectModelModelResult.isSuccess() || jwtSubjectModelModelResult.getResult() == null) {
+            responseOutWithJson(response, jwtSubjectModelModelResult);
+            return false;
+        }
+        JwtSubjectModel jwtSubjectModel = jwtSubjectModelModelResult.getResult();
+        UserDetailResp loginInfo = LocalFacade.getLoginInfo(jwtSubjectModel.getCode());
         if (Objects.isNull(loginInfo)) {
             Map<String, Object> stringObjectMap = resultMessage(ResponseEnum.FRONT_LOGIN_USER_TOKEN_EXPIRE, null);
             responseOutWithJson(response, stringObjectMap);
             return false;
         }
 
-        //存储登录用户code
-        OperatorContext.setOperator();
+        //存储登录用户信息
+        OperatorContext.setOperator(loginInfo);
         return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        OperatorContext.remove();
     }
 
     /**

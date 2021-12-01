@@ -25,6 +25,10 @@ public class OperatorContext {
         });
     }
 
+    public static void setOperator(UserDetailResp userDetailResp) {
+        userInfoThreadLocal.set(userDetailResp);
+    }
+
     public static String getOperator() {
         return userInfoThreadLocal.get().getUserCode();
     }

@@ -1,16 +1,18 @@
 package com.ziroom.tech.demeterapi.open.login.controller;
 
-import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
-import com.ziroom.tech.demeterapi.open.facade.CookieFacade;
-import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
+import com.ziroom.tech.demeterapi.open.facade.CookieFacade;
+import com.ziroom.tech.demeterapi.open.facade.LocalFacade;
+import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
+import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -20,11 +22,8 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 @RestController
 @RequestMapping("open/api/logOut")
-@ConditionalOnExpression("!'${spring.profiles.active}'.equals('test')")
-public class OpenLogoutController {
-
-    @Autowired
-    private RedisFacade redisFacade;
+@ConditionalOnExpression("'${spring.profiles.active}'.equals('test')")
+public class TestOpenLogoutController {
 
     /**
      * 登出
@@ -34,7 +33,7 @@ public class OpenLogoutController {
         //获取当前登录人
         String operator = OperatorContext.getOperator();
         // 删除记录 Redis
-        redisFacade.deleteRedisStoreUser(operator);
+        LocalFacade.delete(operator);
         // 销毁 session
         session.invalidate();
         // 记录登出日志

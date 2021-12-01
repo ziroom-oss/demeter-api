@@ -1,6 +1,7 @@
 package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
 import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
 import com.ziroom.tech.demeterapi.open.common.constant.ContentTypeEnum;
@@ -10,6 +11,7 @@ import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.model.SopUserRedisStoreModel;
 import com.ziroom.tech.demeterapi.open.login.model.JwtSubjectModel;
+import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,9 +37,10 @@ import java.util.Optional;
  * @author: xuzeyu
  */
 @Slf4j
-@Component("handlerInterceptor")
-@ConditionalOnExpression("!'${spring.profiles.active}'.equals('dev')")
+@Component("loginHandlerInterceptor")
+@ConditionalOnExpression("!'${spring.profiles.active}'.equals('test')")
 public class LoginInterceptor implements HandlerInterceptor {
+
     @Autowired
     private RedisFacade redisFacade;
 
@@ -95,28 +100,25 @@ public class LoginInterceptor implements HandlerInterceptor {
             redisFacade.renew(currentUser);
         }
 
-        //存储登录用户code
-        OperatorContext.setOperator();
+        //存储登录用户信息
+        UserDetailResp userDetailResp = new UserDetailResp();
+        userDetailResp.setLoginCode(currentUser.getLoginCode());
+        userDetailResp.setUserCode(currentUser.getUserCode());
+        userDetailResp.setUserName(currentUser.getUserName());
+        userDetailResp.setDeptCode(currentUser.getDeptCode());
+        OperatorContext.setOperator(userDetailResp);
         return true;
     }
 
-
-    /**
-     * 获取jwt token
-     */
-    private String getJwtToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        log.info("[LoginInterceptor] cookies:{}", JSON.toJSONString(cookies));
-        if(cookies == null || cookies.length<1){
-            return null;
-        }
-        Optional<Cookie> first = Arrays.stream(cookies).filter(x -> SystemConstants.JWT_TOKEN.equals(x.getName())).findFirst();
-        if (first.isPresent()) {
-            Cookie cookie = first.get();
-            return cookie.getValue();
-        }
-        return null;
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
     }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        OperatorContext.remove();
+    }
+
 
     /**
      * 写出数据

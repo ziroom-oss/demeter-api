@@ -6,6 +6,7 @@ import com.ziroom.tech.demeterapi.open.common.model.ModelResponse;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResponseUtil;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResultUtil;
+import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
 import com.ziroom.tech.demeterapi.open.ehr.service.OpenEhrService;
 import com.ziroom.tech.demeterapi.open.facade.CookieFacade;
 import com.ziroom.tech.demeterapi.open.facade.LocalFacade;
@@ -16,6 +17,7 @@ import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
 import com.ziroom.tech.demeterapi.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -28,14 +30,13 @@ import javax.servlet.http.HttpSession;
  */
 @RestController
 @Slf4j
-@RequestMapping("test/open/api/login")
+@RequestMapping("open/api/login")
+@ConditionalOnExpression("'${spring.profiles.active}'.equals('test')")
 public class TestOpenLoginController {
 
     @Resource(name = "testOpenEhrService")
     private OpenEhrService openEhrService;
 
-    @Autowired
-    private CookieFacade cookieFacade;
 
     /**
      * 用户名密码登录
@@ -45,11 +46,8 @@ public class TestOpenLoginController {
                                                        HttpSession session, HttpServletResponse response) {
         // 统一登录模块
         ModelResult<LoginResultVo> loginResultVoWebModelResult = commonLoginHandle(loginParam);
-        // 写 jwt 相关的 cookie
-        //cookieFacade.addJWTCookie(response, loginResultVoWebModelResult.getResult());
         return ModelResponseUtil.ok(loginResultVoWebModelResult.getResult());
     }
-
 
     /**
      * 通用登录模块
@@ -67,9 +65,11 @@ public class TestOpenLoginController {
             String sopWebJWT = JwtUtils.createDemeterJWT(JSON.toJSONString(new JwtSubjectModel(userDetailResp.getUserCode(), System.currentTimeMillis())));
 
             // 存本地缓存
+            userDetailResp.setLoginCode(loginParam.getLoginName());
+            userDetailResp.setPassword(loginParam.getPassword());
             LocalFacade.saveLoginInfo(userDetailResp.getUserCode(), userDetailResp);
 
-            LoginResultVo loginResultVo = new LoginResultVo(sopWebJWT, userDetailResp.getUserCode());
+            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), sopWebJWT);
             return ModelResultUtil.success(loginResultVo);
         }catch (Exception e){
             log.error("[OpenLoginController] OpenLoginController.commonLoginHandle exception", e);

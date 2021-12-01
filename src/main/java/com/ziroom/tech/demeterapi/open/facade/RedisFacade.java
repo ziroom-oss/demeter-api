@@ -65,8 +65,10 @@ public class RedisFacade {
 
     private SopUserRedisStoreModel getSopUserRedisStoreModel(UserDetailResp user) {
         SopUserRedisStoreModel sopUserRedisStoreModel = new SopUserRedisStoreModel();
+        sopUserRedisStoreModel.setLoginCode(user.getLoginCode());
         sopUserRedisStoreModel.setUserCode(user.getUserCode());
         sopUserRedisStoreModel.setUserName(user.getUserName());
+        sopUserRedisStoreModel.setDeptCode(user.getDeptCode());
         return sopUserRedisStoreModel;
     }
 

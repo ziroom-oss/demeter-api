@@ -23,9 +23,20 @@ public class SopUserRedisStoreModel implements Serializable {
     private String userName;
 
     /**
+     * 用户登录账号
+     */
+    private String loginCode;
+
+    /**
+     * 用户所属部门code
+     */
+    private String deptCode;
+
+    /**
      * 续签次数
      */
     private Long renewTimes ;
+
     /**
      * 续签时间
      */

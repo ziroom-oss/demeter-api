@@ -8,7 +8,7 @@
 接入此系统需要完成的事情：
 1. 员工画像部分-完成数据指标的采集分析,根据本系统提供的数据模型 采集指标 定时同步数据指标, 此系统仅提供数据展示能力(演示版 有静态数据提供)。
 2. 接入自己公司的用户中心, 消息中心, 文件中心, 权限中心(演示版 有本地服务提供, 用户中心参见 EhrServiceClient.class 消息中心参见 
-   ConsoleSendHandler.class 文件中心参见 FileService.class 权限中心参见 AuthServiceClient.class 用户接入需要替换)
+   ConsoleSendHandler.class 文件中心参见 FileService.class 当前仅支持文本格式文件 权限中心参见 AuthService.class 用户接入根据需要替换)
    
 3. 配置文件中更改redis缓存地址, 根据需要修改 RedisFacade.class (登录模块需要redis, 演示版有本地缓存提供)
 4. 登录拦截器(演示版 由TestLoginInterceptor.class支持, 正式使用时替换为LoginInterceptor.class)

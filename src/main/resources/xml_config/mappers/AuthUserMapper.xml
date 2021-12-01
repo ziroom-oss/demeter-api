@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--suppress ALL -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziroom.tech.demeterapi.open.auth.dao.AuthUserMapper">
+    <sql id="Base_Column_List">
+        id, user_code, role, create_time, modify_time
+    </sql>
+
+    <select id="getRoles" resultType="com.ziroom.tech.demeterapi.open.auth.entity.AuthUserEntity" >
+        select <include refid="Base_Column_List"/> from demeter_auth_user where 1=1
+        <if test="userCode != null and userCode != ''">
+            and user_code=#{userCode}
+        </if>
+    </select>
+</mapper>

@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.utils;
+package com.ziroom.tech.demeterapi.open.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ziroom.tech.demeterapi.open.common.enums.ResponseEnum;

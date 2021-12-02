@@ -15,7 +15,7 @@ import com.ziroom.tech.demeterapi.open.login.model.JwtSubjectModel;
 import com.ziroom.tech.demeterapi.open.login.param.LogInUserParam;
 import com.ziroom.tech.demeterapi.open.login.vo.LoginResultVo;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.utils.JwtUtils;
+import com.ziroom.tech.demeterapi.open.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

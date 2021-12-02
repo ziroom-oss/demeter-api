@@ -1,4 +1,4 @@
-package com.ziroom.tech.demeterapi.utils;
+package com.ziroom.tech.demeterapi.open.utils;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 

@@ -5,7 +5,7 @@ import com.ziroom.tech.demeterapi.open.common.model.ModelResponse;
 import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.utils.ModelResponseUtil;
 import com.ziroom.tech.demeterapi.open.login.model.JwtSubjectModel;
-import com.ziroom.tech.demeterapi.utils.JwtUtils;
+import com.ziroom.tech.demeterapi.open.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

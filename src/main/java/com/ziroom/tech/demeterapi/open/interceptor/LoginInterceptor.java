@@ -1,7 +1,6 @@
 package com.ziroom.tech.demeterapi.open.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import com.ziroom.tech.demeterapi.open.ehr.client.service.EhrServiceClient;
 import com.ziroom.tech.demeterapi.open.login.model.OperatorContext;
 import com.ziroom.tech.demeterapi.open.facade.RedisFacade;
 import com.ziroom.tech.demeterapi.open.common.constant.ContentTypeEnum;
@@ -12,7 +11,7 @@ import com.ziroom.tech.demeterapi.open.common.model.ModelResult;
 import com.ziroom.tech.demeterapi.open.common.model.SopUserRedisStoreModel;
 import com.ziroom.tech.demeterapi.open.login.model.JwtSubjectModel;
 import com.ziroom.tech.demeterapi.po.dto.resp.ehr.UserDetailResp;
-import com.ziroom.tech.demeterapi.utils.JwtUtils;
+import com.ziroom.tech.demeterapi.open.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +20,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 登录拦截器

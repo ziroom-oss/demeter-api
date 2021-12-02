@@ -1,4 +1,14 @@
 
+-----------------------------------------------------------用户权限-----------------------------------------------------------------
+CREATE TABLE `demeter_auth_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_code` int(11) NOT NULL COMMENT '用户code',
+  `role` varchar(20) NOT NULL COMMENT '角色',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='用户权限管理';
+
 -----------------------------------------------------------员工画像-----------------------------------------------------------------
 CREATE TABLE `ca_commit_report` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

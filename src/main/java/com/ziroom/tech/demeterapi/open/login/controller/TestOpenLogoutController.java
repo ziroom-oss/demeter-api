@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 @RestController
-@RequestMapping("open/api/logOut")
+@RequestMapping("open/api/logout")
 @ConditionalOnExpression("'${spring.profiles.active}'.equals('test')")
 public class TestOpenLogoutController {
 

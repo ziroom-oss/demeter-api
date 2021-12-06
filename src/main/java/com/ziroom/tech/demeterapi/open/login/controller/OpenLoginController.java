@@ -106,7 +106,7 @@ public class OpenLoginController {
             userDetailResp.setLoginCode(loginParam.getLoginName());
             redisFacade.saveJwt(userDetailResp);
 
-            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), sopWebJWT);
+            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), userDetailResp.getUserName(), sopWebJWT);
             return ModelResultUtil.success(loginResultVo);
         }catch (Exception e){
             log.error("[OpenLoginController] OpenLoginController.commonLoginHandle exception", e);

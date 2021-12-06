@@ -66,7 +66,7 @@ public class TestOpenLoginController {
             userDetailResp.setPassword(loginParam.getPassword());
             LocalFacade.saveLoginInfo(userDetailResp.getUserCode(), userDetailResp);
 
-            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), sopWebJWT);
+            LoginResultVo loginResultVo = new LoginResultVo(userDetailResp.getUserCode(), userDetailResp.getUserName(), sopWebJWT);
             return ModelResultUtil.success(loginResultVo);
         }catch (Exception e){
             log.error("[OpenLoginController] OpenLoginController.commonLoginHandle exception", e);

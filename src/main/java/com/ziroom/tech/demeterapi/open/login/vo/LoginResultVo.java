@@ -20,6 +20,11 @@ public class LoginResultVo implements Serializable {
     private String uid;
 
     /**
+     * 姓名
+     */
+    private String name;
+
+    /**
      * token
      */
     private String token ;

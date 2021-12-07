@@ -46,7 +46,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (requestURI.startsWith(request.getContextPath() + SystemConstants.NO_INTERCEPT_URI)
                 || requestURI.equals(request.getContextPath() + "/error")
                 || requestURI.equals(request.getContextPath() + "/")
-                || requestURI.equals(request.getContextPath() + "")
+                || requestURI.startsWith(request.getContextPath() + "/api/task/get/outcome")
         ) {
             return true;
         }

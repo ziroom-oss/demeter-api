@@ -39,7 +39,8 @@ public class TestLoginInterceptor implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
         if (requestURI.startsWith(request.getContextPath() + SystemConstants.NO_INTERCEPT_URI)
                 || requestURI.equals(request.getContextPath() + "/error")
-                || requestURI.equals(request.getContextPath() + "/ok")) {
+                || requestURI.equals(request.getContextPath() + "/ok")
+        || requestURI.startsWith(request.getContextPath() + "/api/task/get/outcome")) {
             return true;
         }
         String jwtToken = request.getHeader(SystemConstants.AUTHORIZATION);

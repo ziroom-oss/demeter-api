@@ -43,6 +43,9 @@ public class TestOpenLoginController {
                                                        HttpSession session, HttpServletResponse response) {
         // 统一登录模块
         ModelResult<LoginResultVo> loginResultVoWebModelResult = commonLoginHandle(loginParam);
+        if(!ModelResultUtil.isSuccess(loginResultVoWebModelResult)){
+            return ModelResponseUtil.error(loginResultVoWebModelResult.getResultCode(), loginResultVoWebModelResult.getResultMessage());
+        }
         return ModelResponseUtil.ok(loginResultVoWebModelResult.getResult());
     }
 
@@ -55,7 +58,7 @@ public class TestOpenLoginController {
             ModelResult<UserDetailResp> modelResult = openEhrService.getUserInfoByLogin(loginParam);
             if (!ModelResultUtil.isSuccess(modelResult)) {
                 log.error("[LoginController] openEhrService.getUserInfoByLogin result is {}", JSON.toJSONString(modelResult));
-                return ModelResultUtil.error(modelResult.getResultCode(), modelResult.getResultMessage());
+                return ModelResultUtil.error(ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getCode(), ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getMessage());
             }
             // 生成 jwt_token
             UserDetailResp userDetailResp = modelResult.getResult();

@@ -96,7 +96,7 @@ public class OpenLoginController {
             ModelResult<UserDetailResp> modelResult = openEhrService.getUserInfoByLogin(loginParam);
             if (!ModelResultUtil.isSuccess(modelResult)) {
                 log.error("[LoginController] openEhrService.getUserInfoByLogin result is {}", JSON.toJSONString(modelResult));
-                return ModelResultUtil.error(modelResult.getResultCode(), modelResult.getResultMessage());
+                return ModelResultUtil.error(ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getCode(), ResponseEnum.FRONT_LOGIN_USER_PASSWORD_WRONG.getMessage());
             }
             // 生成 jwt_token
             UserDetailResp userDetailResp = modelResult.getResult();

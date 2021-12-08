@@ -36,5 +36,7 @@ public interface DemeterTaskUserDao {
     public int updateByPrimaryKeySelective(DemeterTaskUser record);
 
     public int updateByPrimaryKey(DemeterTaskUser record);
+
+    int selectByTaskIdAndReceiveId(@Param("taskId")Long taskId, @Param("receiveId")String receiveId);
 }
 

@@ -88,7 +88,7 @@ CREATE TABLE `demeter_person_growingup` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='开发者个人成长画像展现表';
 -----------------------------------------------------------技能图谱-----------------------------------------------------------------
-create table demeter.demeter_assign_task
+create table demeter_assign_task
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
@@ -111,7 +111,7 @@ create table demeter.demeter_assign_task
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '指派任务';
 
-create table demeter.demeter_auth_history
+create table demeter_auth_history
 (
   `id` bigint(10) NOT NULL AUTO_INCREMENT,
   `user_task_id` bigint(10) NOT NULL COMMENT '主键',
@@ -125,7 +125,7 @@ create table demeter.demeter_auth_history
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='认证历史表';
 
-create table demeter.demeter_role
+create table demeter_role
 (
   `id` bigint(10) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `role_code` varchar(100) NOT NULL COMMENT '角色编码',
@@ -136,7 +136,7 @@ create table demeter.demeter_role
   UNIQUE KEY `demeter_role_role_code_uindex` (`role_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
-create table demeter.demeter_skill_learn_path
+create table demeter_skill_learn_path
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `task_user_id` bigint(20) NOT NULL COMMENT '关联detmeter_task_user主键',
@@ -150,7 +150,7 @@ create table demeter.demeter_skill_learn_path
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='员工技能点学习路径';
 
-create table demeter.demeter_skill_task
+create table demeter_skill_task
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `task_name` varchar(255) NOT NULL DEFAULT '' COMMENT '任务名称',
@@ -171,7 +171,7 @@ create table demeter.demeter_skill_task
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '技能点';
 
-create table demeter.demeter_task_user
+create table demeter_task_user
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `task_id` bigint(20) NOT NULL COMMENT '任务id',
@@ -191,7 +191,7 @@ create table demeter.demeter_task_user
   PRIMARY KEY (`id`,`task_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='任务发布和接收记录表';
 
-create table demeter.demeter_task_user_extend
+create table demeter_task_user_extend
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `task_user_id` bigint(20) NOT NULL COMMENT '关联detmeter_task_user主键',
@@ -205,7 +205,7 @@ create table demeter.demeter_task_user_extend
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='员工任务扩展表(task-user，task，manifest)';
 
-create table demeter.demeter_user_learn_manifest
+create table demeter_user_learn_manifest
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL COMMENT '学习清单名称',
@@ -221,7 +221,7 @@ create table demeter.demeter_user_learn_manifest
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='员工学习清单表';
 
-create table demeter.jobs
+create table jobs
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `code` int(11) NOT NULL COMMENT '职务编号',
@@ -233,7 +233,7 @@ create table demeter.jobs
   UNIQUE KEY `unique_code` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='互联网职务清单';
 
-create table demeter.role_user
+create table role_user
 (
   `id` bigint(10) NOT NULL AUTO_INCREMENT,
   `system_code` varchar(30) NOT NULL,
@@ -244,7 +244,7 @@ create table demeter.role_user
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='角色人员关系表';
 
 
-create table demeter.skill_map
+create table skill_map
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL COMMENT '图谱名称',
@@ -256,7 +256,7 @@ create table demeter.skill_map
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='技能图谱管理表';
 
-create table demeter.skill_map_skill
+create table skill_map_skill
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `skill_map_id` int(11) NOT NULL COMMENT '技能图谱表主键',
@@ -268,7 +268,7 @@ create table demeter.skill_map_skill
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='技能图谱-技能点关联表';
 
-create table demeter.skill_tree
+create table skill_tree
 (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL COMMENT '节点名称',
@@ -280,7 +280,7 @@ create table demeter.skill_tree
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='技能树';
 
-create table demeter.task_finish_condition
+create table task_finish_condition
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `task_id` bigint(20) NOT NULL COMMENT '关联的任务id',
@@ -293,7 +293,7 @@ create table demeter.task_finish_condition
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='技能验收标准';
 
-create table demeter.task_finish_condition_info
+create table task_finish_condition_info
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `uid` varchar(20) NOT NULL COMMENT '任务完成条件关联的员工系统号',
@@ -308,7 +308,7 @@ create table demeter.task_finish_condition_info
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='员工技能点完成情况';
 
-create table demeter.task_finish_outcome
+create table task_finish_outcome
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `file_address` varchar(2000) NOT NULL DEFAULT '' COMMENT '学习成果文件下载地址',

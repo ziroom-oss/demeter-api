@@ -278,4 +278,10 @@
             modify_id = #{modifyId,jdbcType=VARCHAR}
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectByTaskAndUid" resultType="int">
+        SELECT count(1)
+        FROM task_finish_outcome
+        WHERE task_id = #{taskId} and receiver_uid = #{receiveId}
+    </select>
 </mapper>

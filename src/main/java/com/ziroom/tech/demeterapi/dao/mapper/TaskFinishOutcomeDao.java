@@ -31,4 +31,6 @@ public interface TaskFinishOutcomeDao {
     public int updateByPrimaryKeySelective(TaskFinishOutcome record);
 
     public int updateByPrimaryKey(TaskFinishOutcome record);
+
+    int selectByTaskAndUid(@Param("taskId")Long taskId, @Param("receiveId")String receiveId);
 }

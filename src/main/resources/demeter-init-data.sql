@@ -1,6 +1,9 @@
 INSERT INTO `demeter_auth_user` VALUES ('1', '60028724', 'demeter-super-admin', '2021-12-01 19:35:45', '2021-12-01 19:35:45');
 INSERT INTO `demeter_auth_user` VALUES ('2', '60010370', 'demeter-super-admin', '2021-12-01 19:35:52', '2021-12-01 19:36:00');
 INSERT INTO `demeter_auth_user` VALUES ('3', '60033587', 'plain', '2021-12-01 19:47:54', '2021-12-01 19:47:54');
+INSERT INTO `demeter_auth_user` VALUES ('4', '60022930', 'plain', '2021-12-07 10:13:26', '2021-12-07 10:13:29');
+INSERT INTO `demeter_auth_user` VALUES ('5', '60007423', 'plain', '2021-12-07 10:13:51', '2021-12-07 10:13:53');
+INSERT INTO `demeter_auth_user` VALUES ('6', '60034198', 'plain', '2021-12-07 10:14:06', '2021-12-07 10:14:08');
 
 INSERT INTO `demeter_role` VALUES ('1', 'java-tl', 'Java工程师认证者', '2021-06-23 16:18:21', '2021-06-23 08:18:18');
 INSERT INTO `demeter_role` VALUES ('2', 'fe-tl', '前端工程师认证者', '2021-06-23 16:18:20', '2021-06-23 08:18:19');

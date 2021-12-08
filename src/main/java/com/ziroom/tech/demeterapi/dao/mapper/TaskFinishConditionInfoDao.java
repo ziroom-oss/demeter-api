@@ -31,4 +31,6 @@ public interface TaskFinishConditionInfoDao {
     public int updateByPrimaryKeySelective(TaskFinishConditionInfo record);
 
     public int updateByPrimaryKey(TaskFinishConditionInfo record);
+
+    int selectByTaskAndUid(@Param("taskId")Long taskId, @Param("receiveId")String receiveId);
 }

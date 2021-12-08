@@ -808,9 +808,79 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
-     *
+     * 修改学习清单
      */
     @Transactional
+    @Override
+    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
+        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
+        manifestUpdateExample.createCriteria()
+                .andIdEqualTo(req.getId());
+        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
+                .name(req.getName())
+                .modifyId(OperatorContext.getOperator())
+                .learnPeriodStart(req.getLearnPeriodStart())
+                .learnPeriodEnd(req.getLearnPeriodEnd())
+                .learnerUid(req.getLearnerUid())
+                .build();
+        demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
+
+        long manifestId = req.getId();
+
+        // 2.创建技能点学习任务
+        String learnerUid = req.getLearnerUid();
+        // 先添加技能点到 demeter_task_user
+        req.getSkillPaths().entrySet().forEach(entry -> {
+            Long skillId = Long.valueOf(entry.getKey());
+            List<String> learnPaths = entry.getValue();
+
+            // 2.1如果技能点编号不存在，则抛出异常
+            DemeterSkillTask skillTask = demeterSkillTaskDao.selectByPrimaryKey(skillId);
+            if (Objects.isNull(skillTask)){
+                throw new BusinessException(String.format("技能点编号：%d不存在", skillId));
+            }
+
+            //判断技能任务是否已经添加
+            int total = demeterTaskUserDao.selectByTaskIdAndReceiveId(skillId, learnerUid);
+            if(total < 1){
+                // 2.2 demeter_task_user 添加技能任务
+                DemeterTaskUser taskUser = this.createTaskUser(skillId, learnerUid);
+
+                //添加认证标准
+                this.createTaskOutcome(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+
+                //此处新增任务完成条件
+                this.createTaskFinishCondition(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+
+                long taskUserId = taskUser.getId();
+                // 2.4【demeter_task_user_extend】表 demeter_task_user_extend 关联 task_user_id 到 demeter_task_user 主键，关联 manifest_id 到 demeter_user_learn_manifest 主键
+                this.createSkillTaskIntoManifest(skillId, manifestId, taskUserId);
+                // 2.5【demeter_skill_learn_path】添加学习路径
+                if(CollectionUtils.isNotEmpty(learnPaths)){
+                    learnPaths.stream().forEach(path -> {
+                        this.createLearnPathIntoSkill(taskUserId, skillId, path);
+                    });
+                }
+            }else {
+                //判断是否创建 技能认证标准
+                int num = taskFinishConditionInfoDao.selectByTaskAndUid(skillId, learnerUid);
+                if(num < 1){
+                    //添加认证标准
+                    this.createTaskOutcome(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+                    //此处新增任务完成条件
+                    this.createTaskFinishCondition(skillId, TaskType.SKILL.getCode(), req.getLearnerUid());
+                }
+            }
+
+        });
+
+
+        return 1;
+    }
+
+    /**
+     *
+     */
     @Override
     public DemeterTaskUser createTaskUser(Long taskId, String learnerUid) {
             // 2.2 如果是员工已经学习过的技能点，则抛出异常
@@ -845,27 +915,6 @@ public class TaskServiceImpl implements TaskService {
             return entity;
     }
 
-    /**
-     * 修改学习清单
-     */
-    @Transactional
-    @Override
-    public Integer modifySkillLearnManifest(ModifySkillLearnManifestReq req) {
-        DemeterUserLearnManifestExample manifestUpdateExample = new DemeterUserLearnManifestExample();
-        manifestUpdateExample.createCriteria()
-                .andIdEqualTo(req.getId());
-        DemeterUserLearnManifest manifest = DemeterUserLearnManifest.builder()
-                .name(req.getName())
-                .modifyId(OperatorContext.getOperator())
-                .learnPeriodStart(req.getLearnPeriodStart())
-                .learnPeriodEnd(req.getLearnPeriodEnd())
-                .learnerUid(req.getLearnerUid())
-                .build();
-        demeterUserLearnManifestDao.updateByExampleSelective(manifest, manifestUpdateExample);
-        return 1;
-    }
-
-    @Transactional
     @Override
     public Long createLearnPathIntoSkill(Long taskUserId, Long taskId, String path) {
         DemeterSkillLearnPathExample skillLearnPathExample = new DemeterSkillLearnPathExample();
@@ -886,7 +935,6 @@ public class TaskServiceImpl implements TaskService {
         return learnPath.getId();
     }
 
-    @Transactional
     @Override
     public Integer createSkillTaskIntoManifest(Long taskId, Long manifestId, Long taskUserId) {
         DemeterTaskUserExtend userExtend = DemeterTaskUserExtend.builder()
@@ -906,7 +954,6 @@ public class TaskServiceImpl implements TaskService {
      * 在编辑学习清单的时候，会为技能点添加学习路径 Skill_Learn_Path 表
      * 所以在移除技能点的话也得去移除属下的所有学习路径
      */
-    @Transactional
     @Override
     public Integer deleteSkillLearnManifestSkill(Long manifestId, Long taskId) {
         // 先移除 Task_User_Extend 表的记录

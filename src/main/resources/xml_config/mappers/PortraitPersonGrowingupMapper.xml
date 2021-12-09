@@ -10,7 +10,7 @@
     <select id="getUserGrowingupInfo" resultType="com.ziroom.tech.demeterapi.open.portrait.person.entity.PortraitPersonGrowingupEntity">
         select
         <include refid="Base_Column_List"/>
-        FROM demeter_open_person_growingup
+        FROM demeter_person_growingup
         <if test="contributor != null and contributor !=''">
             contributor = #{contributor}
         </if>

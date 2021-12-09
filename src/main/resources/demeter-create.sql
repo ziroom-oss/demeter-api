@@ -1,5 +1,7 @@
 
------------------------------------------------------------用户权限-----------------------------------------------------------------
+-- ----------------------------
+-- 用户权限
+-- ----------------------------
 CREATE TABLE `demeter_auth_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_code` int(11) NOT NULL COMMENT '用户code',
@@ -7,10 +9,12 @@ CREATE TABLE `demeter_auth_user` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='用户权限管理';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='用户权限管理';
 
------------------------------------------------------------员工画像-----------------------------------------------------------------
-CREATE TABLE `ca_commit_report` (
+-- ----------------------------
+-- 员工画像
+-- ----------------------------
+CREATE TABLE `demeter_ca_commit_report` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `commit_id` varchar(255) DEFAULT NULL COMMENT 'commit hash',
   `commit_time` datetime DEFAULT NULL COMMENT '提交时间',
@@ -33,7 +37,6 @@ CREATE TABLE `ca_commit_report` (
   `fun_impact` int(10) DEFAULT NULL COMMENT '提交影响的函数数目',
   `commit_fun_total` int(10) DEFAULT NULL COMMENT '提交函数总数目',
   `fun_total` int(10) DEFAULT NULL COMMENT '函数总数目',
-  `skil_points` varchar(4000) DEFAULT NULL COMMENT '技能点',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `moditiy_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -41,7 +44,7 @@ CREATE TABLE `ca_commit_report` (
   KEY `idx_pro_com_time` (`project_code`,`commit_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='提交记录分析报告展现表';
 
-CREATE TABLE `ca_commit_report` (
+CREATE TABLE `demeter_ca_person_devlop_report` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `contributor` varchar(255) DEFAULT NULL COMMENT '作者',
   `contributor_email` varchar(255) DEFAULT NULL COMMENT '作者邮箱',
@@ -69,8 +72,7 @@ CREATE TABLE `ca_commit_report` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `moditiy_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  KEY `date_index` (`commit_time`),
-  KEY `idx_pro_com_time` (`project_code`,`commit_time`)
+  KEY `contributor_time_index` (`contributor`,`create_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='开发者分析报告展现表';
 
 CREATE TABLE `demeter_person_growingup` (
@@ -87,7 +89,10 @@ CREATE TABLE `demeter_person_growingup` (
   `moditiy_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='开发者个人成长画像展现表';
------------------------------------------------------------技能图谱-----------------------------------------------------------------
+
+-- ----------------------------
+-- 技能图谱
+-- ----------------------------
 create table demeter_assign_task
 (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -211,13 +216,13 @@ create table demeter_user_learn_manifest
   `name` varchar(20) NOT NULL COMMENT '学习清单名称',
   `assigner_uid` varchar(20) NOT NULL COMMENT '分配者',
   `learner_uid` varchar(20) NOT NULL COMMENT '学习者',
-  `learn_period_start` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '学习周期开始时间',
-  `learn_period_end` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '学习周期结束时间',
+  `learn_period_start` varchar(255) DEFAULT NULL COMMENT '学习周期开始时间',
+  `learn_period_end` varchar(255) DEFAULT NULL COMMENT '学习周期结束时间',
   `is_del` tinyint(4) NOT NULL DEFAULT '0' COMMENT '1 删除',
   `modify_id` varchar(20) NOT NULL DEFAULT '',
   `create_id` varchar(20) NOT NULL DEFAULT '',
-  `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='员工学习清单表';
 

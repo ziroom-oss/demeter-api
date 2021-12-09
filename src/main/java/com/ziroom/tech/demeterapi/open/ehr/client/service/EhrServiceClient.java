@@ -61,12 +61,12 @@ public class EhrServiceClient {
      */
     Map<String, List<UserDetailResp>> userRelDeptMap = new HashMap<String, List<UserDetailResp>>(){{
         List<UserDetailResp> dept1List = Lists.newArrayList();
-        dept1List.add(new UserDetailResp("60010370","杨天佑","yangty1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        dept1List.add(new UserDetailResp("60033587","徐泽宇","xuzy5@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        dept1List.add(new UserDetailResp("60028724","代建坤","daijk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        dept1List.add(new UserDetailResp("60022930","戴锦如","daijr@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        dept1List.add(new UserDetailResp("60007423","梁仁凯","liangrk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        dept1List.add(new UserDetailResp("60034198","章鑫童","zhangxt3@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60010370","诸葛亮","zhugl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60033587","孙尚香","sunsx1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60028724","公孙离","gongsl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60022930","西施","xis1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60007423","王昭君","wangzj1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        dept1List.add(new UserDetailResp("60034198","杨玉环","yangyh1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
         put("102558", dept1List);
 
         List<UserDetailResp> dept2List = Lists.newArrayList();
@@ -80,34 +80,34 @@ public class EhrServiceClient {
      * 员工信息
      */
     Map<String, UserDetailResp> userMap = new HashMap<String, UserDetailResp>(){{
-        put("60010370", new UserDetailResp("60010370","杨天佑","yangty1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("60033587", new UserDetailResp("60033587","徐泽宇","xuzy5@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("60028724", new UserDetailResp("60028724","代建坤","daijk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("60022930", new UserDetailResp("60022930","戴锦如","daijr@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("60007423", new UserDetailResp("60007423","梁仁凯","liangrk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("60034198", new UserDetailResp("60034198","章鑫童","zhangxt3@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60010370", new UserDetailResp("60010370","诸葛亮","zhugl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60033587", new UserDetailResp("60033587","孙尚香","sunsx1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60028724", new UserDetailResp("60028724","公孙离","gongsl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60022930", new UserDetailResp("60022930","西施","xis1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60007423", new UserDetailResp("60007423","王昭君","wangzj1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("60034198", new UserDetailResp("60034198","杨玉环","yangyh1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
         put("60050000", new UserDetailResp("60050000","狄仁杰","dirj1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
         put("60050001", new UserDetailResp("60050001","李元芳","liyf1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
     }};
 
     Map<String, UserDetailResp> userMap1 = new HashMap<String, UserDetailResp>(){{
-        put("杨天佑", new UserDetailResp("60010370","杨天佑","yangty1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("徐泽宇", new UserDetailResp("60033587","徐泽宇","xuzy5@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("代建坤", new UserDetailResp("60028724","代建坤","daijk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("戴锦如", new UserDetailResp("60022930","戴锦如","daijr@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("梁仁凯", new UserDetailResp("60007423","梁仁凯","liangrk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("章鑫童", new UserDetailResp("60034198","章鑫童","zhangxt3@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("诸葛亮", new UserDetailResp("60010370","诸葛亮","zhugl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("孙尚香", new UserDetailResp("60033587","孙尚香","sunsx1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("公孙离", new UserDetailResp("60028724","公孙离","gongsl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("西施", new UserDetailResp("60022930","西施","xis1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("王昭君", new UserDetailResp("60007423","王昭君","wangzj1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("杨玉环", new UserDetailResp("60034198","杨玉环","yangyh1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
         put("狄仁杰", new UserDetailResp("60050000","狄仁杰","dirj1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
         put("李元芳", new UserDetailResp("60050001","李元芳","liyf1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
     }};
 
     Map<String, UserDetailResp> userLoginMap = new HashMap<String, UserDetailResp>(){{
-        put("yangty1", new UserDetailResp("60010370","杨天佑","yangty1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("xuzy5", new UserDetailResp("60033587","徐泽宇","xuzy5@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("daijk", new UserDetailResp("60028724","代建坤","daijk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("daijr", new UserDetailResp("60022930","戴锦如","daijr@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("liangrk", new UserDetailResp("60007423","梁仁凯","liangrk@ziroom.com", "基础平台组", "102558", "101/201/102558"));
-        put("zhangxt3", new UserDetailResp("60034198","章鑫童","zhangxt3@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("zhugl1", new UserDetailResp("60010370","诸葛亮","zhugl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("sunsx1", new UserDetailResp("60033587","孙尚香","sunsx1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("gongsl1", new UserDetailResp("60028724","公孙离","gongsl1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("xis1", new UserDetailResp("60022930","西施","xis1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("wangzj1", new UserDetailResp("60007423","王昭君","wangzj1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
+        put("yangyh1", new UserDetailResp("60034198","杨玉环","yangyh1@ziroom.com", "基础平台组", "102558", "101/201/102558"));
         put("dirj1", new UserDetailResp("60050000","狄仁杰","dirj1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
         put("liyf1", new UserDetailResp("60050001","李元芳","liyf1@ziroom.com", "北方业务拓展", "102550", "101/202/102550"));
     }};
@@ -128,8 +128,8 @@ public class EhrServiceClient {
             } else {
                 UserDetailResp userResp = new UserDetailResp();
                 userResp.setUserCode(userCode);
-                userResp.setUserName("徐泽宇");
-                userResp.setEmail("xuzy5@ziroom.com");
+                userResp.setUserName("孙尚香");
+                userResp.setEmail("sunsx1@ziroom.com");
                 userRespList.add(userResp);
             }
 
@@ -156,8 +156,8 @@ public class EhrServiceClient {
         if(Objects.isNull(userDetailResp)){
             UserDetailResp tempUser = new UserDetailResp();
             tempUser.setUserCode(userCode);
-            tempUser.setUserName("徐泽宇");
-            tempUser.setEmail("xuzy5@ziroom.com");
+            tempUser.setUserName("孙尚香");
+            tempUser.setEmail("sunsx1@ziroom.com");
             tempUser.setDept("基础平台组");
             tempUser.setDeptCode("102558");
             tempUser.setTreePath("101/201/102558");

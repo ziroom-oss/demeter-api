@@ -1,7 +1,7 @@
-# demeter
+# demeter-api
 
 ## 友情提示
-> 1. **快速体验项目**：[在线访问地址](http://www.ziroom.com)。
+> 1. **快速体验项目**：暂未提供，运行项目请参照下文 [演示版本运行必须完成的事情] 板块，完成准备工作。参照 [项目运行] 模块运行项目。
 > 2. **演示版本账号**：管理员账号: gongsl1 密码: 1  普通成员账号: wangzj1 密码: 1。
 > 3. **前端项目地址**：[demeter-ui](https://github.com/ziroom/demeter-ui)
 
@@ -63,8 +63,8 @@
 ```
 ### 项目运行
 ```lua
-├── 后端 -- 直接启动即可
-├── 前端 -- 1. npm insall   2. npm start
+├── 后端 -- 执行 [演示版本运行必须完成的事情] 后，直接启动即可
+├── 前端 -- 1. npm insall   2. npm start 具体参照 [传送门](https://github.com/ziroom/demeter-ui/README.md) 中 [搭建步骤] 模块
 ```
 ### 正式使用需要完成的事情
 
@@ -83,7 +83,7 @@
 
 ##### 业务架构图
 
-![系统架构图](http://img.macrozheng.com/mall/project/mall_business_arch.png)
+![系统架构图](src/main/resources/img/framework01.png)
 
 #### 工程指标解读
 开发当量：衡量开发者修改代码的工作量的指标
@@ -105,4 +105,4 @@
 
 ## 许可证
 
-[Apache License 2.0](https://github.com/)
+[Apache License 2.0](https://github.com/ziroom/demeter-api/LICENSE)

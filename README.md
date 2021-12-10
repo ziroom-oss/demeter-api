@@ -105,4 +105,4 @@
 
 ## 许可证
 
-[Apache License 2.0](https://github.com/ziroom/demeter-api/LICENSE)
+[Apache License 2.0](LICENSE)

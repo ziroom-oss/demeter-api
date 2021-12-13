@@ -61,12 +61,12 @@
 ```lua
 ├── 数据库 -- 1. 创建数据库(mysql版本 5.7之后版本 支持多个timestamp)   2. 执行 demeter-create.sql, demeter-init.sql 导入数据   3. 修改 application-test.properties 数据库配置 
 ```
-### 项目运行
+### 项目运行需要完成的事情
 ```lua
 ├── 后端 -- 执行 [演示版本运行必须完成的事情] 后，直接启动即可
 ├── 前端 -- 1. npm insall   2. npm start 具体参照 [传送门](https://github.com/ziroom/demeter-ui/README.md) 中 [搭建步骤] 模块
 ```
-### 正式使用需要完成的事情
+### 正式使用需要完成的事情(根据需要酌情替换)
 
 ``` lua
 ├── 员工画像 -- 完成数据指标的采集分析,根据本系统提供的数据模型 采集指标 定时同步数据指标, 此系统仅提供数据展示能力(演示版 有静态数据提供)。

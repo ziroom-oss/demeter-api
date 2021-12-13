@@ -3,7 +3,7 @@
 ## 友情提示
 > 1. **快速体验项目**：暂未提供，运行项目请参照下文 [演示版本运行必须完成的事情] 板块，完成准备工作。参照 [项目运行] 模块运行项目。
 > 2. **演示版本账号**：管理员账号: gongsl1 密码: 1  普通成员账号: wangzj1 密码: 1。
-> 3. **前端项目地址**：[demeter-ui](https://github.com/ziroom/demeter-ui)
+> 3. **前端项目地址**：[demeter-ui](https://github.com/ziroom-oss/demeter-ui)
 
 
 ## 前言

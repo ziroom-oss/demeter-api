@@ -71,13 +71,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         JwtSubjectModel jwtSubjectModel = jwtSubjectModelModelResult.getResult();
         log.info("[LoginInterceptor] 当前登录用户: {}", JSON.toJSONString(jwtSubjectModel));
 
-        // 续签 -- 如果每次访问都续签，大大浪费Redis的读写， 目前 是 15钟后才续签，Redis 存储 45分钟，极限是半小时登录失效，最大是45分钟失效
-        //
-        //       |~~~~|______________:______________.____________|
-        //      token |             续签                         |
-        //      生成  存            时间                        过期
-        //      时间  Redis                                     时间
-        //            时间
         String userCode = jwtSubjectModel.getCode();
         SopUserRedisStoreModel currentUser = redisFacade.getCurrentUser(userCode);
         if (currentUser == null) {
